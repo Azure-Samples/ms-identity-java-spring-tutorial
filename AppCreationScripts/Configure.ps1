@@ -223,6 +223,14 @@ Function ConfigureApplications
 
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
 
+   # Add Required Resources Access (from 'webApp' to 'Microsoft Graph')
+   Write-Host "Getting access from 'webApp' to 'Microsoft Graph'"
+   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
+                                                -requiredDelegatedPermissions "User.Read" `
+
+   $requiredResourcesAccess.Add($requiredPermissions)
+
+
    Set-AzureADApplication -ObjectId $webAppAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
    Write-Host "Granted permissions."
 
@@ -231,14 +239,7 @@ Function ConfigureApplications
    Write-Host "Updating the sample code ($configFile)"
    $dictionary = @{ "Enter_Your_Tenant_ID_Here" = $tenantId;"Enter_Your_Client_ID_Here" = $webAppAadApplication.AppId;"Enter_Your_Client_Secret_Here" = $webAppAppKey };
    ReplaceInTextFile -configFilePath $configFile -dictionary $dictionary
-   Write-Host ""
-   Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
-   Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
-   Write-Host "- For 'webApp'"
-   Write-Host "  - Navigate to '$webAppPortalUrl'"
-
-   Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
-     
+  
    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
 }
 
