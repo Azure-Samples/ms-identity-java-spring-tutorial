@@ -16,9 +16,7 @@
             "AllowImplicitFlow": false,
             "HomePage": "http://localhost:8080/",
             "ReplyUrls": "http://localhost:8080/login/oauth2/code/azure",
-            "RequiredResourcesAccess": [],
-            "ManualSteps": [
-            ]
+            "RequiredResourcesAccess": []
         }
     ],
     "CodeConfiguration": [
