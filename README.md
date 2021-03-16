@@ -7,11 +7,11 @@ products:
   - msal-java
   - azure-active-directory
   - microsoft-identity-platform  
-name: Enable your Java Spring MVC web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform
+name: Enable your Java Spring MVC web app to sign in users and call Microsoft Graph with the Microsoft identity platform
 urlFragment: ms-identity-java-spring-tutorial
-description: "This sample demonstrates a Java Spring MVC web app that authenticates users against Azure AD"
+description: "This sample demonstrates a Java Spring MVC web app that signs in users and calls Microsoft Graph"
 ---
-# Enable your Java Spring MVC web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform
+# Enable your Java Spring MVC web app to sign in users and call Microsoft Graph with the Microsoft identity platform
 
  1. [Overview](#overview)
  1. [Scenario](#scenario)
@@ -31,16 +31,14 @@ description: "This sample demonstrates a Java Spring MVC web app that authentica
 
 ## Overview
 
-This sample demonstrates a Java Spring MVC web app that signs in users on your Azure Active Directory tenant using the [Azure AD Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory). It uses the OpenID Connect protocol.
+This sample demonstrates a Java Spring MVC web app that signs in users and obtains an access token for calling [Microsoft Graph](https://docs.microsoft.com/graph/overview). It uses the [Azure AD Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory).
 
 ![Overview](./ReadmeFiles/topology.png)
 
 ## Scenario
 
-1. The client Java Spring MVC web app leverages the Azure AD Spring Boot Starter client library for Java to obtain an ID Token from **Azure AD**.
-2. The **ID Token** proves that the user has successfully authenticated with **Azure AD** and allows the user to access protected routes.
-
-![Overview](./ReadmeFiles/topology.png)
+1. This Java Spring MVC web app leverages the **Azure AD Spring Boot Starter client library for Java** to obtain an [Access Token](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) for [Microsoft Graph](https://docs.microsoft.com/graph/overview) from **Azure AD**.
+1. The **Access Token** proves that the user is authorized to access the Microsoft Graph API endpoint as defined in the scope.
 
 ## Contents
 
@@ -69,15 +67,13 @@ From your shell or command line:
 ```console
     git clone https://github.com/Azure-Samples/ms-identity-java-spring-tutorial.git
     cd ms-identity-spring-tutorial
-    cd 1-Authentication/sign-in
+    cd 2-Authorization/call-graph
 ```
 
 or download and extract the repository .zip file.
 
 > :warning: To avoid path length limitations on Windows, we recommend cloning into a directory near the root of your drive.
 
-### Step 2: Install project dependencies
-// Java install
 ### Register the sample application(s) with your Azure Active Directory tenant
 
 There is one project in this sample. To register it, you can:
@@ -120,12 +116,12 @@ As a first step you'll need to:
 1. Sign in to the [Azure portal](https://portal.azure.com).
 1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory** to change your portal session to the desired Azure AD tenant.
 
-### Register the webApp app (java-spring-webapp-auth)
+### Register the webApp app (java-spring-webapp-call-graph)
 
 1. Navigate to the [Azure portal](https://portal.azure.com) and select the **Azure AD** service.
 1. Select the **App Registrations** blade on the left, then select **New registration**.
 1. In the **Register an application page** that appears, enter your application's registration information:
-   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-spring-webapp-auth`.
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-spring-webapp-call-graph`.
    - Under **Supported account types**, select **Accounts in this organizational directory only**.
    - In the **Redirect URI (optional)** section, select **Web** in the combo-box and enter the following redirect URI: `http://localhost:8080/login/oauth2/code/azure`.
 1. Select **Register** to create the application.
@@ -138,7 +134,7 @@ As a first step you'll need to:
    - The generated key value will be displayed when you select the **Add** button. Copy the generated value for use in the steps later.
    - You'll need this key later in your code's configuration files. This key value will not be displayed again, and is not retrievable by any other means, so make sure to note it from the Azure portal before navigating to any other screen or blade.
 
-#### Configure the webApp app (java-spring-webapp-auth) to use your app registration
+#### Configure the webApp app (java-spring-webapp-call-graph) to use your app registration
 
 Open the project in your IDE (Visual Studio Code or IntelliJ IDEA) to configure the code.
 
@@ -146,8 +142,8 @@ Open the project in your IDE (Visual Studio Code or IntelliJ IDEA) to configure 
 
 1. Open the `src\main\resources\application.properties` file.
 1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant ID.
-1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapp-auth` app copied from the Azure portal.
-1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-spring-webapp-auth` copied from the Azure portal.
+1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapp-call-graph` app copied from the Azure portal.
+1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-spring-webapp-call-graph` copied from the Azure portal.
 
 ## Running the sample
 
