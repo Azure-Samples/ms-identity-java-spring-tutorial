@@ -2,15 +2,11 @@ package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.client.web.server.UnAuthenticatedServerOAuth2AuthorizedClientRepository;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -22,11 +18,11 @@ public class MsIdentitySpringBootWebappApplication extends WebSecurityConfigurer
 
 	@Override
     public void configure(HttpSecurity http) throws Exception {
-    http
-        .authorizeRequests()
-		.antMatchers("/token_details").authenticated() 	//limit token_details page to authenticated users
-        .antMatchers("/**").permitAll()					// allow all other endpoints
-		.and().oauth2Login().defaultSuccessUrl("/")
-		.and().logout().logoutUrl("/logout").clearAuthentication(true).logoutSuccessUrl("/");
+		http
+			.authorizeRequests()
+			.antMatchers("/token_details").authenticated()     // limit token_details page to authenticated users
+			.antMatchers("/**").permitAll()                    // allow all other routes.
+			.and().oauth2Login().defaultSuccessUrl("/")        // on successful auth, go to /, unless auth was auto-initiated from a protected endpoint.
+			.and().logout().logoutUrl("/logout").clearAuthentication(true).logoutSuccessUrl("/"); // set logout url, clear authentication on logout, redirect to /
   }
 }
