@@ -1,6 +1,6 @@
 {
     "Sample": {
-        "Title": "Enable your Java Spring MVC web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform",
+        "Title": "Enable your Java Spring MVC web app to sign in users and call Microsoft Graph with the Microsoft identity platform",
         "Level": 100,
         "Client": "Java Spring MVC web app",
         "RepositoryUrl": "ms-identity-java-spring-tutorial",
@@ -9,7 +9,7 @@
     "AADApps": [
         {
             "Id": "webApp",
-            "Name": "java-spring-webapp-auth",
+            "Name": "java-spring-webapp-call-graph",
             "Kind": "WebApp",
             "Audience": "AzureADMyOrg",
             "PasswordCredentials": "Auto",
@@ -17,8 +17,7 @@
             "HomePage": "http://localhost:8080/",
             "ReplyUrls": "http://localhost:8080/login/oauth2/code/azure",
             "RequiredResourcesAccess": [],
-            "ManualSteps": [
-            ]
+            "ManualSteps": []
         }
     ],
     "CodeConfiguration": [

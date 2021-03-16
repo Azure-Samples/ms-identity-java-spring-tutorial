@@ -66,9 +66,9 @@ Function Cleanup
     Write-Host "Cleaning-up applications from tenant '$tenantName'"
 
 
-    Write-Host "Removing 'webApp' (java-spring-webapp-auth) if needed"
-    Get-AzureADApplication -Filter "DisplayName eq 'java-spring-webapp-auth'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
-    $apps = Get-AzureADApplication -Filter "DisplayName eq 'java-spring-webapp-auth'"
+    Write-Host "Removing 'webApp' (java-spring-webapp-call-graph) if needed"
+    Get-AzureADApplication -Filter "DisplayName eq 'java-spring-webapp-call-graph'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
+    $apps = Get-AzureADApplication -Filter "DisplayName eq 'java-spring-webapp-call-graph'"
     if ($apps)
     {
         Remove-AzureADApplication -ObjectId $apps.ObjectId
@@ -77,10 +77,10 @@ Function Cleanup
     foreach ($app in $apps) 
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
-        Write-Host "Removed java-spring-webapp-auth.."
+        Write-Host "Removed java-spring-webapp-call-graph.."
     }
     # also remove service principals of this app
-    Get-AzureADServicePrincipal -filter "DisplayName eq 'java-spring-webapp-auth'" | ForEach-Object {Remove-AzureADServicePrincipal -ObjectId $_.Id -Confirm:$false}
+    Get-AzureADServicePrincipal -filter "DisplayName eq 'java-spring-webapp-call-graph'" | ForEach-Object {Remove-AzureADServicePrincipal -ObjectId $_.Id -Confirm:$false}
     
 
 }
