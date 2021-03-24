@@ -7,11 +7,11 @@ products:
   - msal-java
   - azure-active-directory
   - microsoft-identity-platform  
-name: Enable your Java Spring MVC web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform
+name: Enable your Java Spring Boot web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform
 urlFragment: ms-identity-java-spring-tutorial
-description: "This sample demonstrates a Java Spring MVC web app that authenticates users against Azure AD"
+description: "This sample demonstrates a Java Spring MVC web app that authenticates users with Azure AD"
 ---
-# Enable your Java Spring MVC web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform
+# Enable your Java Spring Boot web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform
 
  1. [Overview](#overview)
  1. [Scenario](#scenario)
@@ -163,11 +163,10 @@ To run the sample in Visual Studio Code, ensure that you have installed the [Jav
   - Alternatively, click the link to `token details`. Since this is a protected page that requires authentication, you'll be automatically redirected to the sign-in page.
 - Follow the instructions on the next page to sign in with an account in the Azure AD tenant.
 - On the consent screen, note the scopes that are being requested.
-- Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`) or the `token details` page, depending on which button you opted to choose for signing in.
+- Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`) or `token details` page, depending on which button you opted to use for signing in.
 - Note the context-sensitive button now says `Sign out` and displays your username to its left.
 - If you are on the home page, you'll see an option to click **ID Token Details**: click it to see some of the ID token's decoded claims.
-- You can also use the button on the top right to sign out.
-- After signing out, you should be able to see your status is signed out.
+- You can also use the button on the top right to sign out. The status page will reflect this.
 
 > :information_source: Did the sample not work for you as expected? Did you encounter issues trying this sample? Then please reach out to us using the [GitHub Issues](../../../../issues) page.
 

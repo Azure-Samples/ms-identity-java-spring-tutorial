@@ -22,7 +22,7 @@ public class SampleController {
      *  Sign in status endpoint
      *  The page demonstrates sign-in status. For full details, see the src/main/webapp/content/status.jsp file.
      * 
-     * @param model Model used for placing claims param and bodyContent param in request before serving UI.
+     * @param model Model used for placing bodyContent param in request before serving UI.
      * @return String the UI.
      */
     @GetMapping(value = {"/", "sign_in_status", "/index"})
@@ -37,7 +37,7 @@ public class SampleController {
      *  For full details, see method: Utilities.filterclaims(OidcUser principal)
      * 
      * @param model Model used for placing claims param and bodyContent param in request before serving UI.
-     * @param principal OidcUser this property contains all ID token claims about the user. See utilities file.
+     * @param principal OidcUser this object contains all ID token claims about the user. See utilities file.
      * @return String the UI.
      */
     @GetMapping(path = "/token_details")
