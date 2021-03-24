@@ -164,7 +164,6 @@ To run the sample in Visual Studio Code, ensure that you have installed the [Jav
 - Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`), `token details` page, or `call graph` page, depending on which button you opted to use for signing in.
 - Note the context-sensitive button now says `Sign out` and displays your username to its left.
 - If you are on the home page, you'll see an option to click **ID Token Details**: click it to see some of the ID token's decoded claims.
-- You can also use the button on the top right to sign out.
 - Click the **Call Graph** button to make a call to Microsoft Graph's [/me endpoint](https://docs.microsoft.com/graph/api/user-get?view=graph-rest-1.0&tabs=java#example-2-signed-in-user-request) endpoint and see a selection of user details obtained.
 - You can also use the button on the top right to sign out. The status page will reflect this.
 
