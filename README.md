@@ -7,11 +7,11 @@ products:
   - msal-java
   - azure-active-directory
   - microsoft-identity-platform  
-name: Enable your Java Spring MVC web app to sign in users and call Microsoft Graph with the Microsoft identity platform
+name: Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform
 urlFragment: ms-identity-java-spring-tutorial
 description: "This sample demonstrates a Java Spring MVC web app that signs in users and calls Microsoft Graph"
 ---
-# Enable your Java Spring MVC web app to sign in users and call Microsoft Graph with the Microsoft identity platform
+# Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform
 
  1. [Overview](#overview)
  1. [Scenario](#scenario)
@@ -52,7 +52,7 @@ This sample demonstrates a Java Spring MVC web app that signs in users and obtai
 
 ## Prerequisites
 
-- [JDK Version 15](https://jdk.java.net/15/). This sample has been developed on Java 15 but may be compatible with other versions.
+- [JDK Version 15](https://jdk.java.net/15/). This sample has been developed on a system with Java 15 but may be compatible with other versions.
 - [Maven 3](https://maven.apache.org/download.cgi)
 - [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) for Visual Studio Code is recommended for running this sample VSCode.
 - An **Azure AD** tenant. For more information see: [How to get an Azure AD tenant](https://docs.microsoft.com/azure/active-directory/develop/quickstart-create-new-tenant)
@@ -67,7 +67,7 @@ From your shell or command line:
 ```console
     git clone https://github.com/Azure-Samples/ms-identity-java-spring-tutorial.git
     cd ms-identity-spring-tutorial
-    cd 2-Authorization/call-graph
+    cd 2-Authorization-I/call-graph
 ```
 
 or download and extract the repository .zip file.
@@ -171,7 +171,7 @@ To run the sample in Visual Studio Code, ensure that you have installed the [Jav
 
 ## We'd love your feedback!
 
-Were we successful in addressing your learning objective? Consider taking a moment to [share your experience with us](Enter_Survey_Form_Link).
+Were we successful in addressing your learning objective? Consider taking a moment to [share your experience with us]([Enter_Survey_Form_Link](https://forms.office.com/r/iTZtCTrZrH).
 
 ## About the code
 
@@ -196,7 +196,7 @@ With this configuration, you should be able to download a functional application
 This app also serves `.jsp` pages, makes use of `JSTL` tags and `Spring Security` tags in the UI. Your design considerations may vary, but if you'd like to use this setup, you must also add the following dependencies to your `pom.xml` file. Make sure that the `spring-security-taglibs` and `tomcat-jasper` versions you add to your `pom.xml` file correspond to your exact `Spring Security` and `Tomcat` versions, respectively.
 
 ```xml
-    <!-- Spring Security Taglibs -->
+    <!-- Spring Security Taglibs. Match version to YOUR version of Spring Security -->
    <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-taglibs</artifactId>
@@ -208,7 +208,7 @@ This app also serves `.jsp` pages, makes use of `JSTL` tags and `Spring Security
          <artifactId>jstl</artifactId>
          <version>1.2</version>
       </dependency>
-   <!-- JSP -->
+   <!-- JSP. Match version to YOUR version of Tomcat -->
    <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>tomcat-jasper</artifactId>
@@ -238,7 +238,7 @@ To sign in, you must make a request to the Azure Active Directory sign-in endpoi
 <a class="btn btn-success" href="/oauth2/authorization/azure">Sign In</a>
 ```
 
-To sign out, you must make POST request to the **logout** endpoint as defined by your `SpringSecurityConfigurerAdapter` (see section below for configuration).
+To sign out, you must make POST request to the **logout** endpoint.
 
 ```HTML
 <form:form action="/logout" method="POST">
@@ -259,35 +259,32 @@ This app has some simple logic in the .jsp pages for determining content to disp
     </sec:authorize>
 ```
 
-### Web security configuration adapter
+### AADWebSecurityConfigurerAdapter
 
-This app protects the **ID Token Details** page so that only logged-in users can access it. To configure your app's specific requirements, extend `WebSecurityConfigurationAdapter` in one of your classes. For example see this app's [MsIdentitySpringBootWebappSample](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/MsIdentitySpringBootWebappApplication.java) class.
+By default, this app protects the **ID Token Details** page so that only logged-in users can access it. This app looks up this value from the `application.properties` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For example see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
 
 ```java
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@SpringBootApplication
-public class MsIdentitySpringBootWebappApplication extends WebSecurityConfigurerAdapter {
-    public static void main(String[] args) {
-        SpringApplication.run(MsIdentitySpringBootWebappApplication.class, args);
-    }
+public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
+  @Value( "${app.protect.authenticated}" )
+  private String[] protectedRoutes;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-            .antMatchers("/token_details").authenticated()     // limit token_details page to authenticated users
-            .antMatchers("/**").permitAll()                    // allow all other routes.
-            .and().oauth2Login().defaultSuccessUrl("/")        // on successful auth, go to /, unless auth was auto-initiated from a protected endpoint.
-            .and().logout().logoutUrl("/logout").clearAuthentication(true).logoutSuccessUrl("/"); // set logout url, clear authentication on logout, redirect to /
-  }
+    // use required configuration form AADWebSecurityAdapter.configure:
+    super.configure(http);
+    // add custom configuration:
+    http.authorizeRequests()
+      .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details)
+      .antMatchers("/**").permitAll();                  // allow all other routes.
+    }
 }
 ```
 
 ## Deployment
-
-// link to deployment sample.
-
+<!-- TODO: link to deployment -->
+// TODO: link to deployment sample.
 
 ## More information
 

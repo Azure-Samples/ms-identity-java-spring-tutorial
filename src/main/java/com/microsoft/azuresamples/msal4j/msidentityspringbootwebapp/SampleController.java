@@ -1,63 +1,65 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapp;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 
 @Controller
 public class SampleController {
+    @Value( "${app.ui.base:base.jsp}" )
+    private String baseUI;
 
-    @Autowired
-    private OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
+    @Value( "${app.ui.content:bodyContent}" )
+    private String content;
 
-    @GetMapping(value = { "/", "sign_in_status", "/index" })
-    public String login(HttpServletRequest req) {
-        req.setAttribute("bodyContent", "content/status.jsp");
-        return "index.jsp";
+    /**
+     *  Sign in status endpoint
+     *  The page demonstrates sign-in status. For full details, see the src/main/webapp/content/status.jsp file.
+     * 
+     * @param model Model used for placing claims param and bodyContent param in request before serving UI.
+     * @return String the UI.
+     */
+    @GetMapping(value = {"/", "sign_in_status", "/index"})
+    public String login(Model model) {
+        model.addAttribute(content, "content/status.jsp");
+        return baseUI;
     }
 
+    /**
+     *  Token details endpoint
+     *  Demonstrates how to extract and make use of token details
+     *  For full details, see method: Utilities.filterclaims(OidcUser principal)
+     * 
+     * @param model Model used for placing claims param and bodyContent param in request before serving UI.
+     * @param principal OidcUser this property contains all ID token claims about the user. See utilities file.
+     * @return String the UI.
+     */
     @GetMapping(path = "/token_details")
-    public String tokenDetails(HttpServletRequest req, @AuthenticationPrincipal OidcUser principal) {
-        req.setAttribute("claims", filterClaims(principal));
-        req.setAttribute("bodyContent", "content/token.jsp");
-        return "index.jsp";
-    }
-
-    @GetMapping(path = "/survey")
-    public String tokenDetails(HttpServletRequest req) {
-        req.setAttribute("bodyContent", "content/survey.jsp");
-        return "index.jsp";
+    public String tokenDetails(Model model, @AuthenticationPrincipal OidcUser principal) {
+        model.addAttribute("claims", Utilities.filterClaims(principal));
+        model.addAttribute(content, "content/token.jsp");
+        return baseUI;
     }
 
     @GetMapping(path = "/call_graph")
-    public String callGraph(HttpServletRequest req, @RegisteredOAuth2AuthorizedClient("graph") OAuth2AuthorizedClient graph) {
-        req.setAttribute('user', toJsonString(graphClient))
-        return "index.jsp";
+    public String callGraph(Model model, @RegisteredOAuth2AuthorizedClient("graph") OAuth2AuthorizedClient graph) {
+        model.addAttribute(content, (graph.toString()));
+        return baseUI;
     }
 
-    private HashMap<String, String> filterClaims(OidcUser principal) {
-        final String[] claimKeys = { "sub", "aud", "ver", "iss", "name", "oid", "preferred_username" };
-        final List<String> includeClaims = Arrays.asList(claimKeys);
-
-        HashMap<String, String> filteredClaims = new HashMap<>();
-        includeClaims.forEach(claim -> {
-            if (principal.getIdToken().getClaims().containsKey(claim)) {
-                filteredClaims.put(claim, principal.getIdToken().getClaims().get(claim).toString());
-            }
-        });
-        return filteredClaims;
+    // survey endpoint - did the sample address your needs?
+    // not an integral a part of this tutorial.
+    @GetMapping(path = "/survey")
+    public String tokenDetails(Model model) {
+        model.addAttribute(content, "content/survey.jsp");
+        return baseUI;
     }
 }

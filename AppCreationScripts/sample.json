@@ -1,8 +1,8 @@
 {
     "Sample": {
-        "Title": "Enable your Java Spring MVC web app to sign in users and call Microsoft Graph with the Microsoft identity platform",
+        "Title": "Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform",
         "Level": 100,
-        "Client": "Java Spring MVC web app",
+        "Client": "Java Spring Boot web app",
         "RepositoryUrl": "ms-identity-java-spring-tutorial",
         "Endpoint": "AAD v2.0"
     },
