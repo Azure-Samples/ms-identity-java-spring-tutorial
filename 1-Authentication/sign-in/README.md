@@ -6,7 +6,6 @@ products:
   - azure
   - msal-java
   - azure-active-directory
-  - microsoft-identity-platform  
 name: Enable your Java Spring Boot web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform
 urlFragment: ms-identity-java-spring-tutorial
 description: "This sample demonstrates a Java Spring MVC web app that authenticates users with Azure AD"
@@ -56,13 +55,13 @@ This sample demonstrates a Java Spring MVC web app that signs in users on your A
 
 - [JDK Version 15](https://jdk.java.net/15/). This sample has been developed on a system with Java 15 but may be compatible with other versions.
 - [Maven 3](https://maven.apache.org/download.cgi)
-- [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) for Visual Studio Code is recommended for running this sample VSCode.
+- [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample VSCode.
 - An **Azure AD** tenant. For more information see: [How to get an Azure AD tenant](https://docs.microsoft.com/azure/active-directory/develop/quickstart-create-new-tenant)
 - A user account in your **Azure AD** tenant. This sample will not work with a **personal Microsoft account**. Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a personal account and have never created a user account in your directory before, you need to do that now.
 
 ## Setup
 
-### Step 1: Clone or download this repository
+### Clone or download this repository
 
 From your shell or command line:
 
