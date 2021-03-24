@@ -50,8 +50,9 @@ public class SampleController {
     }
 
     @GetMapping(path = "/call_graph")
-    public String callGraph(Model model, @RegisteredOAuth2AuthorizedClient("graph") OAuth2AuthorizedClient graph) {
-        model.addAttribute(content, (graph.toString()));
+    public String callGraph(Model model, @RegisteredOAuth2AuthorizedClient("graph") OAuth2AuthorizedClient graphClient) {
+        model.addAttribute("user", Utilities.graphUserProperties(graphClient));
+        model.addAttribute(content, "content/graph.jsp");
         return baseUI;
     }
 

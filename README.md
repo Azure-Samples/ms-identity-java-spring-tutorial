@@ -259,7 +259,7 @@ This app has some simple logic in the .jsp pages for determining content to disp
     </sec:authorize>
 ```
 
-### AADWebSecurityConfigurerAdapter
+### Protecting routes with AADWebSecurityConfigurerAdapter
 
 By default, this app protects the **ID Token Details** page so that only logged-in users can access it. This app looks up this value from the `application.properties` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For example see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
 
@@ -281,6 +281,26 @@ public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
     }
 }
 ```
+
+### Call Graph
+
+When the user navigates to `/call_graph`, the application creates an instance of the GraphServiceClient (Java Graph SDK), passing along the Oauth2Authorized client that AAD boot starter has created. When this is set up properly (see scopes section), it will surface the required Access Token. The GraphServiceClient from hereon gets and places the access token in the Authorization headers of its requests. The app then asks the Graph Client to call the  `/me` endpoint to yield details for the currently signed-in user.
+
+The following code is all that is required for an application developer to write for accessing the `/me` endpoint, provided that they already have a valid access token for Graph Service with the `User.Read` scope.
+
+  ```java
+  //Utilities.java
+  User user = GraphHelper.getGraphSDKClient(graphClient).me().buildRequest().get();
+  ```
+
+### Scopes
+
+- [Scopes](https://docs.microsoft.com/azure/active-directory/develop/v2-permissions-and-consent) tell Azure AD the level of access that the application is requesting.
+- Based on the requested scopes, Azure AD presents a consent dialogue to the user upon signing in.
+- If the user consents to one or more scopes and obtains a token, the scopes-consented-to are encoded into the resulting `access_token`.
+- Note the graph scopes requested by the application by referring to [authentication.properties](./src/main/resources/authentication.properties). By default, the application sets the scopes value to `User.Read`.
+- This particular MS Graph API scope is for accessing the information of the currently-signed-in user. The graph endpoint for accessing this info is `https://graph.microsoft.com/v1.0/me`
+- Any valid requests made to this endpoint must bear an `access_token` that contains the scope `User.Read` in the Authorization header.
 
 ## Deployment
 <!-- TODO: link to deployment -->

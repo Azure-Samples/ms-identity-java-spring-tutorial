@@ -13,6 +13,7 @@
             </c:forEach>
             <br>
             <a class="btn btn-success" href="/sign_in_status">Sign-in Status</a>
+            <a class="btn btn-success" href="/call_graph">Call Graph</a>
         </p>
     </div>
 </div>
