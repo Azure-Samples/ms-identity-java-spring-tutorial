@@ -185,7 +185,7 @@ This sample demonstrates how to use **Azure AD Spring Boot Starter client librar
 
 ### Project Initialization
 
-If you'd like to create a project like this from scratch, you may use [Spring Initializer](start.spring.io):
+If you'd like to create a project like this from scratch, you may use [Spring Initializer](https://start.spring.io):
 
 - For **Project**, select `Maven Project`
 - For **Language**, select `Java`
