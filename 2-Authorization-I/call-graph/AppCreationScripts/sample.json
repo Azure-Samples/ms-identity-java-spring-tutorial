@@ -15,7 +15,7 @@
             "PasswordCredentials": "Auto",
             "AllowImplicitFlow": false,
             "HomePage": "http://localhost:8080/",
-            "ReplyUrls": "http://localhost:8080/login/oauth2/code/azure",
+            "ReplyUrls": "http://localhost:8080/login/oauth2/code",
             "RequiredResourcesAccess": [
                 {
                     "Resource": "Microsoft Graph",

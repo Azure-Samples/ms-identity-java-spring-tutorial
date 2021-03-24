@@ -31,7 +31,7 @@ description: "This sample demonstrates a Java Spring MVC web app that signs in u
 
 ## Overview
 
-This sample demonstrates a Java Spring MVC web app that signs in users and obtains an access token for calling [Microsoft Graph](https://docs.microsoft.com/graph/overview). It uses the [Azure AD Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory).
+This sample demonstrates a Java Spring Boot web app that signs in users and obtains an access token for calling [Microsoft Graph](https://docs.microsoft.com/graph/overview). It uses the [Azure AD Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory) for authentication, authorization, and token acquisition. It leverages [Microsoft Graph SDK for Java](https://github.com/microsoftgraph/msgraph-sdk-java) to obtain data from Graph.
 
 ![Overview](./ReadmeFiles/topology.png)
 
@@ -158,14 +158,15 @@ To run the sample in Visual Studio Code, ensure that you have installed the [Jav
 
 - Note the signed-in or signed-out status displayed at the center of the screen.
 - Click the context-sensitive button at the top right (it will read `Sign In` on first run)
-  - Alternatively, click the link to `token details`. Since this is a protected page that requires authentication, you'll be automatically redirected to the sign-in page.
+  - Alternatively, click the link to `token details` or `call graph`. Since this is a protected page that requires authentication, you'll be automatically redirected to the sign-in page.
 - Follow the instructions on the next page to sign in with an account in the Azure AD tenant.
 - On the consent screen, note the scopes that are being requested.
-- Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`) or the `token details` page, depending on which button you opted to choose for signing in.
+- Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`), `token details` page, or `call graph` page, depending on which button you opted to use for signing in.
 - Note the context-sensitive button now says `Sign out` and displays your username to its left.
 - If you are on the home page, you'll see an option to click **ID Token Details**: click it to see some of the ID token's decoded claims.
 - You can also use the button on the top right to sign out.
-- After signing out, you should be able to see your status is signed out.
+- Click the **Call Graph** button to make a call to Microsoft Graph's [/me endpoint](https://docs.microsoft.com/graph/api/user-get?view=graph-rest-1.0&tabs=java#example-2-signed-in-user-request) endpoint and see a selection of user details obtained.
+- You can also use the button on the top right to sign out. The status page will reflect this.
 
 > :information_source: Did the sample not work for you as expected? Did you encounter issues trying this sample? Then please reach out to us using the [GitHub Issues](../../../../issues) page.
 
@@ -284,23 +285,40 @@ public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
 
 ### Call Graph
 
-When the user navigates to `/call_graph`, the application creates an instance of the GraphServiceClient (Java Graph SDK), passing along the Oauth2Authorized client that AAD boot starter has created. When this is set up properly (see scopes section), it will surface the required Access Token. The GraphServiceClient from hereon gets and places the access token in the Authorization headers of its requests. The app then asks the Graph Client to call the  `/me` endpoint to yield details for the currently signed-in user.
+When the user navigates to `/call_graph`, the application creates an instance of the GraphServiceClient ([Microsoft Graph SDK for Java, v3](https://github.com/microsoftgraph/msgraph-sdk-java)), utilizing an Oauth2AuthorizedClient (`graphAuthorizedClient`) that AAD boot starter has prepared. The app asks the GraphServiceClient to call the  `/me` endpoint and displays details for the currently-signed-in user.
 
-The following code is all that is required for an application developer to write for accessing the `/me` endpoint, provided that they already have a valid access token for Graph Service with the `User.Read` scope.
+The Oauth2AuthorizedClient must be prepared with the correct scopes (see `application.properties` and the following **Scopes** section). It is used to surface the access token and place it in the Authorization header of GraphServiceClient requests.
 
-  ```java
-  //Utilities.java
-  User user = GraphHelper.getGraphSDKClient(graphClient).me().buildRequest().get();
-  ```
+```java
+//see SampleController.java
+@GetMapping(path = "/call_graph")
+public String callGraph(@RegisteredOAuth2AuthorizedClient("graph") OAuth2AuthorizedClient graphAuthorizedClient) {
+  // See the Utilities.graphUserProperties() method for the full example of the following operation:
+  GraphServiceClient graphServiceClient = Utilities.getGraphServiceClient(graphAuthorizedClient);
+  User user = graphServiceClient.me().buildRequest().get();
+  return user.displayName;
+}
+```
+
+```ini
+# see application.properties file
+# Specifies the Microsoft Graph scopes that your app needs access to:
+azure.activedirectory.authorization-clients.graph.scopes=https://graph.microsoft.com/User.Read
+```
 
 ### Scopes
 
-- [Scopes](https://docs.microsoft.com/azure/active-directory/develop/v2-permissions-and-consent) tell Azure AD the level of access that the application is requesting.
-- Based on the requested scopes, Azure AD presents a consent dialogue to the user upon signing in.
-- If the user consents to one or more scopes and obtains a token, the scopes-consented-to are encoded into the resulting `access_token`.
-- Note the graph scopes requested by the application by referring to [authentication.properties](./src/main/resources/authentication.properties). By default, the application sets the scopes value to `User.Read`.
-- This particular MS Graph API scope is for accessing the information of the currently-signed-in user. The graph endpoint for accessing this info is `https://graph.microsoft.com/v1.0/me`
-- Any valid requests made to this endpoint must bear an `access_token` that contains the scope `User.Read` in the Authorization header.
+[Scopes](https://docs.microsoft.com/azure/active-directory/develop/v2-permissions-and-consent) tell Azure AD the level of access that the application is requesting. Note the Microsoft Graph scopes requested by this application by referring to [application.properties](./src/main/resources/application.properties).
+
+- By default, this application sets the scopes value to `https://graph.microsoft.com/User.Read`.
+- The `User.Read` scope is for accessing the information of the currently-signed-in user from the [/me endpoint](https://graph.microsoft.com/v1.0/me).
+- Valid requests to the [/me endpoint](https://graph.microsoft.com/v1.0/me) must contain the `User.Read` scope.
+
+Upon signing in, Azure AD presents a consent dialogue to the user, based on the scopes requested by the application. If the user consents to one or more scopes and obtains a token, the scopes-consented-to are encoded into the resulting **Access Token**.
+
+In this app, the `graphAuthorizedClient` (see previous section) surfaces the **Access Token** that proves which the scopes the user has consented to. The app leverages this to create an instance of `GraphServiceClient` (discussed above) that handles Graph requests.
+
+Using `GraphServiceClient.me().buildRequest().get()`, a request built and made to `https://graph.microsoft.com/v1.0/me`. The **Access Token** is placed in the Authorization header of the request.
 
 ## Deployment
 <!-- TODO: link to deployment -->
