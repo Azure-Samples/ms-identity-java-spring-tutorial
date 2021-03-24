@@ -178,9 +178,9 @@ Were we successful in addressing your learning objective? Consider taking a mome
 
 This sample demonstrates how to use **Azure AD Spring Boot Starter client library for Java** to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web**. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user.
 
-### Project Initialization
+### Project Initializations
 
-If you'd like to create a project like this from scratch, you may use [Spring Initializer](start.spring.io):
+If you'd like to create a project like this from scratch, you may use [Spring Initializer](https://start.spring.io):
 
 - For **Project**, select `Maven Project`
 - For **Language**, select `Java`
