@@ -223,6 +223,14 @@ Function ConfigureApplications
 
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
 
+   # Add Required Resources Access (from 'webApp' to 'Microsoft Graph')
+   Write-Host "Getting access from 'webApp' to 'Microsoft Graph'"
+   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
+                                                -requiredDelegatedPermissions "User.Read" `
+
+   $requiredResourcesAccess.Add($requiredPermissions)
+
+
    Set-AzureADApplication -ObjectId $webAppAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
    Write-Host "Granted permissions."
 
