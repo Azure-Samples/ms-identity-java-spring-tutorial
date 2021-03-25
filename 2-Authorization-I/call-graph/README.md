@@ -65,7 +65,7 @@ From your shell or command line:
 
 ```console
     git clone https://github.com/Azure-Samples/ms-identity-java-spring-tutorial.git
-    cd ms-identity-spring-tutorial
+    cd ms-identity-java-spring-tutorial
     cd 2-Authorization-I/call-graph
 ```
 
