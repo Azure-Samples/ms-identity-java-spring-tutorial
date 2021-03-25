@@ -32,11 +32,11 @@ public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-    // use required configuration form AADWebSecurityAdapter.configure:
+    // use required configuration from AADWebSecurityAdapter.configure:
     super.configure(http);
     // add custom configuration:
     http.authorizeRequests()
-      .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details)
+      .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details, /call_graph)
       .antMatchers("/**").permitAll();                  // allow all other routes.
     }
 }
