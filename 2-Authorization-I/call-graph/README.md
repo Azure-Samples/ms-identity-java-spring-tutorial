@@ -165,7 +165,9 @@ Open the project in your IDE (Visual Studio Code or IntelliJ IDEA) to configure 
 
 To run the sample in Visual Studio Code, ensure that you have installed the [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
 
-1. Open the Explorer window in VS Code (shortcut: ctrl+shift+E).
+1. Open Visual Studio Code in the directory of this readme file.
+1. Open the integrated terminal (shortcut: `ctrl + ~`). Run `mvn clean compile`.
+1. Open the Explorer window in VS Code (shortcut: `ctrl + shift + E`).
 1. Expand the `JAVA PROJECTS` blade.
 1. Click the run button next to `ms-identity-spring-boot-webapp`.
 1. Open your browser and navigate to `http://localhost:8080`.
