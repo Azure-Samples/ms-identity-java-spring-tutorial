@@ -48,7 +48,7 @@ public class Utilities {
      * @return Map<String,String> select Key-Values from User object
      */
     public static Map<String,String> graphUserProperties(OAuth2AuthorizedClient graphAuthorizedClient) {
-        final GraphServiceClient graphServiceClient = Utilities.getGraphSDKClient(graphAuthorizedClient);
+        final GraphServiceClient graphServiceClient = Utilities.getGraphServiceClient(graphAuthorizedClient);
         final User user = graphServiceClient.me().buildRequest().get();
         Map<String,String> userProperties = new HashMap<>();
 
