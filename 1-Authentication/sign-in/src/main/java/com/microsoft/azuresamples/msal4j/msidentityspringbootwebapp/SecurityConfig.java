@@ -32,7 +32,7 @@ public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-    // use required configuration form AADWebSecurityAdapter.configure:
+    // use required configuration from AADWebSecurityAdapter.configure:
     super.configure(http);
     // add custom configuration:
     http.authorizeRequests()
