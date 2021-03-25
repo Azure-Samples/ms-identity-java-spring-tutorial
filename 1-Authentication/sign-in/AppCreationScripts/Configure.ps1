@@ -196,7 +196,7 @@ Function ConfigureApplications
    # create the application 
    $webAppAadApplication = New-AzureADApplication -DisplayName "java-spring-webapp-auth" `
                                                   -HomePage "http://localhost:8080/" `
-                                                  -ReplyUrls "http://localhost:8080/login/oauth2/code" `
+                                                  -ReplyUrls "http://localhost:8080/login/oauth2/code/" `
                                                   -IdentifierUris "https://$tenantName/java-spring-webapp-auth" `
                                                   -PasswordCredentials $key `
                                                   -PublicClient $False
