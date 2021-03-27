@@ -3,28 +3,36 @@ page_type: sample
 languages:
   - java
 products:
-  - azure-active-directory  
-name: Enable your Java Spring MVC web app to restrict access to routes using app roles & the roles claim with the Microsoft identity platform
+  - azure
+  - msal-java
+  - azure-active-directory
+name: Enable your Java Spring Boot web app to restrict access to routes using app roles & the roles claim with the Microsoft identity platform
 urlFragment: ms-identity-java-spring-tutorial
 description: "This sample demonstrates a Java Spring MVC web app that authenticates users with Azure AD and restricts access to routes based on the roles claim from the ID token."
 ---
-# Enable your Java Spring MVC web app to restrict access to routes using app roles & the roles claim with the Microsoft identity platform
+# Enable your Java Spring Boot web app to restrict access to routes using app roles & the roles claim with the Microsoft identity platform
 
- 1. [Overview](#overview)
- 1. [Scenario](#scenario)
- 1. [Contents](#contents)
- 1. [Prerequisites](#prerequisites)
- 1. [Setup](#setup)
- 1. [Registration](#registration)
- 1. [Running the sample](#running-the-sample)
- 1. [Explore the sample](#explore-the-sample)
- 1. [About the code](#about-the-code)
- 1. [Deployment](#deployment)
- 1. [More information](#more-information)
- 1. [Community Help and Support](#community-help-and-support)
- 1. [Contributing](#contributing)
+- [Overview](#overview)
+- [Scenario](#scenario)
+- [Contents](#contents)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+  - [Step 1: Clone or download this repository](#step-1-clone-or-download-this-repository)
+  - [Step 2: Install project dependencies](#step-2-install-project-dependencies)
+  - [Register the sample application with your Azure Active Directory tenant](#register-the-sample-application-with-your-azure-active-directory-tenant)
+  - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
+  - [Register the webApp app (java-spring-webapp-roles)](#register-the-webapp-app-java-spring-webapp-roles)
+- [Running the sample](#running-the-sample)
+- [Explore the sample](#explore-the-sample)
+- [We'd love your feedback!](#wed-love-your-feedback)
+- [About the code](#about-the-code)
+- [Deployment](#deployment)
+  - [Deploying web app to Azure App Services](#deploying-web-app-to-azure-app-services)
+- [More information](#more-information)
+- [Community Help and Support](#community-help-and-support)
+- [Contributing](#contributing)
 
-![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/<BuildNumber>/badge)
+<!-- ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/<BuildNumber>/badge) -->
 
 ## Overview
 
