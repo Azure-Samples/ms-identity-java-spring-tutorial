@@ -1,11 +1,10 @@
-<!-- Not hooked up -->
 <div class="card">
     <h5 class="card-header bg-primary">
-        401: Unauthorized
+        403: Forbidden
     </h5>
     <div class="card-body">
         <p class="card-text">
-            Visiting this page requires you to be <b>authenticated</b>. Use the button on the top right to sign in.
+            Visiting this page requires the signed-in user to be a member of required app role(s).
             <br>
             <a class="btn btn-success" href="/sign_in_status">Sign-in Status</a>
             <a class="btn btn-success" href="/token_details">ID Token Details</a>
