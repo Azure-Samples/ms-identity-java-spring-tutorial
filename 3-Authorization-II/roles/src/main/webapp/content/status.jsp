@@ -21,7 +21,7 @@
                 Attempts to go to a protected page, such as the
                 <a href="/token_details">ID Token Details</a> page or
                 <a href="/admin_only">Admins Only</a> page or
-                <a href="/call_graph">Regular Users</a> page
+                <a href="/regular_user">Regular Users</a> page
                 will result in automatic redirection to Microsoft identity platform sign in page.
             </sec:authorize>
         </p>
