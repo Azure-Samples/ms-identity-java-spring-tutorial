@@ -226,12 +226,12 @@ Were we successful in addressing your learning objective? Consider taking a mome
 
 ## About the code
 
-This sample demonstrates how to use **Azure AD Spring Boot Starter client library for Java** to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web**. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user.
+This sample demonstrates how to use **Azure AD Spring Boot Starter client library for Java** to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web**. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user, and to restrict access to some pages by using the roles claim for authorization.
 
 ### Project Initialization
 
 Create a new Java Maven project and copy the `pom.xml` file from this project, and the `src` folder of this repository.
-This app serves `.jsp` pages, makes use of `JSTL` tags in the UI. Your design considerations may vary, so you may opt to omit `tomcat-jasper` and `JSTL` depending on your requirements.
+This app serves `.jsp` pages, and makes use of `JSTL` tags in the UI. Your design considerations may vary, so you may opt to omit `tomcat-embed-jasper` and `jstl` from the pom file depending on your requirements.
 
 If you'd like to create a project like this from scratch, you may use [Spring Initializer](https://start.spring.io):
 
@@ -244,8 +244,7 @@ If you'd like to create a project like this from scratch, you may use [Spring In
   - Azure Active Directory
   - Spring Oauth2 Client
   - Spring Web
-
-Be sure that it comes with Azure SDK version 3.3 or higher. If not, please consider replacing the `pom.xml` with the `pom.xml` from this repository.
+- Be sure that it comes with Azure SDK version 3.3 or higher. If not, please consider replacing the pre-configured `pom.xml` with the `pom.xml` from this repository.
 
 ### ID Token Claims
 
