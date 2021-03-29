@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="/">Microsoft Identity Platform</a>
-    <span class="navbar-text">Authentication: Use Active Directory Spring Boot Starter to sign in users</span>
+    <span class="navbar-text">Authorization II: Use Active Directory Spring Boot Starter to control access by app roles</span>
     <div class="btn-group ml-auto dropleft">
         <ul class="nav navbar-nav navbar-right">
             <sec:authorize access="isAuthenticated()">
