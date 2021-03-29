@@ -16,15 +16,15 @@
 	<description>Microsoft identity platform Spring Boot sample</description>
 	<properties>
 		<java.version>11</java.version>
-		<azure.version>3.2.0</azure.version>
+		<azure.version>3.3.0</azure.version>
 	</properties>
 	<dependencies>
 
-		<!-- Spring Security Taglibs. Match version to YOUR version of Spring Security -->
+		<!-- Spring Security Taglibs. -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-taglibs</artifactId>
-			<version>5.3.8.RELEASE</version>
+			<version>${spring-security.version}</version>
 		</dependency>
 		<!-- For JSTL on frontend pages -->
 			<dependency>
@@ -32,19 +32,19 @@
 				<artifactId>jstl</artifactId>
 				<version>1.2</version>
 			</dependency>
-		<!-- JSP. Match version to YOUR version of Tomcat -->
+		<!-- JSP. -->
 		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-jasper</artifactId>
-			<version>9.0.43</version>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- For MS Graph -->
-        <dependency>
-            <groupId>com.microsoft.graph</groupId>
-            <artifactId>microsoft-graph</artifactId>
-            <version>3.0.0</version>
-        </dependency>
+		<dependency>
+			<groupId>com.microsoft.graph</groupId>
+			<artifactId>microsoft-graph</artifactId>
+			<version>3.0.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -57,6 +57,7 @@
 		<dependency>
 			<groupId>com.azure.spring</groupId>
 			<artifactId>azure-spring-boot-starter-active-directory</artifactId>
+			<version>3.3.0</version>
 		</dependency>
 
 		<dependency>
@@ -76,17 +77,6 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.azure.spring</groupId>
-				<artifactId>azure-spring-boot-bom</artifactId>
-				<version>${azure.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<build>
 		<plugins>

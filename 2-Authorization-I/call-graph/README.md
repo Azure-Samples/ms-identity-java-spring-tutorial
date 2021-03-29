@@ -179,7 +179,7 @@ To run the sample in Visual Studio Code, ensure that you have installed the [Jav
   - Alternatively, click the link to `token details` or `call graph`. Since this is a protected page that requires authentication, you'll be automatically redirected to the sign-in page.
 - Follow the instructions on the next page to sign in with an account in the Azure AD tenant.
 - On the consent screen, note the scopes that are being requested.
-- Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`), `token details` page, or `call graph` page, depending on which button you opted to use for signing in.
+- Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`), or one of the other pages, depending on which button triggered your sign-in flow.
 - Note the context-sensitive button now says `Sign out` and displays your username to its left.
 - If you are on the home page, you'll see an option to click **ID Token Details**: click it to see some of the ID token's decoded claims.
 - Click the **Call Graph** button to make a call to Microsoft Graph's [/me endpoint](https://docs.microsoft.com/graph/api/user-get?view=graph-rest-1.0&tabs=java#example-2-signed-in-user-request) endpoint and see a selection of user details obtained.
@@ -193,9 +193,12 @@ Were we successful in addressing your learning objective? Consider taking a mome
 
 ## About the code
 
-This sample demonstrates how to use **Azure AD Spring Boot Starter client library for Java** to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web**. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user.
+This sample demonstrates how to use **Azure AD Spring Boot Starter client library for Java** to sign in users into your Azure AD tenant and obtain an **Access Token** for calling **Microsoft Graph**. It also makes use of **Spring Oauth2 Client** and **Spring Web**.
 
 ### Project Initialization
+
+Create a new Java Maven project and copy the `pom.xml` file from this project, and the `src` folder of this repository.
+This app serves `.jsp` pages, and makes use of `JSTL` tags in the UI. Your design considerations may vary, so you may opt to omit `tomcat-embed-jasper` and `jstl` from the pom file depending on your requirements.
 
 If you'd like to create a project like this from scratch, you may use [Spring Initializer](https://start.spring.io):
 
@@ -208,31 +211,7 @@ If you'd like to create a project like this from scratch, you may use [Spring In
   - Azure Active Directory
   - Spring Oauth2 Client
   - Spring Web
-
-With this configuration, you should be able to download a functional application.
-
-This app also serves `.jsp` pages, makes use of `JSTL` tags and `Spring Security` tags in the UI. Your design considerations may vary, but if you'd like to use this setup, you must also add the following dependencies to your `pom.xml` file. Make sure that the `spring-security-taglibs` and `tomcat-jasper` versions you add to your `pom.xml` file correspond to your exact `Spring Security` and `Tomcat` versions, respectively.
-
-```xml
-    <!-- Spring Security Taglibs. Match version to YOUR version of Spring Security -->
-   <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-taglibs</artifactId>
-      <version>5.3.8.RELEASE</version>
-   </dependency>
-   <!-- For JSTL on frontend pages -->
-      <dependency>
-         <groupId>jstl</groupId>
-         <artifactId>jstl</artifactId>
-         <version>1.2</version>
-      </dependency>
-   <!-- JSP. Match version to YOUR version of Tomcat -->
-   <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-jasper</artifactId>
-      <version>9.0.43</version>
-   </dependency>
-```
+- Be sure that it comes with Azure SDK version 3.3 or higher. If not, please consider replacing the pre-configured `pom.xml` with the `pom.xml` from this repository.
 
 ### ID Token Claims
 
