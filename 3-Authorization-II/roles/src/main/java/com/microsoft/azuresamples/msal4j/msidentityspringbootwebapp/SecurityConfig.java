@@ -36,7 +36,7 @@ public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
     super.configure(http);
     // add custom configuration:
     http.authorizeRequests()
-      .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details, /call_graph)
+      .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details, /admin_only, /regular_user)
       .antMatchers("/**").permitAll();                  // allow all other routes.
     }
 }

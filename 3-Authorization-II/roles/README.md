@@ -6,28 +6,32 @@ products:
   - azure
   - msal-java
   - azure-active-directory
-name: Enable your Java Spring Boot web app to restrict access to routes using app roles & the roles claim with the Microsoft identity platform
+name: Enable your Java Spring Boot web app to restrict access to routes using app roles with the Microsoft identity platform
 urlFragment: ms-identity-java-spring-tutorial
 description: "This sample demonstrates a Java Spring MVC web app that authenticates users with Azure AD and restricts access to routes based on the roles claim from the ID token."
 ---
-# Enable your Java Spring Boot web app to restrict access to routes using app roles & the roles claim with the Microsoft identity platform
+# Enable your Java Spring Boot web app to restrict access to routes using app roles with the Microsoft identity platform
 
 - [Overview](#overview)
 - [Scenario](#scenario)
 - [Contents](#contents)
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
-  - [Step 1: Clone or download this repository](#step-1-clone-or-download-this-repository)
-  - [Step 2: Install project dependencies](#step-2-install-project-dependencies)
+  - [Clone or download this repository](#clone-or-download-this-repository)
   - [Register the sample application with your Azure Active Directory tenant](#register-the-sample-application-with-your-azure-active-directory-tenant)
   - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
-  - [Register the webApp app (java-spring-webapp-roles)](#register-the-webapp-app-java-spring-webapp-roles)
+  - [Register the web app (java-spring-webapp-roles)](#register-the-web-app-java-spring-webapp-roles)
 - [Running the sample](#running-the-sample)
 - [Explore the sample](#explore-the-sample)
 - [We'd love your feedback!](#wed-love-your-feedback)
 - [About the code](#about-the-code)
+  - [Project Initialization](#project-initialization)
+  - [ID Token Claims](#id-token-claims)
+  - [Processing Roles claim in the ID token](#processing-roles-claim-in-the-id-token)
+  - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
+  - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
+  - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
 - [Deployment](#deployment)
-  - [Deploying web app to Azure App Services](#deploying-web-app-to-azure-app-services)
 - [More information](#more-information)
 - [Community Help and Support](#community-help-and-support)
 - [Contributing](#contributing)
@@ -36,14 +40,31 @@ description: "This sample demonstrates a Java Spring MVC web app that authentica
 
 ## Overview
 
-This sample demonstrates a Java Spring MVC web app that authenticates users against Azure AD.
+This sample demonstrates a Java Spring Boot web app that uses the [Azure AD Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory) for authentication, authorization, and token acquisition with the [OpenID Connect](https://docs.microsoft.com/azure/active-directory/develop/v1-protocols-openid-connect-code) protocol to sign in users, and restricts access to some routes using [**Azure AD Application Roles (app roles)**](https://docs.microsoft.com/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps) for authorization.
+
+App roles, along with Security groups are popular means to implement authorization. Using RBAC with Application Roles and Role Claims, developers can securely enforce authorization policies with minimal effort on their part. Another approach is to use Azure AD Groups and Group Claims. Azure AD Groups and Application Roles are by no means mutually exclusive; they can be used in tandem to provide even finer grained access control.
+
+A Microsoft Identity Platform Office Hours session covered Azure AD App roles and security groups, featuring a similar scenario. A recording of the session is is provided in this video [Using Security Groups and Application Roles in your apps](https://www.youtube.com/watch?v=LRoc-na27l0)
+
+For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
+
+![Overview](./ReadmeFiles/topology.png)
 
 ## Scenario
 
-1. The client Java Spring MVC web app uses the Microsoft Authentication Library (MSAL) to obtain an ID Token from **Azure AD**.
-2. The **ID Token** proves that the user has successfully authenticated against **Azure AD**.
+1. This Java Spring MVC web app leverages the **Azure AD Spring Boot Starter client library for Java** to sign in a user and obtain an [ID Token](https://docs.microsoft.com/azure/active-directory/develop/id-tokens) from **Azure AD**.
+1. The **ID Token** token contains the **roles** claim. The application inspects the value of this claim to determine which pages the user is authorized to access.
 
-![Overview](./ReadmeFiles/topology.png)
+This kind of authorization is implemented using role-based access control (RBAC). When using RBAC, an administrator grants permissions to roles, not to individual users or groups. The administrator can then assign roles to different users and groups to control who has then access to certain content and functionality.  
+
+This sample application defines the following two *Application Roles*:
+
+- `PrivilegedAdmin`: Authorized to access the `Admins Only` and the `Regular Users` pages.
+- `RegularUser`: Authorized to access the `Regular Users` page.
+
+These application roles are defined in the [Azure portal](https://portal.azure.com) in the application's registration manifest.  When a user signs into the application, Azure AD emits a `roles` claim for each role that the user has been granted individually to the user in the from of role membership.  Assignment of users and groups to roles can be done through the portal's UI, or programmatically using the [Microsoft Graph](https://graph.microsoft.com) and [Azure AD PowerShell](https://docs.microsoft.com/powershell/module/azuread/?view=azureadps-2.0). In this sample, application role management is done through the Azure portal or using PowerShell.
+
+⚠️NOTE: Role claims will not be present for guest users in a tenant if the `https://login.microsoftonline.com/common/` endpoint is used as the authority to sign in users. You need to sign-in a user to a tenanted endpoint like 'https://login.microsoftonline.com/tenantid'
 
 ## Contents
 
@@ -57,28 +78,27 @@ This sample demonstrates a Java Spring MVC web app that authenticates users agai
 
 ## Prerequisites
 
- // Enter Java Environment Requirements
-
+- [JDK Version 15](https://jdk.java.net/15/). This sample has been developed on a system with Java 15 but may be compatible with other versions.
+- [Maven 3](https://maven.apache.org/download.cgi)
+- [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample VSCode.
 - An **Azure AD** tenant. For more information see: [How to get an Azure AD tenant](https://docs.microsoft.com/azure/active-directory/develop/quickstart-create-new-tenant)
 - A user account in your **Azure AD** tenant. This sample will not work with a **personal Microsoft account**. Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a personal account and have never created a user account in your directory before, you need to do that now.
 
 ## Setup
 
-### Step 1: Clone or download this repository
+### Clone or download this repository
 
 From your shell or command line:
 
 ```console
     git clone https://github.com/Azure-Samples/ms-identity-java-spring-tutorial.git
+    cd ms-identity-java-spring-tutorial
+    cd 3-Authorization-II/roles
 ```
 
 or download and extract the repository .zip file.
 
 > :warning: To avoid path length limitations on Windows, we recommend cloning into a directory near the root of your drive.
-
-### Step 2: Install project dependencies
-
-// Java install
 
 ### Register the sample application with your Azure Active Directory tenant
 
@@ -123,14 +143,14 @@ As a first step you'll need to:
 1. Sign in to the [Azure portal](https://portal.azure.com).
 1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory** to change your portal session to the desired Azure AD tenant.
 
-### Register the webApp app (java-spring-webapp-roles)
+### Register the web app (java-spring-webapp-roles)
 
 1. Navigate to the [Azure portal](https://portal.azure.com) and select the **Azure AD** service.
 1. Select the **App Registrations** blade on the left, then select **New registration**.
 1. In the **Register an application page** that appears, enter your application's registration information:
    - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-spring-webapp-roles`.
    - Under **Supported account types**, select **Accounts in this organizational directory only**.
-   - In the **Redirect URI (optional)** section, select **Web** in the combo-box and enter the following redirect URI: `http://localhost:8080/login/oauth2/code/azure`.
+   - In the **Redirect URI (optional)** section, select **Web** in the combo-box and enter the following redirect URI: `http://localhost:8080/login/oauth2/code/`.
 1. Select **Register** to create the application.
 1. In the app's registration screen, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
 1. Select **Save** to save your changes.
@@ -141,7 +161,26 @@ As a first step you'll need to:
    - The generated key value will be displayed when you select the **Add** button. Copy the generated value for use in the steps later.
    - You'll need this key later in your code's configuration files. This key value will not be displayed again, and is not retrievable by any other means, so make sure to note it from the Azure portal before navigating to any other screen or blade.
 
-#### Configure the webApp app (java-spring-webapp-roles) to use your app registration
+#### Define the app Roles
+
+1. Still on the same app registration, select the **App roles** blade to the left.
+1. Select **Create app role**:
+    - For **Display name**, enter a suitable name, for instance **PrivilegedAdmin**.
+    - For **Allowed member types**, choose **User**.
+    - For **Value**, enter **PrivilegedAdmin**.
+    - For **Description**, enter **PrivilegedAdmins who can view the Admin Page**.
+1. Select **Create app role**:
+    - For **Display name**, enter a suitable name, for instance **RegularUser**.
+    - For **Allowed member types**, choose **User**.
+    - For **Value**, enter **RegularUser**.
+    - For **Description**, enter **RegularUsers who can view the User Page**.
+1. Select **Apply** to save your changes.
+
+#### Assign users to app roles
+
+ To add users to the app role defined earlier, follow the guidelines here: [Assign users and groups to roles.](https://docs.microsoft.com/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps#assign-users-and-groups-to-roles)
+
+#### Configure the web app (java-spring-webapp-roles) to use your app registration
 
 Open the project in your IDE (like Visual Studio or Visual Studio Code) to configure the code.
 
@@ -151,49 +190,171 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant ID.
 1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapp-roles` app copied from the Azure portal.
 1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-spring-webapp-roles` copied from the Azure portal.
+1. Open the `src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootapplication/Sample.Controller.java` file.
+1. Find the references to `PrivilegedUser` and `RegularUser` app roles in this file. If necessary, change them to reflect the app role names you chose in the previous steps.
 
 ## Running the sample
 
-// Java start
+To run the sample in Visual Studio Code, ensure that you have installed the [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
+
+1. Open Visual Studio Code in the directory of this readme file.
+1. Open the integrated terminal (shortcut: `ctrl + ~`). Run `mvn clean compile`.
+1. Open the Explorer window in VS Code (shortcut: `ctrl + shift + E`).
+1. Expand the `JAVA PROJECTS` blade.
+1. Click the run button next to `ms-identity-spring-boot-webapp`.
+1. Open your browser and navigate to `http://localhost:8080`.
 
 ## Explore the sample
 
-> Explain how to explore the sample.
-> Insert a screenshot of the client application.
+- Note the signed-in or signed-out status displayed at the center of the screen.
+- Click the context-sensitive button at the top right (it will read `Sign In` on first run)
+- Alternatively, click the link to `token details`, `admins only` or `regular users`. Since these are protected pages that require authentication, you'll be automatically redirected to the sign-in page.
+- Follow the instructions on the next page to sign in with an account in the Azure AD tenant.
+- On the consent screen, note the scopes that are being requested.
+- Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`), or one of the other pages, depending on which button triggered your sign-in flow.
+- Note the context-sensitive button now says `Sign out` and displays your username to its left.
+- If you are on the home page, you'll see an option to click **ID Token Details**: click it to see some of the ID token's decoded claims, including **roles**.
+- Click the **Admins Only** button to view the `/admin_only`. Only users with app role **PrivilegedAdmin** will be able to view this page. Otherwise an authorization failure message will be displayed.
+- Click the **Regular Users** button to view the `/regular_user` page. Only users with app role **RegularUser** or **PrivilegedAdmin** will be able to view this page. Otherwise an authorization failure message will be displayed.
+- You can also use the button on the top right to sign out. The status page will reflect this.
 
-> :information_source: Did the sample not work for you as expected? Then please reach out to us using the [GitHub Issues](../../../issues) page.
+> :information_source: Did the sample not work for you as expected? Then please reach out to us using the [GitHub Issues](../../../../issues) page.
 
 ## We'd love your feedback!
 
-Were we successful in addressing your learning objective? Consider taking a moment to [share your experience with us](Enter_Survey_Form_Link).
+Were we successful in addressing your learning objective? Consider taking a moment to [share your experience with us](https://forms.office.com/r/iTZtCTrZrH).
 
 ## About the code
 
-> - Describe where the code uses auth libraries, or calls the graph
-> - Describe specific aspects (e.g. caching, validation etc.)
+This sample demonstrates how to use **Azure AD Spring Boot Starter client library for Java** to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web**. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user.
+
+### Project Initialization
+
+Create a new Java Maven project and copy the `pom.xml` file from this project, and the `src` folder of this repository.
+This app serves `.jsp` pages, makes use of `JSTL` tags in the UI. Your design considerations may vary, so you may opt to omit `tomcat-jasper` and `JSTL` depending on your requirements.
+
+If you'd like to create a project like this from scratch, you may use [Spring Initializer](https://start.spring.io):
+
+- For **Project**, select `Maven Project`
+- For **Language**, select `Java`
+- For **Spring Boot**, select version `2.3.9`
+- For **Packaging**, select `Jar`
+- For **Java** select version `11`
+- For **Dependencies**, add the following:
+  - Azure Active Directory
+  - Spring Oauth2 Client
+  - Spring Web
+
+Be sure that it comes with Azure SDK version 3.3 or higher. If not, please consider replacing the `pom.xml` with the `pom.xml` from this repository.
+
+### ID Token Claims
+
+To extract token details, make use of Spring Security's `AuthenticationPrincipal` and `OidcUser` object in a request mapping. See the [Sample Controller](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SampleController.java) for an example of this app making use of ID Token claims.
+
+```java
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+//...
+@GetMapping(path = "/some_path")
+public String tokenDetails(@AuthenticationPrincipal OidcUser principal) {
+    Map<String, Object> claims = principal.getIdToken().getClaims();
+}
+```
+
+### Processing Roles claim in the ID token
+
+The name of the the roles that the signed in user is assigned to is returned in the `roles` claim of the token.
+
+```JSON
+{
+  ...
+  "roles": [
+    "PrivilegedUser",
+    "RegularUser",]
+  ...
+}
+```
+
+A common way to access them is documented in the **ID Token Claims** section above.
+Azure AD Boot Starter (v3.3 and above) also parses the roles claim automatically and adds each role to the signed in user's **Authorities**, prefixing each with the string `APPROLE_`. This allows developers to make use of app roles with Spring **PrePost** condition annotations using the `hasAuthority` method. For example, you'll find the following `@PreAuthorize` conditions demonstrated in `SampleController.java`:
+
+```java
+    @GetMapping(path = "/admin_only")
+    @PreAuthorize("hasAuthority('APPROLE_PrivilegedUser')")
+    public String adminOnly(Model model) {
+        // restrict to users who have PrivilegedUser app role only
+    }
+    @GetMapping(path = "/regular_user")
+    @PreAuthorize("hasAnyAuthority('APPROLE_PrivilegedUser','APPROLE_RegularUser')")
+    public String regularUser(Model model) {
+       // restrict to users who have any of RegularUser or PrivilegedUser app roles
+    }
+```
+
+To see a full list of authorities for a given user:
+
+ ```java
+@GetMapping(path = "/some_path")
+public String tokenDetails(@AuthenticationPrincipal OidcUser principal) {
+    Collection<? extends GrantedAuthority> authorities = principal.getAuthorities();
+}
+```
+
+### Sign-in and sign-out links
+
+To sign in, you must make a request to the Azure Active Directory sign-in endpoint that is automatically configured by **Azure AD Spring Boot Starter client library for Java**.
+
+```html
+<a class="btn btn-success" href="/oauth2/authorization/azure">Sign In</a>
+```
+
+To sign out, you must make POST request to the **logout** endpoint.
+
+```HTML
+<form:form action="/logout" method="POST">
+    <input class="btn btn-warning" type="submit" value="Sign Out" />
+</form:form>
+```
+
+### Authentication-dependent UI elements
+
+This app has some simple logic in the .jsp pages for determining content to display based on whether the user is authenticated or not. For example, the following Spring Security Tags may be used:
+
+```html
+    <sec:authorize access="isAuthenticated()">
+        <!-- this content only shows to authenticated users -->
+    </sec:authorize>
+    <sec:authorize access="isAnonymous()">
+        <!-- this content only shows to not-authenticated users -->
+    </sec:authorize>
+```
+
+### Protecting routes with AADWebSecurityConfigurerAdapter
+
+By default, this app protects the **ID Token Details**, **Admins Only** and **Regular Users** pages so that only logged-in users can access them. This app uses configures these routes from the `app.protect.authenticated` property from the `application.properties` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For an example, see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
+
+```java
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
+  @Value( "${app.protect.authenticated}" )
+  private String[] protectedRoutes;
+
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+    // use required configuration form AADWebSecurityAdapter.configure:
+    super.configure(http);
+    // add custom configuration:
+    http.authorizeRequests()
+      .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details, /admin_only, /regular_user)
+      .antMatchers("/**").permitAll();                  // allow all other routes.
+    }
+}
+```
 
 ## Deployment
-
-// deployment steps
-
-### Deploying web app to Azure App Services
-
-There is one web app in this sample. To deploy it to **Azure App Services**, you'll need to:
-
-- create an **Azure App Service**
-- publish the projects to the **App Services**, and
-- update its client(s) to call the website instead of the local environment.
-
-#### Update the Azure AD app registration (java-spring-webapp-roles)
-
-1. Navigate back to to the [Azure portal](https://portal.azure.com).
-In the left-hand navigation pane, select the **Azure Active Directory** service, and then select **App registrations (Preview)**.
-1. In the resulting screen, select the `java-spring-webapp-roles` application.
-1. In the app's registration screen, select **Authentication** in the menu.
-   - In the **Redirect URIs** section, update the reply URLs to match the site URL of your Azure deployment. For example:
-      - `https://java-spring-webapp-roles.azurewebsites.net/login/oauth2/code/azure`
-
-> :warning: If your app is using an *in-memory* storage, **Azure App Services** will spin down your web site if it is inactive, and any records that your app was keeping will emptied. In addition, if you increase the instance count of your website, requests will be distributed among the instances. Your app's records, therefore, will not be the same on each instance.
+<!-- TODO: link to deployment -->
+// TODO: link to deployment sample.
 
 ## More information
 
@@ -206,7 +367,9 @@ In the left-hand navigation pane, select the **Azure Active Directory** service,
 - [Application and service principal objects in Azure Active Directory](https://docs.microsoft.com/azure/active-directory/develop/app-objects-and-service-principals)
 - [National Clouds](https://docs.microsoft.com/azure/active-directory/develop/authentication-national-cloud#app-registration-endpoints)
 - [MSAL code samples](https://docs.microsoft.com/azure/active-directory/develop/sample-v2-code)
-    // Add MSAL-java docs
+- [Azure Active Directory Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory)
+- [Microsoft Authentication Library for Java (MSAL4J)](https://github.com/AzureAD/microsoft-authentication-library-for-java)
+- [MSAL4J Wiki](https://github.com/AzureAD/microsoft-authentication-library-for-java/wiki)
 
 For more information about how OAuth 2.0 protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](https://docs.microsoft.com/azure/active-directory/develop/authentication-flows-app-scenarios).
 

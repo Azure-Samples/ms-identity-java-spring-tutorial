@@ -5,11 +5,11 @@ package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapp;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 @Controller
-public class SampleController implements ErrorController {
+public class SampleController {
     @Value( "${app.ui.base:base.jsp}" )
     private String baseUI;
 
@@ -83,15 +83,23 @@ public class SampleController implements ErrorController {
         return baseUI;
     }
 
+    /**
+     *  handleError - show custom 403 page on failing to meet roles requirements
+     * @param model Model used for placing user param and bodyContent param in request before serving UI.
+     * @param req used to determine which endpoint triggered this, in order to display correct error message.
+     * @param adex the access-denied exception
+     * @return String the UI.
+     */
     @ExceptionHandler(AccessDeniedException.class)
-    public String handleError(Model model, AccessDeniedException adex) {
+    public String handleError(Model model, AccessDeniedException adex, HttpServletRequest req) {
+        String path = req.getServletPath();
+        if (path.equals("regular_user")) {
+            model.addAttribute("roles", "PrivilegedUser, RegularUser");
+        } else if (path.equals("admin_only")) {
+            model.addAttribute("roles", "PrivilegedUser");
+        }
         model.addAttribute(content, "content/403.jsp");
         return baseUI;
-    }
-
-    @Override
-    public String getErrorPath() {
-        return null;
     }
 
     // survey endpoint - did the sample address your needs?
