@@ -56,14 +56,14 @@ public class SampleController {
     /**
      *  Admin Only endpoint
      *  Demonstrates how to filter so only users with admin role can access.
-     * 
+     * @param req used to determine which endpoint triggered this, in order to display required roles.
      * @param model Model used for placing user param and bodyContent param in request before serving UI.
      * @return String the UI.
      */
     @GetMapping(path = "/admin_only")
     @PreAuthorize("hasAuthority('APPROLE_PrivilegedUser')")
-    public String adminOnly(Model model) {
-        model.addAttribute("roles", "PrivilegedUser");
+    public String adminOnly(Model model, HttpServletRequest req) {
+        addRolesAttribute(model, req);
         model.addAttribute(content, "content/role.jsp");
         return baseUI;
     }
@@ -71,14 +71,14 @@ public class SampleController {
     /**
      *  Regular User endpoint
      *  Demonstrates how to filter so only users with ONE OF or BOTH of PrivilegedUser OR RegularUser role can access.
-     * 
+     * @param req used to determine which endpoint triggered this, in order to display required roles.
      * @param model Model used for placing user param and bodyContent param in request before serving UI.
      * @return String the UI.
      */
     @GetMapping(path = "/regular_user")
     @PreAuthorize("hasAnyAuthority('APPROLE_RegularUser','APPROLE_RegularUser')")
-    public String regularUser(Model model) {
-        model.addAttribute("roles", "PrivilegedUser, RegularUser");
+    public String regularUser(Model model, HttpServletRequest req) {
+        addRolesAttribute(model, req);
         model.addAttribute(content, "content/role.jsp");
         return baseUI;
     }
@@ -86,20 +86,24 @@ public class SampleController {
     /**
      *  handleError - show custom 403 page on failing to meet roles requirements
      * @param model Model used for placing user param and bodyContent param in request before serving UI.
-     * @param req used to determine which endpoint triggered this, in order to display correct error message.
+     * @param req used to determine which endpoint triggered this, in order to display required roles.
      * @param adex the access-denied exception
      * @return String the UI.
      */
     @ExceptionHandler(AccessDeniedException.class)
     public String handleError(Model model, AccessDeniedException adex, HttpServletRequest req) {
+        addRolesAttribute(model, req);
+        model.addAttribute(content, "content/403.jsp");
+        return baseUI;
+    }
+
+    private void addRolesAttribute(Model model, HttpServletRequest req) {
         String path = req.getServletPath();
         if (path.equals("regular_user")) {
             model.addAttribute("roles", "PrivilegedUser, RegularUser");
         } else if (path.equals("admin_only")) {
             model.addAttribute("roles", "PrivilegedUser");
         }
-        model.addAttribute(content, "content/403.jsp");
-        return baseUI;
     }
 
     // survey endpoint - did the sample address your needs?
