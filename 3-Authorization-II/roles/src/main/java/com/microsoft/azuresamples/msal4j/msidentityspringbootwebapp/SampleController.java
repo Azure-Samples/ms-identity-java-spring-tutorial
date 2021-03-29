@@ -61,7 +61,7 @@ public class SampleController {
      * @return String the UI.
      */
     @GetMapping(path = "/admin_only")
-    @PreAuthorize("hasAuthority('APPROLE_PrivilegedUser')")
+    @PreAuthorize("hasAuthority('APPROLE_PrivilegedAdmin')")
     public String adminOnly(Model model, HttpServletRequest req) {
         addRolesAttribute(model, req);
         model.addAttribute(content, "content/role.jsp");
@@ -76,7 +76,7 @@ public class SampleController {
      * @return String the UI.
      */
     @GetMapping(path = "/regular_user")
-    @PreAuthorize("hasAnyAuthority('APPROLE_PrivilegedUser','APPROLE_RegularUser')")
+    @PreAuthorize("hasAnyAuthority('APPROLE_PrivilegedAdmin','APPROLE_RegularUser')")
     public String regularUser(Model model, HttpServletRequest req) {
         addRolesAttribute(model, req);
         model.addAttribute(content, "content/role.jsp");
@@ -100,9 +100,9 @@ public class SampleController {
     private void addRolesAttribute(Model model, HttpServletRequest req) {
         String path = req.getServletPath();
         if (path.equals("/regular_user")) {
-            model.addAttribute("roles", "PrivilegedUser, RegularUser");
+            model.addAttribute("roles", "PrivilegedAdmin, RegularUser");
         } else if (path.equals("/admin_only")) {
-            model.addAttribute("roles", "PrivilegedUser");
+            model.addAttribute("roles", "PrivilegedAdmin");
         }
     }
 

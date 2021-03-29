@@ -191,7 +191,7 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapp-roles` app copied from the Azure portal.
 1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-spring-webapp-roles` copied from the Azure portal.
 1. Open the `src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootapplication/Sample.Controller.java` file.
-1. Find the references to `PrivilegedUser` and `RegularUser` app roles in this file. If necessary, change them to reflect the app role names you chose in the previous steps.
+1. Find the references to `PrivilegedAdmin` and `RegularUser` app roles in this file. If necessary, change them to reflect the app role names you chose in the previous steps.
 
 ## Running the sample
 
@@ -268,7 +268,7 @@ The name of the the roles that the signed in user is assigned to is returned in 
 {
   ...
   "roles": [
-    "PrivilegedUser",
+    "PrivilegedAdmin",
     "RegularUser",]
   ...
 }
@@ -279,14 +279,14 @@ Azure AD Boot Starter (v3.3 and above) also parses the roles claim automatically
 
 ```java
     @GetMapping(path = "/admin_only")
-    @PreAuthorize("hasAuthority('APPROLE_PrivilegedUser')")
+    @PreAuthorize("hasAuthority('APPROLE_PrivilegedAdmin')")
     public String adminOnly(Model model) {
-        // restrict to users who have PrivilegedUser app role only
+        // restrict to users who have PrivilegedAdmin app role only
     }
     @GetMapping(path = "/regular_user")
-    @PreAuthorize("hasAnyAuthority('APPROLE_PrivilegedUser','APPROLE_RegularUser')")
+    @PreAuthorize("hasAnyAuthority('APPROLE_PrivilegedAdmin','APPROLE_RegularUser')")
     public String regularUser(Model model) {
-       // restrict to users who have any of RegularUser or PrivilegedUser app roles
+       // restrict to users who have any of RegularUser or PrivilegedAdmin app roles
     }
 ```
 
