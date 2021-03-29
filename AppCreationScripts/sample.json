@@ -1,8 +1,8 @@
 {
     "Sample": {
-        "Title": "Enable your Java Spring MVC web app to restrict access to routes using app roles & the roles claim with the Microsoft identity platform",
+        "Title": "Enable your Java Spring Boot web app to restrict access to routes using app roles & the roles claim with the Microsoft identity platform",
         "Level": 100,
-        "Client": "Java Spring MVC web app",
+        "Client": "Java Spring Boot web app",
         "RepositoryUrl": "ms-identity-java-spring-tutorial",
         "Endpoint": "AAD v2.0"
     },
@@ -15,7 +15,7 @@
             "PasswordCredentials": "Auto",
             "AllowImplicitFlow": false,
             "HomePage": "http://localhost:8080/",
-            "ReplyUrls": "http://localhost:8080/login/oauth2/code/azure",
+            "ReplyUrls": "http://localhost:8080/login/oauth2/code/",
             "RequiredResourcesAccess": [],
             "ManualSteps": [
                 {
