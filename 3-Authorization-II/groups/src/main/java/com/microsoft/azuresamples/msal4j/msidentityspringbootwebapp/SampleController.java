@@ -75,7 +75,7 @@ public class SampleController {
      * @param model Model used for placing user param and bodyContent param in request before serving UI.
      * @return String the UI.
      */
-    @GetMapping(path = "/preauthorize_group")
+    @GetMapping(path = "/preauthorize_groups")
     @PreAuthorize("hasRole('ROLE_TestGroup1') && hasRole('ROLE_TestGroup2')")
     public String preAuthorizeGroup(Model model, HttpServletRequest req) {
         addGroupsAttribute(model, req);
@@ -93,7 +93,7 @@ public class SampleController {
      * @param req used to determine which endpoint triggered this, in order to display required groups.
      * @return String the UI.
      */
-    @GetMapping(path = "/token_group")
+    @GetMapping(path = "/token_groups")
     public String tokenGroup(Model model, @AuthenticationPrincipal OidcUser principal,
             @RegisteredOAuth2AuthorizedClient("graph") OAuth2AuthorizedClient graphAuthorizedClient,
             HttpServletRequest req) {
@@ -149,7 +149,6 @@ public class SampleController {
      */
     @ExceptionHandler(AccessDeniedException.class)
     public String handleError(Model model, AccessDeniedException adex, HttpServletRequest req) {
-        // addRolesAttribute(model, req);
         addGroupsAttribute(model, req);
         model.addAttribute(content, "content/403.jsp");
         return baseUI;
@@ -157,9 +156,9 @@ public class SampleController {
 
     private void addGroupsAttribute(Model model, HttpServletRequest req) {
         String path = req.getServletPath();
-        if (path.equals("preauthorize_group")) {
+        if (path.equals("/preauthorize_groups")) {
             model.addAttribute("groupsRequired", "TestGroup1, TestGroup2");
-        } else if (path.equals("token_group") || path.equals("graph_group")) {
+        } else if (path.equals("/token_groups") || path.equals("/graph_groups")) {
             model.addAttribute("groupsRequired", manualVerificationGroups.toString() );
         }
     }
