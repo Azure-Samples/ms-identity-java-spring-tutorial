@@ -5,13 +5,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.9.RELEASE</version>
+		<version>2.4.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.microsoft.azuresamples.msal4j</groupId>
 	<artifactId>ms-identity-spring-boot-webapp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
 	<name>ms-identity-spring-boot-webapp</name>
 	<description>Microsoft identity platform Spring Boot sample</description>
 	<properties>
@@ -19,6 +18,32 @@
 		<azure.version>3.3.0</azure.version>
 	</properties>
 	<dependencies>
+		<!-- Azure Active Directory Spring Boot Starter  -->
+		<dependency>
+			<groupId>com.azure.spring</groupId>
+			<artifactId>azure-spring-boot-starter-active-directory</artifactId>
+			<version>${azure.version}</version>
+		</dependency>
+
+		<!-- Spring OAuth2 Client -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+		</dependency>
+
+		<!-- Spring Web App -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!-- MS Graph SDK -->
+		<dependency>
+			<groupId>com.microsoft.graph</groupId>
+			<artifactId>microsoft-graph</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+
 
 		<!-- Spring Security Taglibs. -->
 		<dependency>
@@ -41,25 +66,6 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.azure.spring</groupId>
-			<artifactId>azure-spring-boot-starter-active-directory</artifactId>
-			<version>3.3.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 			<exclusions>
@@ -70,14 +76,5 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>
