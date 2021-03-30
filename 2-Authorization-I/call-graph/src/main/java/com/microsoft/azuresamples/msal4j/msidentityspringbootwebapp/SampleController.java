@@ -56,7 +56,7 @@ public class SampleController {
      *  For full details, see method: Utilities.graphUserProperties(OAuth2AuthorizedClient graphAuthorizedClient)
      * 
      * @param model Model used for placing user param and bodyContent param in request before serving UI.
-     * @param graphAuthorizedClient OAuth2AuthorizedClient this object contains all ID token claims about the user. See utilities file.
+     * @param graphAuthorizedClient OAuth2AuthorizedClient this object contains Graph Access Token. See utilities file.
      * @return String the UI.
      */
     @GetMapping(path = "/call_graph")
