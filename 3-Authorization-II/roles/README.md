@@ -42,7 +42,8 @@ description: "This sample demonstrates a Java Spring MVC web app that authentica
 
 This sample demonstrates a Java Spring Boot web app that uses the [Azure AD Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory) for authentication, authorization, and token acquisition with the [OpenID Connect](https://docs.microsoft.com/azure/active-directory/develop/v1-protocols-openid-connect-code) protocol to sign in users, and restricts access to some routes using [**Azure AD Application Roles (app roles)**](https://docs.microsoft.com/azure/active-directory/develop/howto-add-app-roles-in-azure-ad-apps) for authorization.
 
-App roles, along with Security groups are popular means to implement authorization. Using RBAC with Application Roles and Role Claims, developers can securely enforce authorization policies with minimal effort on their part. Another approach is to use Azure AD Groups and Group Claims. Azure AD Groups and Application Roles are by no means mutually exclusive; they can be used in tandem to provide even finer grained access control.
+App roles, along with Security groups are popular means to implement authorization. Using Role-based Access Control (RBAC) with Application Roles and Role Claims, developers can securely enforce authorization policies with minimal effort on their part. Another approach is to use Azure AD Groups and Group Claims. Azure AD Groups and Application Roles are by no means mutually exclusive; they can be used in tandem to provide even finer grained access control.
+
 
 A Microsoft Identity Platform Office Hours session covered Azure AD App roles and security groups, featuring a similar scenario. A recording of the session is is provided in this video [Using Security Groups and Application Roles in your apps](https://www.youtube.com/watch?v=LRoc-na27l0)
 
