@@ -58,7 +58,7 @@ Function CleanupUsers
 
     $tenantName =  ($tenant.VerifiedDomains | Where { $_._Default -eq $True }).Name
 
-    $appName = "java-servlet-webapp-roles"
+    $appName = "java-spring-webapp-roles"
 
     # Removes the users created for the application
     Write-Host "Removing Users"
