@@ -43,9 +43,7 @@ This sample demonstrates a Java Spring Boot web app that uses the [Azure AD Spri
 
 App roles, along with Security groups are popular means to implement authorization. Using Role-based Access Control (RBAC) with Application Roles and Role Claims, developers can securely enforce authorization policies with minimal effort on their part. Another approach is to use Azure AD Groups and Group Claims. Azure AD Groups and Application Roles are by no means mutually exclusive; they can be used in tandem to provide even finer grained access control.
 
-
 A Microsoft Identity Platform Office Hours session covered Azure AD App roles and security groups, featuring a similar scenario. A recording of the session is provided in this video [Using Security Groups and Application Roles in your apps](https://www.youtube.com/watch?v=LRoc-na27l0)
-
 
 For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
 
@@ -81,7 +79,7 @@ These application roles are defined in the [Azure portal](https://portal.azure.c
 
 - [JDK Version 15](https://jdk.java.net/15/). This sample has been developed on a system with Java 15 but may be compatible with other versions.
 - [Maven 3](https://maven.apache.org/download.cgi)
-- [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample VSCode.
+- [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample in VSCode.
 - An **Azure AD** tenant. For more information see: [How to get an Azure AD tenant](https://docs.microsoft.com/azure/active-directory/develop/quickstart-create-new-tenant)
 - A user account in your **Azure AD** tenant. This sample will not work with a **personal Microsoft account**. Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a personal account and have never created a user account in your directory before, you need to do that now.
 
@@ -204,6 +202,8 @@ To run the sample in Visual Studio Code, ensure that you have installed the [Jav
 1. Expand the `JAVA PROJECTS` blade.
 1. Click the run button next to `ms-identity-spring-boot-webapp`.
 1. Open your browser and navigate to `http://localhost:8080`.
+
+![Experience](./ReadmeFiles/app.png)
 
 ## Explore the sample
 
