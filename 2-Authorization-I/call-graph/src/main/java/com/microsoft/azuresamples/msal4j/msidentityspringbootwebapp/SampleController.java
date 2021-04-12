@@ -14,7 +14,7 @@ import org.springframework.ui.Model;
 
 @Controller
 public class SampleController {
-    @Value( "${app.ui.base:base.jsp}" )
+    @Value( "${app.ui.base:base}" )
     private String baseUI;
 
     @Value( "${app.ui.content:bodyContent}" )
@@ -29,7 +29,7 @@ public class SampleController {
      */
     @GetMapping(value = {"/", "sign_in_status", "/index"})
     public String status(Model model) {
-        model.addAttribute(content, "content/status.jsp");
+        model.addAttribute(content, "content/status.html");
         return baseUI;
     }
 
@@ -45,7 +45,7 @@ public class SampleController {
     @GetMapping(path = "/token_details")
     public String tokenDetails(Model model, @AuthenticationPrincipal OidcUser principal) {
         model.addAttribute("claims", Utilities.filterClaims(principal));
-        model.addAttribute(content, "content/token.jsp");
+        model.addAttribute(content, "content/token.html");
         return baseUI;
     }
 
@@ -62,7 +62,7 @@ public class SampleController {
     @GetMapping(path = "/call_graph")
     public String callGraph(Model model, @RegisteredOAuth2AuthorizedClient("graph") OAuth2AuthorizedClient graphAuthorizedClient) {
         model.addAttribute("user", Utilities.graphUserProperties(graphAuthorizedClient));
-        model.addAttribute(content, "content/graph.jsp");
+        model.addAttribute(content, "content/graph.html");
         return baseUI;
     }
 
@@ -70,7 +70,7 @@ public class SampleController {
     // not an integral a part of this tutorial.
     @GetMapping(path = "/survey")
     public String tokenDetails(Model model) {
-        model.addAttribute(content, "content/survey.jsp");
+        model.addAttribute(content, "content/survey.html");
         return baseUI;
     }
 }
