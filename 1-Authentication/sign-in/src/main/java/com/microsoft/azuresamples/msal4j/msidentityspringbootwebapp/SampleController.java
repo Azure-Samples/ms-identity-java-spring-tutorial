@@ -26,7 +26,7 @@ public class SampleController {
      * @return String the UI.
      */
     @GetMapping(value = {"/", "sign_in_status", "/index"})
-    public String login(Model model) {
+    public String status(Model model) {
         model.addAttribute(content, "content/status.jsp");
         return baseUI;
     }
