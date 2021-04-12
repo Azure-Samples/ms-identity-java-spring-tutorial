@@ -31,7 +31,6 @@ description: "This sample demonstrates a Java Spring MVC web app that authentica
   - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
   - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
   - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
-- [Deployment](#deployment)
 - [More information](#more-information)
 - [Community Help and Support](#community-help-and-support)
 - [Contributing](#contributing)
@@ -353,9 +352,9 @@ public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
 }
 ```
 
-## Deployment
-<!-- TODO: link to deployment -->
-// TODO: link to deployment sample.
+<!-- ## Deployment
+
+// TODO: link to deployment sample. -->
 
 ## More information
 
