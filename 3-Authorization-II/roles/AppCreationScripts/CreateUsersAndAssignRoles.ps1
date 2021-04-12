@@ -92,9 +92,9 @@ Function CreateRolesUsersAndRoleAssignments
     $user = Get-AzureADUser -ObjectId $creds.Account.Id
     
     # Add the roles
-    Write-Host "Adding app roles to to the app 'java-servlet-webapp-roles' in tenant '$tenantName'"
+    Write-Host "Adding app roles to to the app 'java-spring-webapp-roles' in tenant '$tenantName'"
 
-    $app=Get-AzureADApplication -Filter "DisplayName eq 'java-servlet-webapp-roles'" 
+    $app=Get-AzureADApplication -Filter "DisplayName eq 'java-spring-webapp-roles'" 
     
     if ($app)
     {
@@ -126,7 +126,7 @@ Function CreateRolesUsersAndRoleAssignments
         Write-Host "Created user "($aRegularUser.UserPrincipalName)" with password 'test123456789.'"
     }
     else {
-        Write-Host -ForegroundColor Red "Failed to add app roles to the app 'java-servlet-webapp-roles'."
+        Write-Host -ForegroundColor Red "Failed to add app roles to the app 'java-spring-webapp-roles'."
     }
 
     Write-Host -ForegroundColor Green "Run the ..\CleanupUsersAndRoles.ps1 command to remove users created for this sample's application ."
