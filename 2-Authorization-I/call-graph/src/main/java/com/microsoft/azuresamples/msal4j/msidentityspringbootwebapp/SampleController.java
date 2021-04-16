@@ -4,9 +4,11 @@
 package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapp;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -14,7 +16,7 @@ import org.springframework.ui.Model;
 
 @Controller
 public class SampleController {
-    @Value( "${app.ui.base:base.jsp}" )
+    @Value( "${app.ui.base:base}" )
     private String baseUI;
 
     @Value( "${app.ui.content:bodyContent}" )
@@ -29,7 +31,7 @@ public class SampleController {
      */
     @GetMapping(value = {"/", "sign_in_status", "/index"})
     public String status(Model model) {
-        model.addAttribute(content, "content/status.jsp");
+        model.addAttribute(content, "content/status.html");
         return baseUI;
     }
 
@@ -45,7 +47,7 @@ public class SampleController {
     @GetMapping(path = "/token_details")
     public String tokenDetails(Model model, @AuthenticationPrincipal OidcUser principal) {
         model.addAttribute("claims", Utilities.filterClaims(principal));
-        model.addAttribute(content, "content/token.jsp");
+        model.addAttribute(content, "content/token.html");
         return baseUI;
     }
 
@@ -62,15 +64,15 @@ public class SampleController {
     @GetMapping(path = "/call_graph")
     public String callGraph(Model model, @RegisteredOAuth2AuthorizedClient("graph") OAuth2AuthorizedClient graphAuthorizedClient) {
         model.addAttribute("user", Utilities.graphUserProperties(graphAuthorizedClient));
-        model.addAttribute(content, "content/graph.jsp");
+        model.addAttribute(content, "content/graph.html");
         return baseUI;
     }
 
     // survey endpoint - did the sample address your needs?
     // not an integral a part of this tutorial.
     @GetMapping(path = "/survey")
-    public String tokenDetails(Model model) {
-        model.addAttribute(content, "content/survey.jsp");
+    public String survey(Model model) {
+        model.addAttribute(content, "content/survey.html");
         return baseUI;
     }
 }
