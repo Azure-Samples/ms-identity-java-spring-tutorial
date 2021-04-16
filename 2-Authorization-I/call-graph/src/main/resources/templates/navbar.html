@@ -3,25 +3,23 @@
     <span class="navbar-text">Authorization-I: Use Active Directory Spring Boot Starter to sign in and call MS Graph</span>
     <div class="btn-group ml-auto dropleft">
         <ul class="nav navbar-nav navbar-right">
-            <div sec:authorize="isAuthenticated()">
-                <!-- could have also tested if access equals "!hasRole('ROLE_ANONYMOUS') -->
+            <th:block sec:authorize="isAuthenticated()">
                 <li class="nav-item">
                     <a class="nav-link" href="/token_details">Hello
-                        <span sec:authentication="name"></span>!
+                        <th:block sec:authentication="name"></th:block>!
                     </a>
                 </li>
                 <li>
-                    <form:form action="#" th:action="@{/logout}" method="post">
+                    <form action="#" th:action="@{/logout}" method="post">
                         <input class="btn btn-warning" type="submit" value="Sign Out" />
-                    </form:form>
+                    </form>
                 </li>
-            </div>
-            <div sec:authorize="isAnonymous()">
-                <!-- could have also tested if access equals "hasRole('ROLE_ANONYMOUS')" -->
+            </th:block>
+            <th:block sec:authorize="isAnonymous()">
                 <li>
                     <a class="btn btn-success" href="/oauth2/authorization/azure">Sign In</a>
                 </li>
-            </div>
+            </th:block>
         </ul>
     </div>
 </nav>

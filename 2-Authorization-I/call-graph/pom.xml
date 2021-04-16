@@ -9,7 +9,6 @@
     <relativePath/>  
     <!-- lookup parent from repository --> 
   </parent>  
-  <!-- <packaging>war</packaging>   -->
   <groupId>com.microsoft.azuresamples.msal4j</groupId>  
   <artifactId>ms-identity-spring-boot-webapp</artifactId>  
   <version>0.0.1-SNAPSHOT</version>  
@@ -40,28 +39,16 @@
     <dependency> 
       <groupId>com.microsoft.graph</groupId>  
       <artifactId>microsoft-graph</artifactId>  
-      <version>3.0.0</version> 
+      <version>3.2.0</version> 
     </dependency>  
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-thymeleaf</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.thymeleaf.extras</groupId>
-      <artifactId>thymeleaf-extras-springsecurity5</artifactId>
-    </dependency>
     <dependency> 
       <groupId>org.springframework.boot</groupId>  
-      <artifactId>spring-boot-starter-test</artifactId>  
-      <scope>test</scope>  
-      <exclusions> 
-        <exclusion> 
-          <groupId>org.junit.vintage</groupId>  
-          <artifactId>junit-vintage-engine</artifactId> 
-        </exclusion> 
-      </exclusions> 
-    </dependency>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId> 
+    </dependency>  
+    <dependency> 
+      <groupId>org.thymeleaf.extras</groupId>  
+      <artifactId>thymeleaf-extras-springsecurity5</artifactId> 
+    </dependency>  
   </dependencies>  
   <build> 
     <plugins> 
@@ -75,7 +62,7 @@
             </goals> 
           </execution> 
         </executions> 
-      </plugin>  
+      </plugin>
     </plugins> 
   </build> 
 </project>

@@ -4,9 +4,11 @@
 package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapp;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -69,7 +71,7 @@ public class SampleController {
     // survey endpoint - did the sample address your needs?
     // not an integral a part of this tutorial.
     @GetMapping(path = "/survey")
-    public String tokenDetails(Model model) {
+    public String survey(Model model) {
         model.addAttribute(content, "content/survey.html");
         return baseUI;
     }
