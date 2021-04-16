@@ -12,7 +12,7 @@ import org.springframework.ui.Model;
 
 @Controller
 public class SampleController {
-    @Value( "${app.ui.base:base.jsp}" )
+    @Value( "${app.ui.base:base}" )
     private String baseUI;
 
     @Value( "${app.ui.content:bodyContent}" )
@@ -20,14 +20,14 @@ public class SampleController {
 
     /**
      *  Sign in status endpoint
-     *  The page demonstrates sign-in status. For full details, see the src/main/webapp/content/status.jsp file.
+     *  The page demonstrates sign-in status. For full details, see the src/main/webapp/content/status.html file.
      * 
      * @param model Model used for placing bodyContent param in request before serving UI.
      * @return String the UI.
      */
     @GetMapping(value = {"/", "sign_in_status", "/index"})
     public String status(Model model) {
-        model.addAttribute(content, "content/status.jsp");
+        addContent(model, "status");
         return baseUI;
     }
 
@@ -43,15 +43,24 @@ public class SampleController {
     @GetMapping(path = "/token_details")
     public String tokenDetails(Model model, @AuthenticationPrincipal OidcUser principal) {
         model.addAttribute("claims", Utilities.filterClaims(principal));
-        model.addAttribute(content, "content/token.jsp");
+        addContent(model, "token");
         return baseUI;
+    }
+
+    /**
+     * Add HTML partial fragment from /templates/content folder to base page model
+     * @param model
+     * @param fragment
+     */
+    private void addContent(Model model, String fragment) {
+        model.addAttribute(content, String.format("content/%s.html", fragment));
     }
 
     // survey endpoint - did the sample address your needs?
     // not an integral a part of this tutorial.
     @GetMapping(path = "/survey")
     public String tokenDetails(Model model) {
-        model.addAttribute(content, "content/survey.jsp");
+        addContent(model, "survey");
         return baseUI;
     }
 }

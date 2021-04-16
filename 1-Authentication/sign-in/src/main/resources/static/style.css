@@ -55,14 +55,14 @@ flex: 1;
     margin-top: 1em;
 }
 
-#smiley, #frowny {
+.smiley, .frowny {
     height: 1.5em;
     width: 1.5em;
     margin: auto;
     fill: #0078d4
 }
 
-#smiley:hover, #frowny:hover{
+.smiley:hover, .frowny:hover{
     height: 1.5em;
     width: 1.5em;
     margin: auto;
