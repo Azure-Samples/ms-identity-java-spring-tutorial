@@ -59,7 +59,7 @@ public class SampleController {
     // survey endpoint - did the sample address your needs?
     // not an integral a part of this tutorial.
     @GetMapping(path = "/survey")
-    public String tokenDetails(Model model) {
+    public String survey(Model model) {
         addContent(model, "survey");
         return baseUI;
     }
