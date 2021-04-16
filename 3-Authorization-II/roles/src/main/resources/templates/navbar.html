@@ -3,23 +3,23 @@
     <span class="navbar-text">Authorization II: Use Active Directory Spring Boot Starter to control access by app roles</span>
     <div class="btn-group ml-auto dropleft">
         <ul class="nav navbar-nav navbar-right">
-            <sec:authorize access="isAuthenticated()">
+            <th:block sec:authorize="isAuthenticated()">
                 <li class="nav-item">
                     <a class="nav-link" href="/token_details">Hello
-                        <sec:authentication property="name" />!
+                        <th:block sec:authentication="name"></th:block>!
                     </a>
                 </li>
                 <li>
-                    <form:form action="/logout" method="POST">
+                    <form action="#" th:action="@{/logout}" method="post">
                         <input class="btn btn-warning" type="submit" value="Sign Out" />
-                    </form:form>
+                    </form>
                 </li>
-            </sec:authorize>
-            <sec:authorize access="isAnonymous()">
+            </th:block>
+            <th:block sec:authorize="isAnonymous()">
                 <li>
                     <a class="btn btn-success" href="/oauth2/authorization/azure">Sign In</a>
                 </li>
-            </sec:authorize>
+            </th:block>
         </ul>
     </div>
 </nav>
