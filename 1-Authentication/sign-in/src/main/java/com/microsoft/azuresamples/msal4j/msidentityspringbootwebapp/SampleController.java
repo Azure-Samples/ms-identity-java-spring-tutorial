@@ -19,6 +19,16 @@ public class SampleController {
     private String content;
 
     /**
+     * Add HTML partial fragment from /templates/content folder to request and serve base html
+     * @param model Model used for placing user param and bodyContent param in request before serving UI.
+     * @param fragment used to determine which partial to put into UI
+     */
+    private String hydrateUI(Model model, String fragment) {
+        model.addAttribute(content, String.format("content/%s.html", fragment));
+        return baseUI;
+    }
+
+    /**
      *  Sign in status endpoint
      *  The page demonstrates sign-in status. For full details, see the src/main/webapp/content/status.html file.
      * 
@@ -27,8 +37,7 @@ public class SampleController {
      */
     @GetMapping(value = {"/", "sign_in_status", "/index"})
     public String status(Model model) {
-        addContent(model, "status");
-        return baseUI;
+        return hydrateUI(model, "status");
     }
 
     /**
@@ -43,24 +52,13 @@ public class SampleController {
     @GetMapping(path = "/token_details")
     public String tokenDetails(Model model, @AuthenticationPrincipal OidcUser principal) {
         model.addAttribute("claims", Utilities.filterClaims(principal));
-        addContent(model, "token");
-        return baseUI;
-    }
-
-    /**
-     * Add HTML partial fragment from /templates/content folder to base page model
-     * @param model
-     * @param fragment
-     */
-    private void addContent(Model model, String fragment) {
-        model.addAttribute(content, String.format("content/%s.html", fragment));
+        return hydrateUI(model, "token");
     }
 
     // survey endpoint - did the sample address your needs?
     // not an integral a part of this tutorial.
     @GetMapping(path = "/survey")
     public String survey(Model model) {
-        addContent(model, "survey");
-        return baseUI;
+        return hydrateUI(model, "survey");
     }
 }
