@@ -12,29 +12,31 @@ description: "This sample demonstrates a Java Spring MVC web app that signs in u
 ---
 # Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform
 
-- [Overview](#overview)
-- [Scenario](#scenario)
-- [Contents](#contents)
-- [Prerequisites](#prerequisites)
-- [Setup](#setup)
-  - [Clone or download this repository](#clone-or-download-this-repository)
-  - [Register the sample application(s) with your Azure Active Directory tenant](#register-the-sample-applications-with-your-azure-active-directory-tenant)
-  - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
-  - [Register the webApp app (java-spring-webapp-call-graph)](#register-the-webapp-app-java-spring-webapp-call-graph)
-- [Running the sample](#running-the-sample)
-- [Explore the sample](#explore-the-sample)
-- [We'd love your feedback!](#wed-love-your-feedback)
-- [About the code](#about-the-code)
-  - [Project Initialization](#project-initialization)
-  - [ID Token Claims](#id-token-claims)
-  - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
-  - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
-  - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
-  - [Call Graph](#call-graph)
-  - [Scopes](#scopes)
-- [More information](#more-information)
-- [Community Help and Support](#community-help-and-support)
-- [Contributing](#contributing)
+- [Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform](#enable-your-java-spring-boot-web-app-to-sign-in-users-and-call-microsoft-graph-with-the-microsoft-identity-platform)
+  - [Overview](#overview)
+  - [Scenario](#scenario)
+  - [Contents](#contents)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+    - [Clone or download this repository](#clone-or-download-this-repository)
+    - [Register the sample application(s) with your Azure Active Directory tenant](#register-the-sample-applications-with-your-azure-active-directory-tenant)
+    - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
+    - [Register the webApp app (java-spring-webapp-call-graph)](#register-the-webapp-app-java-spring-webapp-call-graph)
+      - [Configure the webApp app (java-spring-webapp-call-graph) to use your app registration](#configure-the-webapp-app-java-spring-webapp-call-graph-to-use-your-app-registration)
+  - [Running the sample](#running-the-sample)
+  - [Explore the sample](#explore-the-sample)
+  - [We'd love your feedback!](#wed-love-your-feedback)
+  - [About the code](#about-the-code)
+    - [Project Initialization](#project-initialization)
+    - [ID Token Claims](#id-token-claims)
+    - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
+    - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
+    - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
+    - [Call Graph](#call-graph)
+    - [Scopes](#scopes)
+  - [More information](#more-information)
+  - [Community Help and Support](#community-help-and-support)
+  - [Contributing](#contributing)
 
 <!-- ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/<BuildNumber>/badge) -->
 
@@ -58,10 +60,11 @@ This sample demonstrates a Java Spring Boot web app that signs in users and obta
 | `CHANGELOG.md`    | List of changes to the sample.             |
 | `CONTRIBUTING.md` | Guidelines for contributing to the sample. |
 | `LICENSE`         | The license for the sample.                |
+| `TODO`         | List the remaining contents.                |
 
 ## Prerequisites
 
-- [JDK Version 15](https://jdk.java.net/15/). This sample has been developed on a system with Java 15 but may be compatiblse with other versions.
+- [JDK Version 15](https://jdk.java.net/15/). This sample has been developed on a system with Java 15 but may be compatible with other versions.
 - [Maven 3](https://maven.apache.org/download.cgi)
 - [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample in VSCode.
 - An **Azure AD** tenant. For more information see: [How to get an Azure AD tenant](https://docs.microsoft.com/azure/active-directory/develop/quickstart-create-new-tenant)
@@ -192,7 +195,7 @@ Were we successful in addressing your learning objective? Consider taking a mome
 
 ## About the code
 
-This sample demonstrates how to use **Azure AD Spring Boot Starter client library for Java** to sign in users into your Azure AD tenant and obtain an **Access Token** for calling **Microsoft Graph**. It also makes use of **Spring Oauth2 Client** and **Spring Web**.
+This sample demonstrates how to use [Azure AD Spring Boot Starter client library for Java](TODO links please ) to sign in users into your Azure AD tenant and obtain an [Access Token](TODO links please) for calling **Microsoft Graph**. It also makes use of **Spring Oauth2 Client** and **Spring Web**.
 
 ### Project Initialization
 
@@ -333,14 +336,15 @@ Using `GraphServiceClient.me().buildRequest().get()`, a request built and made t
 - [Azure Active Directory Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory)
 - [Microsoft Authentication Library for Java (MSAL4J)](https://github.com/AzureAD/microsoft-authentication-library-for-java)
 - [MSAL4J Wiki](https://github.com/AzureAD/microsoft-authentication-library-for-java/wiki)
-
+- [TODO](link to ID token and access token pages)
+  
 For more information about how OAuth 2.0 protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](https://docs.microsoft.com/azure/active-directory/develop/authentication-flows-app-scenarios).
 
 ## Community Help and Support
 
 Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`azure-active-directory` `azure-ad-b2c` `ms-identity` `adal` `msal`].
+Make sure that your questions or comments are tagged with [`azure-active-directory` `azure-ad-b2c` `ms-identity` `adal` `msal`, TODO-check with Navya, you should also add 'Java' along with MSAL].
 
 If you find a bug in the sample, raise the issue on [GitHub Issues](../../../../issues).
 
