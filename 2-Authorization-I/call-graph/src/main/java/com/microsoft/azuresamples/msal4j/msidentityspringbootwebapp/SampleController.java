@@ -8,18 +8,12 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 @Controller
 public class SampleController {
-    @Value( "${app.ui.base:base}" )
-    private String baseUI;
-
-    @Value( "${app.ui.content:bodyContent}" )
-    private String content;
 
     /**
      * Add HTML partial fragment from /templates/content folder to request and serve base html
@@ -27,8 +21,8 @@ public class SampleController {
      * @param fragment used to determine which partial to put into UI
      */
     private String hydrateUI(Model model, String fragment) {
-        model.addAttribute(content, String.format("content/%s.html", fragment));
-        return baseUI;
+        model.addAttribute("bodyContent", String.format("content/%s.html", fragment));
+        return "base"; // base.html in /templates folder
     }
 
     /**
