@@ -12,29 +12,27 @@ description: "This sample demonstrates a Java Spring MVC web app that authentica
 ---
 # Enable your Java Spring Boot web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform
 
-- [Enable your Java Spring Boot web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform](#enable-your-java-spring-boot-web-app-to-sign-in-users-on-your-azure-active-directory-tenant-with-the-microsoft-identity-platform)
-  - [Overview](#overview)
-  - [Scenario](#scenario)
-  - [Contents](#contents)
-  - [Prerequisites](#prerequisites)
-  - [Setup](#setup)
-    - [Clone or download this repository](#clone-or-download-this-repository)
-    - [Register the sample application(s) with your Azure Active Directory tenant](#register-the-sample-applications-with-your-azure-active-directory-tenant)
-    - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
-    - [Register the webApp app (java-spring-webapp-auth)](#register-the-webapp-app-java-spring-webapp-auth)
-      - [Configure the webApp app (java-spring-webapp-auth) to use your app registration](#configure-the-webapp-app-java-spring-webapp-auth-to-use-your-app-registration)
-  - [Running the sample](#running-the-sample)
-  - [Explore the sample](#explore-the-sample)
-  - [We'd love your feedback!](#wed-love-your-feedback)
-  - [About the code](#about-the-code)
-    - [Project Initialization](#project-initialization)
-    - [ID Token Claims](#id-token-claims)
-    - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
-    - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
-    - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
-  - [More information](#more-information)
-  - [Community Help and Support](#community-help-and-support)
-  - [Contributing](#contributing)
+- [Overview](#overview)
+- [Scenario](#scenario)
+- [Contents](#contents)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+  - [Clone or download this repository](#clone-or-download-this-repository)
+  - [Register the sample application(s) with your Azure Active Directory tenant](#register-the-sample-applications-with-your-azure-active-directory-tenant)
+  - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
+  - [Register the webApp app (java-spring-webapp-auth)](#register-the-webapp-app-java-spring-webapp-auth)
+- [Running the sample](#running-the-sample)
+- [Explore the sample](#explore-the-sample)
+- [We'd love your feedback!](#wed-love-your-feedback)
+- [About the code](#about-the-code)
+  - [Project Initialization](#project-initialization)
+  - [ID Token Claims](#id-token-claims)
+  - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
+  - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
+  - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
+- [More information](#more-information)
+- [Community Help and Support](#community-help-and-support)
+- [Contributing](#contributing)
 
 <!-- ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/<BuildNumber>/badge) -->
 
@@ -53,18 +51,20 @@ This sample demonstrates a Java Spring MVC web app that signs in users on your A
 
 ## Contents
 
-> Give a high-level folder structure of the sample.
-
 | File/folder       | Description                                |
 |-------------------|--------------------------------------------|
-| `CHANGELOG.md`    | List of changes to the sample.             |
-| `CONTRIBUTING.md` | Guidelines for contributing to the sample. |
-| `LICENSE`         | The license for the sample.                |
-| `AppCreationScripts`         | TODO.                |
-| `src`         | TODO.                |
-| `target`         | TODO.                |
-| `.project`         | TODO.                |
-| `pom.xml`         | TODO.                |
+| `AppCreationScripts/`                                                               | Scripts to automatically configure Azure AD app registrations.                              |
+| `pom.xml`                                                                           | Application dependencies.                                                                   |
+| `src/main/resources/templates/`                                                     | Thymeleaf Templates for UI.                                                                 |
+| `src/main/resources/application.yml`                                                | Application and Azure AD Boot Starter Library Configuration.                                |
+| `src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/`       | This directory contains the main application entry point, controller, and config classes.   |
+| `.../MsIdentitySpringBootWebappApplication.java`                                    | Main class.                                                                                 |
+| `.../SampleController.java`                                                         | Controller with endpoint mappings.                                                          |
+| `.../SecurityConfig.java`                                                           | Security Configuration (e.g., which routes require authentication?).                        |
+| `.../Utilities.java`                                                                | Utility Class (e.g., filter ID token claims                                                 |
+| `CHANGELOG.md`                                                                      | List of changes to the sample.                                                              |
+| `CONTRIBUTING.md`                                                                   | Guidelines for contributing to the sample.                                                  |
+| `LICENSE`                                                                           | The license for the sample.                                                                 |
 
 ## Prerequisites
 
@@ -156,21 +156,18 @@ Open the project in your IDE (Visual Studio Code or IntelliJ IDEA) to configure 
 
 > In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
-1. Open the `src\main\resources\application.properties` file.
+1. Open the `src\main\resources\application.yml` file.
 1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant ID.
 1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapp-auth` app copied from the Azure portal.
 1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-spring-webapp-auth` copied from the Azure portal.
 
 ## Running the sample
 
-To run the sample in Visual Studio Code, ensure that you have installed the [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
-
-1. Open Visual Studio Code in the directory of this readme file.
-1. Open the integrated terminal (shortcut: `ctrl + ~`). Run `mvn clean compile`.
-1. Open the Explorer window in VS Code (shortcut: `ctrl + shift + E`).
-1. Expand the `JAVA PROJECTS` blade.
-1. Click the run button next to `ms-identity-spring-boot-webapp`.
+1. Open a terminal or the integrated VSCode terminal (shortcut: `ctrl + ~`).
+1. In the same directory as this readme file, run `mvn clean compile spring-boot:run`.
 1. Open your browser and navigate to `http://localhost:8080`.
+
+![Experience](./ReadmeFiles/app.png)
 
 ## Explore the sample
 
@@ -192,18 +189,14 @@ Were we successful in addressing your learning objective? Consider taking a mome
 
 ## About the code
 
-This sample demonstrates how to use [Azure AD Spring Boot Starter client library for Java](https://docs.microsoft.com/java/api/overview/azure/active-directory-spring-boot-starter-readme?view=azure-java-stable) to sign in users into your Azure AD tenant. It also makes use of [Spring Oauth2 Client](TODO) and [Spring Web](TODO). It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user.
+This sample demonstrates how to use [Azure AD Spring Boot Starter client library for Java](https://docs.microsoft.com/java/api/overview/azure/active-directory-spring-boot-starter-readme?view=azure-java-stable) to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web** boot starters. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user.
 
 ### Project Initialization
 
 Create a new Java Maven project and copy the `pom.xml` file from this project, and the `src` folder of this repository.
-This app serves `.jsp` pages, and makes use of `JSTL` tags in the UI. Your design considerations may vary, so you may opt to omit `tomcat-embed-jasper` and `jstl` from the pom file depending on your requirements.
 
 If you'd like to create a project like this from scratch, you may use [Spring Initializer](https://start.spring.io):
 
-- For **Project**, select `Maven Project`
-- For **Language**, select `Java`
-- For **Spring Boot**, select version `2.3.9`
 - For **Packaging**, select `Jar`
 - For **Java** select version `11`
 - For **Dependencies**, add the following:
@@ -237,27 +230,27 @@ To sign in, you must make a request to the Azure Active Directory sign-in endpoi
 To sign out, you must make POST request to the **logout** endpoint.
 
 ```HTML
-<form:form action="/logout" method="POST">
-    <input class="btn btn-warning" type="submit" value="Sign Out" />
-</form:form>
+<form action="#" th:action="@{/logout}" method="post">
+  <input class="btn btn-warning" type="submit" value="Sign Out" />
+</form>
 ```
 
 ### Authentication-dependent UI elements
 
-This app has some simple logic in the .jsp pages for determining content to display based on whether the user is authenticated or not. For example, the following Spring Security Tags may be used:
+This app has some simple logic in the UI template pages for determining content to display based on whether the user is authenticated or not. For example, the following Spring Security Thymeleaf tags may be used:
 
 ```html
-    <sec:authorize access="isAuthenticated()">
-        <!-- this content only shows to authenticated users -->
-    </sec:authorize>
-    <sec:authorize access="isAnonymous()">
-        <!-- this content only shows to not-authenticated users -->
-    </sec:authorize>
+<div sec:authorize="isAuthenticated()">
+  this content only shows to authenticated users
+</div>
+<div sec:authorize="isAnonymous()">
+  this content only shows to not-authenticated users
+</div>
 ```
 
 ### Protecting routes with AADWebSecurityConfigurerAdapter
 
-By default, this app protects the **ID Token Details** page so that only logged-in users can access it. This app uses configures these routes from the `app.protect.authenticated` property from the `application.properties` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For an example, see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
+By default, this app protects the **ID Token Details** page so that only logged-in users can access it. This app uses configures these routes from the `app.protect.authenticated` property from the `application.yml` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For an example, see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
 
 ```java
 @EnableWebSecurity
