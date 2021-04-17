@@ -18,6 +18,4 @@ azure:
 # e.g. app.protect.authenticated=/route1, /route2, /route3
 app:
   protect:
-    authenticated:
-      - /token_details
-      - /call_graph
+    authenticated: /token_details, /call_graph

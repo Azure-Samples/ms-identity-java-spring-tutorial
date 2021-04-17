@@ -51,11 +51,10 @@ This sample demonstrates a Java Spring Boot web app that signs in users and obta
 
 ## Contents
 
-> Give a high-level folder structure of the sample.
-
 | File/folder       | Description                                |
 |-------------------|--------------------------------------------|
 | `AppCreationScripts/`                                                               | Scripts to automatically configure Azure AD app registrations.                              |
+| `pom.xml`                                                                           | Application dependencies.                                                                   |
 | `src/main/resources/templates/`                                                     | Thymeleaf Templates for UI.                                                                 |
 | `src/main/resources/application.yml`                                                | Application and Azure AD Boot Starter Library Configuration.                                |
 | `src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/`       | This directory contains the main application entry point, controller, and config classes.   |
@@ -170,13 +169,8 @@ Open the project in your IDE (Visual Studio Code or IntelliJ IDEA) to configure 
 
 ## Running the sample
 
-To run the sample in Visual Studio Code, ensure that you have installed the [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
-
-1. Open Visual Studio Code in the directory of this readme file.
-1. Open the integrated terminal (shortcut: `ctrl + ~`). Run `mvn clean compile`.
-1. Open the Explorer window in VS Code (shortcut: `ctrl + shift + E`).
-1. Expand the `JAVA PROJECTS` blade.
-1. Click the run button next to `ms-identity-spring-boot-webapp`.
+1. Open a terminal or the integrated VSCode terminal (shortcut: `ctrl + ~`).
+1. In the same directory as this readme file, run `mvn clean compile spring-boot:run`.
 1. Open your browser and navigate to `http://localhost:8080`.
 
 ## Explore the sample
