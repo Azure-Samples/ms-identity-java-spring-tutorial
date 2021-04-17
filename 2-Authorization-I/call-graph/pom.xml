@@ -24,7 +24,13 @@
       <groupId>com.azure.spring</groupId>  
       <artifactId>azure-spring-boot-starter-active-directory</artifactId>  
       <version>${azure.version}</version> 
-    </dependency>  
+    </dependency>
+    <!-- MS Graph SDK -->  
+    <dependency> 
+      <groupId>com.microsoft.graph</groupId>  
+      <artifactId>microsoft-graph</artifactId>  
+      <version>3.2.0</version> 
+    </dependency>
     <!-- Spring OAuth2 Client -->  
     <dependency> 
       <groupId>org.springframework.boot</groupId>  
@@ -34,17 +40,13 @@
     <dependency> 
       <groupId>org.springframework.boot</groupId>  
       <artifactId>spring-boot-starter-web</artifactId> 
-    </dependency>  
-    <!-- MS Graph SDK -->  
-    <dependency> 
-      <groupId>com.microsoft.graph</groupId>  
-      <artifactId>microsoft-graph</artifactId>  
-      <version>3.2.0</version> 
-    </dependency>  
+    </dependency>
+    <!-- Thymeleaf templates -->
     <dependency> 
       <groupId>org.springframework.boot</groupId>  
       <artifactId>spring-boot-starter-thymeleaf</artifactId> 
-    </dependency>  
+    </dependency>
+    <!-- Spring Security tags for Thymeleaf -->
     <dependency> 
       <groupId>org.thymeleaf.extras</groupId>  
       <artifactId>thymeleaf-extras-springsecurity5</artifactId> 
