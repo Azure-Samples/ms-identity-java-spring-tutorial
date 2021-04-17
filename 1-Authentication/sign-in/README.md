@@ -167,6 +167,8 @@ Open the project in your IDE (Visual Studio Code or IntelliJ IDEA) to configure 
 1. In the same directory as this readme file, run `mvn clean compile spring-boot:run`.
 1. Open your browser and navigate to `http://localhost:8080`.
 
+![Experience](./ReadmeFiles/app.png)
+
 ## Explore the sample
 
 - Note the signed-in or signed-out status displayed at the center of the screen.
