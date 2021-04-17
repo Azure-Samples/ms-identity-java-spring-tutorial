@@ -71,9 +71,18 @@ These application roles are defined in the [Azure portal](https://portal.azure.c
 
 | File/folder       | Description                                |
 |-------------------|--------------------------------------------|
-| `CHANGELOG.md`    | List of changes to the sample.             |
-| `CONTRIBUTING.md` | Guidelines for contributing to the sample. |
-| `LICENSE`         | The license for the sample.                |
+| `AppCreationScripts/`                                                               | Scripts to automatically configure Azure AD app registrations.                              |
+| `pom.xml`                                                                           | Application dependencies.                                                                   |
+| `src/main/resources/templates/`                                                     | Thymeleaf Templates for UI.                                                                 |
+| `src/main/resources/application.yml`                                                | Application and Azure AD Boot Starter Library Configuration.                                |
+| `src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/`       | This directory contains the main application entry point, controller, and config classes.   |
+| `.../MsIdentitySpringBootWebappApplication.java`                                    | Main class.                                                                                 |
+| `.../SampleController.java`                                                         | Controller with endpoint mappings.                                                          |
+| `.../SecurityConfig.java`                                                           | Security Configuration (e.g., which routes require authentication?).                        |
+| `.../Utilities.java`                                                                | Utility Class (e.g., filter ID token claims)                                                |
+| `CHANGELOG.md`                                                                      | List of changes to the sample.                                                              |
+| `CONTRIBUTING.md`                                                                   | Guidelines for contributing to the sample.                                                  |
+| `LICENSE`                                                                           | The license for the sample.                                                                 |
 
 ## Prerequisites
 
@@ -227,18 +236,14 @@ Were we successful in addressing your learning objective? Consider taking a mome
 
 ## About the code
 
-This sample demonstrates how to use **Azure AD Spring Boot Starter client library for Java** to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web**. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user, and to restrict access to some pages by using the roles claim for authorization.
+This sample demonstrates how to use [Azure AD Spring Boot Starter client library for Java](https://docs.microsoft.com/java/api/overview/azure/active-directory-spring-boot-starter-readme?view=azure-java-stable) to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web** boot starters. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user, and to restrict access to some pages by using the roles claim for authorization.
 
 ### Project Initialization
 
 Create a new Java Maven project and copy the `pom.xml` file from this project, and the `src` folder of this repository.
-This app serves `.jsp` pages, and makes use of `JSTL` tags in the UI. Your design considerations may vary, so you may opt to omit `tomcat-embed-jasper` and `jstl` from the pom file depending on your requirements.
 
 If you'd like to create a project like this from scratch, you may use [Spring Initializer](https://start.spring.io):
 
-- For **Project**, select `Maven Project`
-- For **Language**, select `Java`
-- For **Spring Boot**, select version `2.3.9`
 - For **Packaging**, select `Jar`
 - For **Java** select version `11`
 - For **Dependencies**, add the following:
@@ -263,7 +268,7 @@ public String tokenDetails(@AuthenticationPrincipal OidcUser principal) {
 
 ### Processing Roles claim in the ID token
 
-The name of the the roles that the signed in user is assigned to is returned in the `roles` claim of the token.
+The name of the the roles that the signed-in user is assigned to is returned in the `roles` claim of the token.
 
 ```JSON
 {
@@ -279,16 +284,16 @@ A common way to access them is documented in the **ID Token Claims** section abo
 Azure AD Boot Starter (v3.3 and above) also parses the roles claim automatically and adds each role to the signed in user's **Authorities**, prefixing each with the string `APPROLE_`. This allows developers to make use of app roles with Spring **PrePost** condition annotations using the `hasAuthority` method. For example, you'll find the following `@PreAuthorize` conditions demonstrated in `SampleController.java`:
 
 ```java
-    @GetMapping(path = "/admin_only")
-    @PreAuthorize("hasAuthority('APPROLE_PrivilegedAdmin')")
-    public String adminOnly(Model model) {
-        // restrict to users who have PrivilegedAdmin app role only
-    }
-    @GetMapping(path = "/regular_user")
-    @PreAuthorize("hasAnyAuthority('APPROLE_PrivilegedAdmin','APPROLE_RegularUser')")
-    public String regularUser(Model model) {
-       // restrict to users who have any of RegularUser or PrivilegedAdmin app roles
-    }
+@GetMapping(path = "/admin_only")
+@PreAuthorize("hasAuthority('APPROLE_PrivilegedAdmin')")
+public String adminOnly(Model model) {
+    // restrict to users who have PrivilegedAdmin app role only
+}
+@GetMapping(path = "/regular_user")
+@PreAuthorize("hasAnyAuthority('APPROLE_PrivilegedAdmin','APPROLE_RegularUser')")
+public String regularUser(Model model) {
+    // restrict to users who have any of RegularUser or PrivilegedAdmin app roles
+}
 ```
 
 To see a full list of authorities for a given user:
@@ -311,22 +316,22 @@ To sign in, you must make a request to the Azure Active Directory sign-in endpoi
 To sign out, you must make POST request to the **logout** endpoint.
 
 ```HTML
-<form:form action="/logout" method="POST">
-    <input class="btn btn-warning" type="submit" value="Sign Out" />
-</form:form>
+<form action="#" th:action="@{/logout}" method="post">
+  <input class="btn btn-warning" type="submit" value="Sign Out" />
+</form>
 ```
 
 ### Authentication-dependent UI elements
 
-This app has some simple logic in the .jsp pages for determining content to display based on whether the user is authenticated or not. For example, the following Spring Security Tags may be used:
+This app has some simple logic in the UI template pages for determining content to display based on whether the user is authenticated or not. For example, the following Spring Security Thymeleaf tags may be used:
 
 ```html
-    <sec:authorize access="isAuthenticated()">
-        <!-- this content only shows to authenticated users -->
-    </sec:authorize>
-    <sec:authorize access="isAnonymous()">
-        <!-- this content only shows to not-authenticated users -->
-    </sec:authorize>
+<div sec:authorize="isAuthenticated()">
+  this content only shows to authenticated users
+</div>
+<div sec:authorize="isAnonymous()">
+  this content only shows to not-authenticated users
+</div>
 ```
 
 ### Protecting routes with AADWebSecurityConfigurerAdapter

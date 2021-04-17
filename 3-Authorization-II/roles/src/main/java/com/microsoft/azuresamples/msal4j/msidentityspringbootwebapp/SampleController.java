@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,11 +18,6 @@ import org.springframework.ui.Model;
 
 @Controller
 public class SampleController {
-    @Value( "${app.ui.base:base}" )
-    private String baseUI;
-
-    @Value( "${app.ui.content:bodyContent}" )
-    private String content;
 
     @Autowired
     HttpServletRequest req;
@@ -46,9 +40,9 @@ public class SampleController {
         }
         model.addAttribute("roles", roles);
 
-        model.addAttribute(content, String.format("content/%s.html", fragment));
+        model.addAttribute("bodyContent", String.format("content/%s.html", fragment));
 
-        return baseUI;
+        return "base"; //base.html in /templates folder.
     }
 
     /**
