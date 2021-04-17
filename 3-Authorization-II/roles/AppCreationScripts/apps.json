@@ -35,7 +35,7 @@
       "codeConfigurations": [
 
         {
-        "settingFile": "/src/main/resources/application.properties", 
+        "settingFile": "/src/main/resources/application.yml", 
           "replaceTokens": 
             {
             /** 

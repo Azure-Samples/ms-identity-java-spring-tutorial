@@ -67,8 +67,6 @@ These application roles are defined in the [Azure portal](https://portal.azure.c
 
 ## Contents
 
-> Give a high-level folder structure of the sample.
-
 | File/folder       | Description                                |
 |-------------------|--------------------------------------------|
 | `AppCreationScripts/`                                                               | Scripts to automatically configure Azure AD app registrations.                              |
@@ -194,7 +192,7 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 
 > In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
-1. Open the `src\main\resources\application.properties` file.
+1. Open the `src\main\resources\application.yml` file.
 1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant ID.
 1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapp-roles` app copied from the Azure portal.
 1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-spring-webapp-roles` copied from the Azure portal.
@@ -205,11 +203,8 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 
 To run the sample in Visual Studio Code, ensure that you have installed the [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
 
-1. Open Visual Studio Code in the directory of this readme file.
-1. Open the integrated terminal (shortcut: `ctrl + ~`). Run `mvn clean compile`.
-1. Open the Explorer window in VS Code (shortcut: `ctrl + shift + E`).
-1. Expand the `JAVA PROJECTS` blade.
-1. Click the run button next to `ms-identity-spring-boot-webapp`.
+1. Open a terminal or the integrated VSCode terminal (shortcut: `ctrl + ~`).
+1. In the same directory as this readme file, run `mvn clean compile spring-boot:run`.
 1. Open your browser and navigate to `http://localhost:8080`.
 
 ![Experience](./ReadmeFiles/app.png)
@@ -336,7 +331,7 @@ This app has some simple logic in the UI template pages for determining content 
 
 ### Protecting routes with AADWebSecurityConfigurerAdapter
 
-By default, this app protects the **ID Token Details**, **Admins Only** and **Regular Users** pages so that only logged-in users can access them. This app uses configures these routes from the `app.protect.authenticated` property from the `application.properties` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For an example, see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
+By default, this app protects the **ID Token Details**, **Admins Only** and **Regular Users** pages so that only logged-in users can access them. This app uses configures these routes from the `app.protect.authenticated` property from the `application.yml` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For an example, see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
 
 ```java
 @EnableWebSecurity
