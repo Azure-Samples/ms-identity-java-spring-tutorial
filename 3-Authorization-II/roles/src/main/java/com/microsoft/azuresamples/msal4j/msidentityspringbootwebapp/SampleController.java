@@ -9,7 +9,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,11 +18,32 @@ import org.springframework.ui.Model;
 
 @Controller
 public class SampleController {
-    @Value( "${app.ui.base:base.jsp}" )
-    private String baseUI;
 
-    @Value( "${app.ui.content:bodyContent}" )
-    private String content;
+    @Autowired
+    HttpServletRequest req;
+
+    /**
+     * Add HTML partial fragment from /templates/content folder to request and serve base html
+     * @param model Model used for placing user param and bodyContent param in request before serving UI.
+     * @param req used to determine which endpoint triggered this, in order to display required roles.
+     * @param fragment used to determine which partial to put into UI
+     */
+    private String hydrateUI(Model model, String fragment) {
+        String path = req.getServletPath();
+        String roles;
+        if (path.equals("/regular_user")) {
+            roles = "PrivilegedAdmin, RegularUser";
+        } else if (path.equals("/admin_only")) {
+            roles = "PrivilegedAdmin";
+        } else {
+            roles = "ROLES UNKNOWN FOR THIS REQUEST";
+        }
+        model.addAttribute("roles", roles);
+
+        model.addAttribute("bodyContent", String.format("content/%s.html", fragment));
+
+        return "base"; //base.html in /templates folder.
+    }
 
     /**
      *  Sign in status endpoint
@@ -33,8 +54,7 @@ public class SampleController {
      */
     @GetMapping(value = {"/", "sign_in_status", "/index"})
     public String status(Model model) {
-        model.addAttribute(content, "content/status.jsp");
-        return baseUI;
+        return hydrateUI(model, "status");
     }
 
     /**
@@ -49,8 +69,7 @@ public class SampleController {
     @GetMapping(path = "/token_details")
     public String tokenDetails(Model model, @AuthenticationPrincipal OidcUser principal) {
         model.addAttribute("claims", Utilities.filterClaims(principal));
-        model.addAttribute(content, "content/token.jsp");
-        return baseUI;
+        return hydrateUI(model, "token");
     }
 
     /**
@@ -62,10 +81,9 @@ public class SampleController {
      */
     @GetMapping(path = "/admin_only")
     @PreAuthorize("hasAuthority('APPROLE_PrivilegedAdmin')")
-    public String adminOnly(Model model, HttpServletRequest req) {
-        addRolesAttribute(model, req);
-        model.addAttribute(content, "content/role.jsp");
-        return baseUI;
+    public String adminOnly(Model model) {
+        // method decorator limits access to this endpoint to admin approle only
+        return hydrateUI(model, "role");
     }
 
     /**
@@ -77,40 +95,26 @@ public class SampleController {
      */
     @GetMapping(path = "/regular_user")
     @PreAuthorize("hasAnyAuthority('APPROLE_PrivilegedAdmin','APPROLE_RegularUser')")
-    public String regularUser(Model model, HttpServletRequest req) {
-        addRolesAttribute(model, req);
-        model.addAttribute(content, "content/role.jsp");
-        return baseUI;
+    public String regularUser(Model model) {
+        // method decorator limits access to this endpoint to either app role
+        return hydrateUI(model, "role");
     }
 
     /**
      *  handleError - show custom 403 page on failing to meet roles requirements
      * @param model Model used for placing user param and bodyContent param in request before serving UI.
-     * @param req used to determine which endpoint triggered this, in order to display required roles.
-     * @param adex the access-denied exception
+
      * @return String the UI.
      */
     @ExceptionHandler(AccessDeniedException.class)
-    public String handleError(Model model, AccessDeniedException adex, HttpServletRequest req) {
-        addRolesAttribute(model, req);
-        model.addAttribute(content, "content/403.jsp");
-        return baseUI;
-    }
-
-    private void addRolesAttribute(Model model, HttpServletRequest req) {
-        String path = req.getServletPath();
-        if (path.equals("/regular_user")) {
-            model.addAttribute("roles", "PrivilegedAdmin, RegularUser");
-        } else if (path.equals("/admin_only")) {
-            model.addAttribute("roles", "PrivilegedAdmin");
-        }
+    public String handleError(Model model) {
+        return hydrateUI(model, "403");
     }
 
     // survey endpoint - did the sample address your needs?
     // not an integral a part of this tutorial.
     @GetMapping(path = "/survey")
-    public String tokenDetails(Model model) {
-        model.addAttribute(content, "content/survey.jsp");
-        return baseUI;
+    public String survey(Model model) {
+        return hydrateUI(model, "survey");
     }
 }

@@ -30,7 +30,7 @@
         {
             "App": "webApp",
             "SettingKind": "Replace",
-            "SettingFile": "\\..\\src\\main\\resources\\application.properties",
+            "SettingFile": "\\..\\src\\main\\resources\\application.yml",
             "Mappings": [
                 {
                     "key": "Enter_Your_Tenant_ID_Here",
