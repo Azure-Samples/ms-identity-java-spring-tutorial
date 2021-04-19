@@ -12,31 +12,29 @@ description: "This sample demonstrates a Java Spring MVC web app that signs in u
 ---
 # Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform
 
-- [Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform](#enable-your-java-spring-boot-web-app-to-sign-in-users-and-call-microsoft-graph-with-the-microsoft-identity-platform)
-  - [Overview](#overview)
-  - [Scenario](#scenario)
-  - [Contents](#contents)
-  - [Prerequisites](#prerequisites)
-  - [Setup](#setup)
-    - [Clone or download this repository](#clone-or-download-this-repository)
-    - [Register the sample application(s) with your Azure Active Directory tenant](#register-the-sample-applications-with-your-azure-active-directory-tenant)
-    - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
-    - [Register the webApp app (java-spring-webapp-call-graph)](#register-the-webapp-app-java-spring-webapp-call-graph)
-      - [Configure the webApp app (java-spring-webapp-call-graph) to use your app registration](#configure-the-webapp-app-java-spring-webapp-call-graph-to-use-your-app-registration)
-  - [Running the sample](#running-the-sample)
-  - [Explore the sample](#explore-the-sample)
-  - [We'd love your feedback!](#wed-love-your-feedback)
-  - [About the code](#about-the-code)
-    - [Project Initialization](#project-initialization)
-    - [ID Token Claims](#id-token-claims)
-    - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
-    - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
-    - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
-    - [Call Graph](#call-graph)
-    - [Scopes](#scopes)
-  - [More information](#more-information)
-  - [Community Help and Support](#community-help-and-support)
-  - [Contributing](#contributing)
+- [Overview](#overview)
+- [Scenario](#scenario)
+- [Contents](#contents)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+  - [Clone or download this repository](#clone-or-download-this-repository)
+  - [Register the sample application(s) with your Azure Active Directory tenant](#register-the-sample-applications-with-your-azure-active-directory-tenant)
+  - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
+  - [Register the webApp app (java-spring-webapp-call-graph)](#register-the-webapp-app-java-spring-webapp-call-graph)
+- [Running the sample](#running-the-sample)
+- [Explore the sample](#explore-the-sample)
+- [We'd love your feedback!](#wed-love-your-feedback)
+- [About the code](#about-the-code)
+  - [Project Initialization](#project-initialization)
+  - [ID Token Claims](#id-token-claims)
+  - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
+  - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
+  - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
+  - [Call Graph](#call-graph)
+  - [Scopes](#scopes)
+- [More information](#more-information)
+- [Community Help and Support](#community-help-and-support)
+- [Contributing](#contributing)
 
 <!-- ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/<BuildNumber>/badge) -->
 
@@ -55,12 +53,6 @@ This sample demonstrates a Java Spring Boot web app that signs in users and obta
 
 | File/folder       | Description                                |
 |-------------------|--------------------------------------------|
-<<<<<<< HEAD
-| `CHANGELOG.md`    | List of changes to the sample.             |
-| `CONTRIBUTING.md` | Guidelines for contributing to the sample. |
-| `LICENSE`         | The license for the sample.                |
-| `TODO`         | List the remaining contents.                |
-=======
 | `AppCreationScripts/`                                                               | Scripts to automatically configure Azure AD app registrations.                              |
 | `pom.xml`                                                                           | Application dependencies.                                                                   |
 | `src/main/resources/templates/`                                                     | Thymeleaf Templates for UI.                                                                 |
@@ -73,7 +65,6 @@ This sample demonstrates a Java Spring Boot web app that signs in users and obta
 | `CHANGELOG.md`                                                                      | List of changes to the sample.                                                              |
 | `CONTRIBUTING.md`                                                                   | Guidelines for contributing to the sample.                                                  |
 | `LICENSE`                                                                           | The license for the sample.                                                                 |
->>>>>>> ecad5e882e84bb1e4e4f4c2dd173bd1d76c77f5e
 
 ## Prerequisites
 
@@ -203,11 +194,7 @@ Were we successful in addressing your learning objective? Consider taking a mome
 
 ## About the code
 
-<<<<<<< HEAD
-This sample demonstrates how to use [Azure AD Spring Boot Starter client library for Java](TODO links please ) to sign in users into your Azure AD tenant and obtain an [Access Token](TODO links please) for calling **Microsoft Graph**. It also makes use of **Spring Oauth2 Client** and **Spring Web**.
-=======
 This sample demonstrates how to use [Azure AD Spring Boot Starter client library for Java](https://docs.microsoft.com/java/api/overview/azure/active-directory-spring-boot-starter-readme?view=azure-java-stable) to sign in users into your Azure AD tenant and obtain an **Access Token** for calling **Microsoft Graph**. It also makes use of **Spring Oauth2 Client** and **Spring Web** boot starters.
->>>>>>> ecad5e882e84bb1e4e4f4c2dd173bd1d76c77f5e
 
 ### Project Initialization
 
