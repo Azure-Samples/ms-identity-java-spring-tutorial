@@ -60,6 +60,7 @@ In order to deploy your app, you must:
 1. Enter a globally unique name for your web app (e.g. `example-domain`) and press enter. Make a note of this name. If you chose `example-domain` for your app name, your app's domain name will be `https://example-domain.azurewebsites.net`
 1. Select `Java 11` for your runtime stack.
 1. Select `Java SE (Embedded Web Server)` for your Java web server stack.
+1. If you are asked for an OS, choose `Linux`.
 1. Select `Free` or any other option for your pricing tier.
 
 ### Step 2: Prepare the web app for deployment
@@ -79,7 +80,7 @@ You must first modify the configuration files in your application. Go to your ap
         # ...
     ```
 
-- Add a value for server configuration in order to properly handle the redirect URI. This tells tomcat that it is behind a reverse proxy and to correctly set URLs to https.
+- Add the following values for server configuration in order to properly handle the redirect URI. This tells the embedded Tomcat server that it is behind a reverse proxy (e.g., Azure App Service) and to correctly identify incoming requests as https.
 
     ```yml
     server:
