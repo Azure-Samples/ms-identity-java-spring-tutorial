@@ -64,20 +64,32 @@ In order to deploy your app, you must:
 
 ### Step 2: Prepare the web app for deployment
 
-You must first modify the configuration files in your application.
+You must first modify the configuration files in your application. Go to your app's properties file(`src/main/resources/application.yml`). 
 
-- Go to your app's properties file(`src/main/resources/application.yml`) and change the value of `post-logout-redirect-uri: http://localhost:8080` to your deployed app's domain name. For example, if you chose `example-domain` for your app name in [Step 1: Create a new app on Azure App Service](#step-1-create-a-new-app-on-azure-app-service), you must now use the value  `post-logout-redirect-uri=https://example-domain.azurewebsites.net`. Be sure that you have also changed the protocol from `http` to `https`.
+- Change the value of `post-logout-redirect-uri: http://localhost:8080` to your deployed app's domain name. For example, if you chose `example-domain` for your app name in [Step 1: Create a new app on Azure App Service](#step-1-create-a-new-app-on-azure-app-service), you must now use the value  `post-logout-redirect-uri=https://example-domain.azurewebsites.net`. Be sure that you have also changed the protocol from `http` to `https`.
 
-```yml
-# the default value was:
-# post-logout-redirect-uri: http://localhost:8080
-# the correct format for the new value is as follows:
-azure:
-  activedirectory:
-    # ...
-    post-logout-redirect-uri: https://example-domain.azurewebsites.net
-    # ...
-```
+    ```yml
+    # the default value was:
+    # post-logout-redirect-uri: http://localhost:8080
+    # the correct format for the new value is as follows:
+    azure:
+      activedirectory:
+        # ...
+        post-logout-redirect-uri: https://example-domain.azurewebsites.net
+        # ...
+    ```
+
+- Add a value for server configuration in order to properly handle the redirect URI. This tells tomcat that it is behind a reverse proxy and to correctly set URLs to https.
+
+    ```yml
+    server:
+      forward-headers-strategy: native
+      tomcat:
+        remoteip:
+          protocol-header: "X-Forwarded-Proto"
+          remote-ip-header: "X-Forwarded-For"
+          internal-proxies: ".*"
+    ```
 
 You **may skip the rest of this step** if you are doing a test deployment with a development Azure Active Directory App registration that does not have any sensitive data. **It is not secure to deploy secrets in a config file to a production application**. To deploy your app more securely, you must:
 
@@ -95,7 +107,7 @@ You **may skip the rest of this step** if you are doing a test deployment with a
          azure.activedirectory.client_secret=`YOUR CLIENT SECRET VALUE`
          ```
 
-3. If you are sure you want to continue, proceed to [Step 3](#step-3-deploy-the-web-app).
+3. If you are sure you want to continue, proceed to [Deploy the web app](#step-3-deploy-the-web-app)
 
 ### Step 3: Deploy the web app
 
@@ -109,7 +121,7 @@ This guide is for deploying to **Azure App Service** via **Azure Maven web app p
         mvn com.microsoft.azure:azure-webapp-maven-plugin:1.13.0:config
         ```
 
-    1. You will be asked to choose a Java SE Web App. Enter the option number corresponding to the app you created in the section [Create a new app on Azure App Service](#step-1-create-a-new-app-on-azure-app-service), e.g., `example-domain (linux, java 11-java11)`. Press enter. Confirm that the details are correct and press enter again to continue. This will add deployment configuration settings in your `pom.xml` file.
+    1. You will be asked to choose a Java SE Web App. Enter the option number corresponding to the app you created in the section [Create a new app on Azure App Service](#step-1-create-a-new-app-on-azure-app-service), e.g., the option number corresponding to `example-domain (linux, java 11-java11)`. Press enter. Confirm that the details are correct and press enter again to continue. This will add deployment configuration settings in your `pom.xml` file.
 
 2. Deploy the web app using the azure webapp maven plugin.
 
