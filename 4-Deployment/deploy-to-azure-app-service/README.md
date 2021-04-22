@@ -33,18 +33,18 @@ This readme demonstrates how to use [Azure App Service](https://docs.microsoft.c
 
 ## Setup
 
-Follow the setup instructions in [Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform](https://github.com/azure-samples/ms-identity-java-spring-tutorial/2-Authorization-I/call-graph) sample.
+Follow the setup instructions in [Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform](https://github.com/Azure-Samples/ms-identity-java-spring-tutorial/tree/main/2-Authorization-I/call-graph) sample.
 
 ## Registration
 
 ### Register the web app
 
 Use an Azure AD application registration and its matching sample that that you have completed previously.
-If you have not completed a sample yet, we recommend you proceed to complete [Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform](https://github.com/azure-samples/ms-identity-java-spring-tutorial/2-Authorization-I/call-graph) sample and use the app registration from it.
+If you have not completed a sample yet, we recommend you proceed to complete [Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform](https://github.com/Azure-Samples/ms-identity-java-spring-tutorial/tree/main/2-Authorization-I/call-graph) sample and use the app registration from it.
 
 ## Deployment
 
-This guide is for deploying to **Azure App Service** via **VS Code Azure Tools Extension**. Follow these steps in a VSCode window with the workspace set to your copy of the [Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform](https://github.com/azure-samples/ms-identity-java-spring-tutorial/2-Authorization-I/call-graph).
+This guide is for deploying to **Azure App Service** via **VS Code Azure Tools Extension**. Follow these steps in a VSCode window with the workspace set to your copy of the [Enable your Java Spring Boot web app to sign in users and call Microsoft Graph with the Microsoft identity platform](https://github.com/Azure-Samples/ms-identity-java-spring-tutorial/tree/main/2-Authorization-I/call-graph).
 
 In order to deploy your app, you must:
 
@@ -65,7 +65,7 @@ In order to deploy your app, you must:
 
 ### Step 2: Prepare the web app for deployment
 
-You must first modify the configuration files in your application. Go to your app's properties file(`src/main/resources/application.yml`). 
+You must first modify the configuration files in your application. Go to your app's properties file(`src/main/resources/application.yml`).
 
 - Change the value of `post-logout-redirect-uri: http://localhost:8080` to your deployed app's domain name. For example, if you chose `example-domain` for your app name in [Step 1: Create a new app on Azure App Service](#step-1-create-a-new-app-on-azure-app-service), you must now use the value  `post-logout-redirect-uri=https://example-domain.azurewebsites.net`. Be sure that you have also changed the protocol from `http` to `https`.
 
