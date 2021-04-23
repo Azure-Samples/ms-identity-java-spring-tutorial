@@ -203,7 +203,7 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 
 To run the sample in Visual Studio Code, ensure that you have installed the [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
 
-1. Open a terminal or the integrated VSCode terminal (shortcut: `ctrl + ~`).
+1. Open a terminal or the integrated VSCode terminal.
 1. In the same directory as this readme file, run `mvn clean compile spring-boot:run`.
 1. Open your browser and navigate to `http://localhost:8080`.
 
