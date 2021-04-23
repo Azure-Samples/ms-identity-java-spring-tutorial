@@ -64,11 +64,11 @@ Please refer to each sample's README for sample-specific recommendations.
 | <img src="./ReadmeFiles/sign-in.png" width="200"> | [**3.1 Acquire an ID Token with the roles claim**](./3-Authorization-II/roles) </br> Enable your web app to acquire an ID Token with the **Roles** claim. Filter access to routes based on the role membership. |
 <!-- | <img src="./ReadmeFiles/sign-in.png" width="200"> | [**3.2 Acquire an ID Token with the Groups claim**](./3-Authorization-II/groups) </br> Enable your web app to acquire an ID Token with a **Groups** claim. Filter access to routes based on the role membership. Learn how to call Graph to handle edge cases where the user is a member of too many groups to fit into an ID Token. | -->
 
-<!-- ### Chapter 4: Deploy your app to Azure
+### Chapter 4: Deploy your app to Azure
 
 |                 |               |
 |-----------------|---------------|
-| <img src="./ReadmeFiles/sign-in.png" width="200"> | [**4.1 Deploy to Azure App Service**](./4-Deployment/deploy-to-azure-app-service) </br> Prepare your app for deployment to Azure App Service. Learn how to package and upload files, configure authentication parameters and use various Azure services for managing your operations. | -->
+| <img src="./ReadmeFiles/sign-in.png" width="200"> | [**4.1 Deploy to Azure App Service**](./4-Deployment/deploy-to-azure-app-service) </br> Prepare your app for deployment to Azure App Service. Learn how to package and upload files, configure authentication parameters and use various Azure services for managing your operations. |
 
 ## We'd love your feedback!
 
@@ -96,7 +96,7 @@ See more code samples:
 
 Use [Stack Overflow](http://stackovergrant.com/questions/tagged/msal) to get support from the community.
 Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-Make sure that your questions or comments are tagged with [`ms-identity` `azure-ad` `azure-ad-b2c` `msal` `python`].
+Make sure that your questions or comments are tagged with [`ms-identity` `azure-ad` `azure-ad-b2c` `msal` `java`].
 
 If you find a bug in the sample, please raise the issue on [GitHub Issues](../../issues).
 
