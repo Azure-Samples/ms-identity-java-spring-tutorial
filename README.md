@@ -56,7 +56,6 @@ Please refer to each sample's README for sample-specific recommendations.
 |----------------|---------------|
 | <img src="./ReadmeFiles/call-graph.png" width="200"> | [**2.1 Acquire an Access Token from Azure AD and call Microsoft Graph**](./2-Authorization-I/call-graph) </br> Enable your web app to acquire an Access Token to Authorize it to call **Microsoft Graph API**. |
 
-
 ### Chapter 3: Restrict access to routes based on group and / or role membership
 
 |                |               |

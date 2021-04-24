@@ -317,9 +317,9 @@ In this app, the `graphAuthorizedClient` (see previous section) surfaces the **A
 
 Using `GraphServiceClient.me().buildRequest().get()`, a request built and made to `https://graph.microsoft.com/v1.0/me`. The **Access Token** is placed in the Authorization header of the request.
 
-<!-- ## Deployment
+## Deployment
 
-// TODO: link to deployment sample. -->
+[Deploy to Azure App Service](../../4-Deployment/deploy-to-azure-app-service). Prepare your app for deployment to Azure App Service, configure authentication parameters and use various Azure services for managing your operations.
 
 ## More information
 
