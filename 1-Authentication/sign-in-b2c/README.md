@@ -88,8 +88,9 @@ From your shell or command line:
 or download and extract the repository .zip file.
 
 > :warning: To avoid path length limitations on Windows, we recommend cloning into a directory near the root of your drive.
+> :warning: This sample comes with a pre-registered application for demo purposes. If you would like to use your own Azure AD B2C tenant and application, follow the steps below to register and configure the application on Azure portal. Otherwise, continue with the steps for Running the sample.
 <details>
-  <summary>Expand this section to see manual steps for configuring your own tenant:</summary>
+  <summary>Expand this section to seesteps for configuring your own tenant:</summary>
 
 ### Choose the Azure AD B2C tenant where you want to create your applications
 
@@ -114,7 +115,7 @@ Please refer to: [Tutorial: Add identity providers to your applications in Azure
 1. Select the **App Registrations** blade on the left, then select **New registration**.
 1. In the **Register an application page** that appears, enter your application's registration information:
    - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-spring-webapp-auth-b2c`.
-   - Under **Supported account types**, select **Accounts in any organizational directory and personal Microsoft accounts (e.g. Skype, Xbox, Outlook.com)**.
+   - Under **Supported account types**, select **Accounts in any identity provider or organizational directory (for authenticating users with user flows)**.
    - In the **Redirect URI (optional)** section, select **Web** in the combo-box and enter the following redirect URI: `http://localhost:8080/login/oauth2/code/`.
 1. Select **Register** to create the application.
 1. In the app's registration screen, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
@@ -140,7 +141,9 @@ Open the project in your IDE (like **Visual Studio Code**) to configure the code
 1. Find the app key `sign-up-or-sign-in` and replace it with the name of the sign-up/sign-in user-flow policy you created in the AAD B2C tenant in which you created the `java-spring-webapp-auth-b2c` application in the Azure portal.
 1. Find the app key `profile-edit` and replace it with the name of the password reset user-flow policy you created in the AAD B2C tenant in which you created the `java-spring-webapp-auth-b2c` application in the Azure portal.
 1. Find the app key `password-reset` and replace it with the name of the edit profile user-flow policy you created in the AAD B2C tenant in which you created the `java-spring-webapp-auth-b2c` application in the Azure portal.
-1. Open the `src/main/resources/templates/navbar.html` file. Find the references to the references to `b2c_1_susi` and `b2c_1_edit_profile` flows and replace them with your `sign-up-sign-in` and `profile-edit` user-flows.
+
+1. Open the [navbar.html](src/main/resources/templates/navbar.html) file.
+1. Find the references to the references to `b2c_1_susi` and `b2c_1_edit_profile` flows and replace them with your `sign-up-sign-in` and `profile-edit` user-flows.
 
 </details>
 
@@ -232,27 +235,35 @@ This app has some simple logic in the UI template pages for determining content 
 </div>
 ```
 
-### Protecting routes with AADWebSecurityConfigurerAdapter
+### Protecting routes with WebSecurityConfigurerAdapter
 
-By default, this app protects the **ID Token Details** page so that only logged-in users can access it. This app uses configures these routes from the `app.protect.authenticated` property from the `application.yml` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For an example, see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
+By default, this app protects the **ID Token Details** page so that only logged-in users can access it. This app uses configures these routes from the `app.protect.authenticated` property from the `application.yml` file. To configure your app's specific requirements, extend `WebSecurityConfigurerAdapter` in one of your classes. For an example, see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
 
 ```java
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
-  @Value( "${app.protect.authenticated}" )
-  private String[] protectedRoutes;
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Value("${app.protect.authenticated}")
+    private String[] protectedRoutes;
+
+    private final AADB2COidcLoginConfigurer configurer;
+
+    public SecurityConfig(AADB2COidcLoginConfigurer configurer) {
+        this.configurer = configurer;
+    }
 
     @Override
-    public void configure(HttpSecurity http) throws Exception {
-    // use required configuration form AADWebSecurityAdapter.configure:
-    super.configure(http);
-    // add custom configuration:
-    http.authorizeRequests()
-      .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details)
-      .antMatchers("/**").permitAll();                  // allow all other routes.
+    protected void configure(HttpSecurity http) throws Exception {
+        // @formatter:off
+        http.authorizeRequests()
+            .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details)
+            .antMatchers("/**").permitAll()                  // allow all other routes.
+            .and()
+            .apply(configurer)
+            ;
+        // @formatter:off
     }
-}
+} 
 ```
 
 ## Deployment
