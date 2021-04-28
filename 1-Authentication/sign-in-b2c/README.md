@@ -39,9 +39,6 @@ description: "This sample demonstrates a Java Spring MVC web app that authentica
 ## Overview
 
 This sample demonstrates a Java Spring MVC web app that signs in users on your Azure Active Directory B2C tenant using the [Azure AD B2C Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory-b2c). It uses the OpenID Connect protocol.
-
-![Overview](./ReadmeFiles/topology.png)
-
 ## Scenario
 
 1. The client Java Spring web app leverages the Azure AD B2C Spring Boot Starter client library for Java to sign in a user and obtain an ID Token from **Azure AD B2C**.
@@ -187,7 +184,7 @@ If you'd like to create a project like this from scratch, you may use [Spring In
 - For **Packaging**, select `Jar`
 - For **Java** select version `11`
 - For **Dependencies**, add the following:
-  - Azure Active Directory
+  - Azure Active Directory B2C
   - Spring Oauth2 Client
   - Spring Web
 - Be sure that it comes with Azure SDK version 3.3 or higher. If not, please consider replacing the pre-configured `pom.xml` with the `pom.xml` from this repository.
