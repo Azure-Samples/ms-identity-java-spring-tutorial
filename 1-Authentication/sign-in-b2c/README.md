@@ -68,7 +68,6 @@ This sample demonstrates a Java Spring MVC web app that signs in users on your A
 - [Maven 3](https://maven.apache.org/download.cgi)
 - [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample in VSCode.
 - An **Azure AD B2C** tenant. For more information see: [How to get an Azure AD B2C tenant](https://docs.microsoft.com/azure/active-directory-b2c/tutorial-create-tenant)
-- A user account in your **Azure AD B2C**.
 
 ## Setup
 
@@ -158,7 +157,7 @@ Open the [navbar.html](src/main/resources/templates/navbar.html) file.
 - Note the signed-in or signed-out status displayed at the center of the screen.
 - Click the context-sensitive button at the top right (it will read `Sign In` on first run)
   - Alternatively, click the link to `token details`. Since this is a protected page that requires authentication, you'll be automatically redirected to the sign-in page.
-- Follow the instructions on the next page to sign in with an account of your chosen identity provider.
+- Follow the instructions on the next page to sign in with an account of your chosen identity provider. You may also choose to sign up or sign in to a local account on the B2C tenant using an email address.
 <!-- - On the consent screen, note the scopes that are being requested. -->
 - Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`) or `token details` page, depending on which button triggered your sign-in flow.
 - Note the context-sensitive button now says `Sign out` and displays your username to its left.
