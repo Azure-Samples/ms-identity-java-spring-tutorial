@@ -48,7 +48,7 @@ Please refer to each sample's README for sample-specific recommendations.
 |               |               |
 |---------------|---------------|
 | <img src="./ReadmeFiles/sign-in.png" width="200"> | [**1.1 Sign-in with Azure AD**](./1-Authentication/sign-in) </br> Sign your users in with **Azure AD** and learn to work with **ID Tokens**.  |
-| <img src="./ReadmeFiles/sign-in-2.png" width="200"> | [**1.2 Sign-in with Azure AD B2C**](./1-Authentication/sign-in-b2c) </br> Sign your customers in with **Azure AD B2C**. Learn to integrate with **external social identity providers**. Learn how to use **user-flows** and **custom policies**. |
+| <img src="./ReadmeFiles/sign-in.png" width="200"> | [**1.2 Sign-in with Azure AD B2C**](./1-Authentication/sign-in-b2c) </br> Sign your customers in with **Azure AD B2C**. Learn to integrate with **external social identity providers**. Learn how to use **user-flows** and **custom policies**. |
 
 ### Chapter 2: Get an Access Token and call Microsoft Graph
 
