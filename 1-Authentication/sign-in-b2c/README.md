@@ -131,7 +131,7 @@ Open the project in your IDE (like **Visual Studio Code**) to configure the code
 
 > In the steps below, "ClientID" is the same as "Application ID" or "AppId".
 
-1. Open the [application.yml](src/main/resources/application.yml) file.
+Open the [application.yml](src/main/resources/application.yml) file.
 1. Find the key `client-id` and replace the existing value with the application ID (clientId) of the `java-spring-webapp-auth-b2c` application from the Azure portal.
 1. Find the app key `client-secret` and replace the existing value with the key you saved during the creation of the `java-spring-webapp-auth-b2c` application from the Azure portal.
 1. Find the app key `base-uri` and replace the two instances of `fabrikamb2c` with the name of the AAD B2C tenant in which you created the `java-spring-webapp-auth-b2c` application in the Azure portal.
@@ -139,7 +139,7 @@ Open the project in your IDE (like **Visual Studio Code**) to configure the code
 1. Find the app key `profile-edit` and replace it with the name of the password reset user-flow policy you created in the AAD B2C tenant in which you created the `java-spring-webapp-auth-b2c` application in the Azure portal.
 1. Find the app key `password-reset` and replace it with the name of the edit profile user-flow policy you created in the AAD B2C tenant in which you created the `java-spring-webapp-auth-b2c` application in the Azure portal.
 
-1. Open the [navbar.html](src/main/resources/templates/navbar.html) file.
+Open the [navbar.html](src/main/resources/templates/navbar.html) file.
 1. Find the references to the references to `b2c_1_susi` and `b2c_1_edit_profile` flows and replace them with your `sign-up-sign-in` and `profile-edit` user-flows.
 
 </details>
@@ -162,7 +162,7 @@ Open the project in your IDE (like **Visual Studio Code**) to configure the code
 - Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`) or `token details` page, depending on which button triggered your sign-in flow.
 - Note the context-sensitive button now says `Sign out` and displays your username to its left.
 - If you are on the home page, you'll see an option to click **ID Token Details**: click it to see some of the ID token's decoded claims.
-- You also have the option of editing your profile. Click the link on the top-right of the navbar to edit details like your display name, place of residence, and profession.
+- You also have the option to edit your profile. Click the `edit profile` link on the top-right of the navbar to change details like your display name, place of residence, and profession.
 - You can also use the button on the top right to sign out. The status page will reflect this.
 
 > :information_source: Did the sample not work for you as expected? Did you encounter issues trying this sample? Then please reach out to us using the [GitHub Issues](../../../../issues) page.
