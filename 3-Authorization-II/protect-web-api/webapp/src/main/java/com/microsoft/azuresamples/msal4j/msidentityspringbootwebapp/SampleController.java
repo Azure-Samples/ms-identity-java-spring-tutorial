@@ -4,7 +4,6 @@
 package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapp;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
@@ -15,13 +14,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.MultiValueMap;
 
 @Controller
 public class SampleController {
@@ -78,10 +73,9 @@ public class SampleController {
             .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
             .build();
 
-        String response = apiClient.get().uri("api/date").retrieve().toEntity(String.class).block().getBody();
         Map<String,String> apiResp = new HashMap<>();
-
         try {
+            String response = apiClient.get().uri("api/date").retrieve().toEntity(String.class).block().getBody();
             apiResp = new ObjectMapper().readValue(response, HashMap.class);
         } catch (Exception ex) {
             apiResp.put("Error", "Response was null or other error");

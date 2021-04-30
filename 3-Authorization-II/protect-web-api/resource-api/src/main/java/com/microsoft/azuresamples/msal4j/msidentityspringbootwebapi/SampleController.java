@@ -4,6 +4,8 @@
 package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapi;
 
 import java.util.Date;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -14,7 +16,7 @@ public class SampleController {
 
     @GetMapping("/api/date")
     @ResponseBody
-    // @PreAuthorize("hasAuthority('SCOPE_access_as_user')")
+    @PreAuthorize("hasAuthority('SCOPE_access_as_user')")
     public String date(BearerTokenAuthentication btAuth) {
         return new DateResponse().toString();
     }
