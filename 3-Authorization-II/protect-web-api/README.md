@@ -41,8 +41,6 @@ description: "This sample demonstrates a Java Spring web application calling a J
 
 This sample demonstrates a Java Spring web application calling a Java Spring web API that is secured using Azure AD. It uses the [Azure AD Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory). It uses the OAuth2.0 protocol.
 
-![Overview](./ReadmeFiles/topology.png)
-
 ## Scenario
 
 1. The client Java Spring MVC web app leverages the Azure AD Spring Boot Starter client library for Java to sign-in a user and obtain an AccessToken from **Azure AD**.
