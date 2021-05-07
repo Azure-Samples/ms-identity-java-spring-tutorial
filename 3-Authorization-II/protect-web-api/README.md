@@ -21,7 +21,7 @@ description: "This sample demonstrates a Java Spring web application calling a J
   - [Register the sample application(s) with your Azure Active Directory tenant](#register-the-sample-applications-with-your-azure-active-directory-tenant)
   - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
   - [Register the service app (java-spring-resource-api)](#register-the-service-app-java-spring-resource-api)
-  - [Register the client app (java-spring-webapp-api)](#register-the-client-app-java-spring-webapp-api)
+  - [Register the client app (java-spring-webapp-client)](#register-the-client-app-java-spring-webapp-client)
 - [Running the sample](#running-the-sample)
 - [Explore the sample](#explore-the-sample)
 - [We'd love your feedback!](#wed-love-your-feedback)
@@ -56,13 +56,21 @@ This sample demonstrates a Java Spring web application calling a Java Spring web
 |-------------------|--------------------------------------------|
 | `AppCreationScripts/`                                                               | Scripts to automatically configure Azure AD app registrations.                              |
 | `resource-api/`                                                                     | Java Spring protected resource web API.                                                     |
-| `resource-api/pom.xml`                                                                           | Application dependencies.                                                                   |
-| `resource-api/src/main/resources/application.yml`                                                | Application and Azure AD Boot Starter Library Configuration.                                |
-| `resource-api/src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapi/`       | This directory contains the main application entry point, controller, and config classes.   |
-| `resource-api/.../MsIdentitySpringBootWebappApplication.java`                                    | Main class.                                                                                 |
-| `resource-api/.../SampleController.java`                                                         | Controller with endpoint mappings.                                                          |
-| `resource-api/.../SecurityConfig.java`                                                           | Security Configuration (e.g., which routes require authentication?).                        |
-| `webapp/`                                                                                        | The Java Spring Boot web app. See a web chapter for description of files.                   |
+| `resource-api/pom.xml`                                                              | Application dependencies.                                                                   |
+| `resource-api/src/main/resources/application.yml`                                   | Application and Azure AD Boot Starter Library Configuration.                                |
+| `resource-api/src/main/java/.../msidentityspringbootwebapi/`                        | This directory contains the main application entry point, controller, and config classes.   |
+| `resource-api/src/main/java/.../MsIdentitySpringBootWebappApplication.java`         | Main class.                                                                                 |
+| `resource-api/src/main/java/.../SampleController.java`                              | Controller with endpoint mappings.                                                          |
+| `resource-api/src/main/java/.../SecurityConfig.java`                                | Security Configuration (e.g., which routes require authentication?).                        |
+| `webapp/`                                                                           | The Java Spring Boot web app. See a web chapter for description of files.                   |
+| `webapp/pom.xml`                                                                    | Application dependencies.                                                                   |
+| `webapp/src/main/resources/templates/`                                              | Thymeleaf Templates for UI.                                                                 |
+| `webapp/src/main/resources/application.yml`                                         | Application and Azure AD Boot Starter Library Configuration.                                |
+| `webapp/src/main/java/.../msidentityspringbootwebapp/`                              | This directory contains the main application entry point, controller, and config classes.   |
+| `webapp/src/main/java/.../MsIdentitySpringBootWebappApplication.java`               | Main class.                                                                                 |
+| `webapp/src/main/java/.../SampleController.java`                                    | Controller with endpoint mappings.                                                          |
+| `webapp/src/main/java/.../SecurityConfig.java`                                      | Security Configuration (e.g., which routes require authentication?).                        |
+| `webapp/src/main/java/.../Utilities.java`                                           | Utility Class (e.g., filter ID token claims).                                               |
 | `CHANGELOG.md`                                                                      | List of changes to the sample.                                                              |
 | `CONTRIBUTING.md`                                                                   | Guidelines for contributing to the sample.                                                  |
 | `LICENSE`                                                                           | The license for the sample.                                                                 |
@@ -143,6 +151,12 @@ As a first step you'll need to:
 1. Select **Register** to create the application.
 1. In the app's registration screen, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
 1. Select **Save** to save your changes.
+1. In the app's registration screen, select the **Certificates & secrets** blade in the left to open the page where we can generate secrets and upload certificates.
+1. In the **Client secrets** section, select **New client secret**:
+   - Type a key description (for instance `app secret`),
+   - Select one of the available key durations (For example, **6 months** or **1 year**) as per your security posture.
+   - The generated key value will be displayed when you select the **Add** button. Copy the generated value for use in the steps later.
+   - You'll need this key later in your code's configuration files. This key value will not be displayed again, and is not retrievable by any other means, so make sure to note it from the Azure portal before navigating to any other screen or blade.
 1. In the app's registration screen, select the **Expose an API** blade to the left to open the page where you can declare the parameters to expose this app as an API for which client applications can obtain [access tokens](https://docs.microsoft.com/azure/active-directory/develop/access-tokens) for.
 The first thing that we need to do is to declare the unique [resource](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow) URI that the clients will be using to obtain access tokens for this Api. To declare an resource URI, follow the following steps:
    - Select `Set` next to the **Application ID URI** to generate a URI that is unique for this app.
@@ -157,6 +171,9 @@ The first thing that we need to do is to declare the unique [resource](https://d
         - For **User consent description** type `Allow the application to access java-spring-resource-api on your behalf.`
         - Keep **State** as **Enabled**.
         - Select the **Add scope** button on the bottom to save this scope.
+1. On the left-hand side menu, select the Manifest blade.
+    - Set accessTokenAcceptedVersion property to 2.
+    - Select Save.
 
 #### Configure the service app (java-spring-resource-api) to use your app registration
 
@@ -167,12 +184,12 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 1. Open the `resource-api\src\main\resources\application.yml` file.
 1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-resource-api` app copied from the Azure portal.
 
-### Register the client app (java-spring-webapp-api)
+### Register the client app (java-spring-webapp-client)
 
 1. Navigate to the [Azure portal](https://portal.azure.com) and select the **Azure AD** service.
 1. Select the **App Registrations** blade on the left, then select **New registration**.
 1. In the **Register an application page** that appears, enter your application's registration information:
-   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-spring-webapp-api`.
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-spring-webapp-client`.
    - Under **Supported account types**, select **Accounts in this organizational directory only**.
    - In the **Redirect URI (optional)** section, select **Web** in the combo-box and enter the following redirect URI: `http://localhost:8080/login/oauth2/code/`.
 1. Select **Register** to create the application.
@@ -185,7 +202,7 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
    - In the **Delegated permissions** section, select the **Access 'java-spring-resource-api'** in the list. Use the search box if necessary.
    - Select the **Add permissions** button at the bottom.
 
-#### Configure the client app (java-spring-webapp-api) to use your app registration
+#### Configure the client app (java-spring-webapp-client) to use your app registration
 
 Open the project in your IDE (like Visual Studio or Visual Studio Code) to configure the code.
 
@@ -194,7 +211,7 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 1. Open the `webapp\src\main\resources\application.yml` file.
 1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant ID.
 1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with webApp.AppId.
-1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-spring-webapp-api` copied from the Azure portal.
+1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-spring-webapp-client` copied from the Azure portal.
 
 ## Running the sample
 

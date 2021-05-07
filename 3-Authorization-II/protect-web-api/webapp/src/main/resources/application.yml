@@ -19,3 +19,8 @@ azure:
 app:
   protect:
     authenticated: /token_details
+
+  # The API to will call, and its endpoint
+  api:
+    base-address: http://localhost:8080
+    date-endpoint: /api/date

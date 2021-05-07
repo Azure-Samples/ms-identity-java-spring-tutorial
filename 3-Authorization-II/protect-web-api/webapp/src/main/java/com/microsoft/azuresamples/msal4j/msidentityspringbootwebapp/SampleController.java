@@ -14,12 +14,20 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 @Controller
 public class SampleController {
+
+    @Value( "${app.api.base-address}" )
+    private String apiAddress;
+
+    @Value( "${app.api.date-endpoint}" )
+    private String apiEndpoint;
+
     /**
      * Add HTML partial fragment from /templates/content folder to request and serve base html
      * @param model Model used for placing user param and bodyContent param in request before serving UI.
@@ -69,15 +77,16 @@ public class SampleController {
     public String callAPI(Model model, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient) {
 
         final WebClient apiClient = WebClient.builder()
-            .baseUrl("http://localhost:8082/")
+            .baseUrl(apiAddress)
             .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
             .build();
 
-        Map<String,String> apiResp = new HashMap<>();
+        Map<String,String> apiResp;
         try {
-            String response = apiClient.get().uri("api/date").retrieve().toEntity(String.class).block().getBody();
-            apiResp = new ObjectMapper().readValue(response, HashMap.class);
+            String response = apiClient.get().uri(apiEndpoint).retrieve().toEntity(String.class).block().getBody();
+            apiResp =  new ObjectMapper().readValue(response, HashMap.class);
         } catch (Exception ex) {
+            apiResp = new HashMap<>();
             apiResp.put("Error", "Response was null or other error");
         }
 
