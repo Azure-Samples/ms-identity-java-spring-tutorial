@@ -27,9 +27,7 @@ description: "This sample demonstrates a Java Spring web application calling a J
 - [We'd love your feedback!](#wed-love-your-feedback)
 - [About the code](#about-the-code)
   - [Project Initialization](#project-initialization)
-  - [ID Token Claims](#id-token-claims)
-  - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
-  - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
+  - [Access Token Claims](#access-token-claims)
   - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
 - [More information](#more-information)
 - [Community Help and Support](#community-help-and-support)
@@ -57,7 +55,7 @@ This sample demonstrates a Java Spring web application calling a Java Spring web
 | `resource-api/pom.xml`                                                              | Application dependencies.                                                                   |
 | `resource-api/src/main/resources/application.yml`                                   | Application and Azure AD Boot Starter Library Configuration.                                |
 | `resource-api/src/main/java/.../msidentityspringbootwebapi/`                        | This directory contains the main application entry point, controller, and config classes.   |
-| `resource-api/src/main/java/.../MsIdentitySpringBootWebappApplication.java`         | Main class.                                                                                 |
+| `resource-api/src/main/java/.../MsIdentitySpringBootWebapi.java`                    | Main class.                                                                                 |
 | `resource-api/src/main/java/.../SampleController.java`                              | Controller with endpoint mappings.                                                          |
 | `resource-api/src/main/java/.../SecurityConfig.java`                                | Security Configuration (e.g., which routes require authentication?).                        |
 | `webapp/`                                                                           | The Java Spring Boot web app. See a web chapter for description of files.                   |
@@ -245,80 +243,42 @@ This sample demonstrates how to use [Azure AD Spring Boot Starter client library
 
 ### Project Initialization
 
-Create a new Java Maven project and copy the `pom.xml` file from this project, and the `src` folder of this repository.
+To make your own Spring boot resource API, create a new Java Maven project and copy the `pom.xml` file and the `src` folder within the `resource-api` directory of this repository.
 
-If you'd like to create a project like this from scratch, you may use [Spring Initializer](https://start.spring.io):
+### Access Token Claims
 
-- For **Packaging**, select `Jar`
-- For **Java** select version `11`
-- For **Dependencies**, add the following:
-  - Azure Active Directory
-  - Spring Oauth2 Client
-  - Spring Web
-- Be sure that it comes with Azure SDK version 3.3 or higher. If not, please consider replacing the pre-configured `pom.xml` with the `pom.xml` from this repository.
-
-### ID Token Claims
-
-To extract token details, make use of Spring Security's `AuthenticationPrincipal` and `OidcUser` object in a request mapping. See the [Sample Controller](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SampleController.java) for an example of this app making use of ID Token claims.
+To extract token details, make use of Spring Security's `AuthenticationPrincipal` and `OidcUser` object in a request mapping. See the [Sample Controller](./resources/src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapi/SampleController.java) for an example of this app making use of ID Token claims.
 
 ```java
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 //...
-@GetMapping(path = "/some_path")
-public String tokenDetails(@AuthenticationPrincipal OidcUser principal) {
-    Map<String, Object> claims = principal.getIdToken().getClaims();
+@GetMapping("/api/date")
+@ResponseBody
+@PreAuthorize("hasAuthority('SCOPE_access_as_user')")
+public String date(BearerTokenAuthentication bearerTokenAuth) {
+    OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
+    return principal.getAttribute("scp").toString();
 }
-```
-
-### Sign-in and sign-out links
-
-To sign in, you must make a request to the Azure Active Directory sign-in endpoint that is automatically configured by **Azure AD Spring Boot Starter client library for Java**.
-
-```html
-<a class="btn btn-success" href="/oauth2/authorization/azure">Sign In</a>
-```
-
-To sign out, you must make POST request to the **logout** endpoint.
-
-```HTML
-<form action="#" th:action="@{/logout}" method="post">
-  <input class="btn btn-warning" type="submit" value="Sign Out" />
-</form>
-```
-
-### Authentication-dependent UI elements
-
-This app has some simple logic in the UI template pages for determining content to display based on whether the user is authenticated or not. For example, the following Spring Security Thymeleaf tags may be used:
-
-```html
-<div sec:authorize="isAuthenticated()">
-  this content only shows to authenticated users
-</div>
-<div sec:authorize="isAnonymous()">
-  this content only shows to not-authenticated users
-</div>
 ```
 
 ### Protecting routes with AADWebSecurityConfigurerAdapter
 
-By default, this app protects the **ID Token Details** page so that only logged-in users can access it. This app uses configures these routes from the `app.protect.authenticated` property from the `application.yml` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For an example, see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
+By default, this app protects all routes so that only users with a valid access token can access it. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For an example, see this app's [SecurityConfig](.resource-api/src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapi/SecurityConfig.java) class.
+
+This app also configures the correct claims validation for the incoming bearer token from the `app-id-uri` and `client-id` property the `application.yml` file.
 
 ```java
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
-  @Value( "${app.protect.authenticated}" )
-  private String[] protectedRoutes;
-
+public class SecurityConfig extends AADResourceServerWebSecurityConfigurerAdapter {
+    /**
+     * Add configuration logic as needed.
+     */
     @Override
-    public void configure(HttpSecurity http) throws Exception {
-    // use required configuration form AADWebSecurityAdapter.configure:
-    super.configure(http);
-    // add custom configuration:
-    http.authorizeRequests()
-      .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details)
-      .antMatchers("/**").permitAll();                  // allow all other routes.
+    protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
+        http.authorizeRequests((requests) -> requests.anyRequest().authenticated());
     }
 }
 ```

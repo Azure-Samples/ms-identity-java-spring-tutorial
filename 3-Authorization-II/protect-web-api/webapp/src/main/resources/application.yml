@@ -22,5 +22,5 @@ app:
 
   # The API to will call, and its endpoint
   api:
-    base-address: http://localhost:8080
+    base-address: http://localhost:8082
     date-endpoint: /api/date
