@@ -283,10 +283,6 @@ public class SecurityConfig extends AADResourceServerWebSecurityConfigurerAdapte
 }
 ```
 
-<!-- ## Deployment
-
-// TODO: link to deployment sample. -->
-
 ## More information
 
 - [Microsoft identity platform (Azure Active Directory for developers)](https://docs.microsoft.com/azure/active-directory/develop/)
