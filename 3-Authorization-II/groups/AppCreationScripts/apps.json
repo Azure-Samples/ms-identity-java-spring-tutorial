@@ -1,0 +1,95 @@
+
+
+
+
+
+
+
+{
+  "Sample": {
+    "Title": "Enable your Java Spring boot web app to restrict access to routes using security groups with the Microsoft identity platform",
+    "Level": 100,
+    "Client": "Java Spring Boot web app"
+  },
+  "AppRegistrations": [
+
+   {
+      "x-ms-id": "webApp",
+      "x-ms-name": "java-servlet-webapp-groups",
+      "x-ms-version": "2.0",
+
+      "replyUrlsWithType": [
+
+        {
+          "url": "http://localhost:8080/login/oauth2/code/",
+          "type": "Web"
+        } ],
+
+      
+"oauth2AllowImplicitFlow": false,
+
+      
+"oauth2AllowIdTokenImplicitFlow": false,
+
+
+      "requiredResourceAccess": [
+
+        {
+          "x-ms-resourceAppName": "Microsoft Graph",
+          "resourceAppId": "00000003-0000-0000-c000-000000000000",
+          "resourceAccess": [
+
+            {
+              "id": "unknown",
+              "type": "Scope",
+              "x-ms-name": "GroupMember.Read.All"
+            } ]
+        }
+
+      ],
+
+      "codeConfigurations": [
+
+        {
+        "settingFile": "/src/main/resources/application.yml", 
+          "replaceTokens": 
+            {
+            /** 
+            * Note: The following 'key-value' pairs are for illustration only; you may
+            * not have all of them in your configuration file. Azure portal will replace
+            * the values (i.e. text) below with the actual app credentials.
+            * Finally, don't forget to remove this comment.
+            */
+            "appId": "Enter_the_Application_Id_Here",
+            "redirectUri": "Enter_the_Redirect_Uri_Here",
+            "tenantId": "Enter_the_Tenant_Info_Here",
+            "clientSecret": "Enter_the_Client_Secret_Here",
+            "authorityEndpointHost": "Enter_the_Cloud_Instance_Id_Here",
+            "msgraphEndpointHost": "Enter_the_Graph_Endpoint_Here",
+            "signInAudience": "Enter_the_Sign-in_Audience_Here"
+            }
+        }, 
+
+        {
+        "settingFile": "/src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SampleController.java", 
+          "replaceTokens": 
+            {
+            /** 
+            * Note: The following 'key-value' pairs are for illustration only; you may
+            * not have all of them in your configuration file. Azure portal will replace
+            * the values (i.e. text) below with the actual app credentials.
+            * Finally, don't forget to remove this comment.
+            */
+            "appId": "Enter_the_Application_Id_Here",
+            "redirectUri": "Enter_the_Redirect_Uri_Here",
+            "tenantId": "Enter_the_Tenant_Info_Here",
+            "clientSecret": "Enter_the_Client_Secret_Here",
+            "authorityEndpointHost": "Enter_the_Cloud_Instance_Id_Here",
+            "msgraphEndpointHost": "Enter_the_Graph_Endpoint_Here",
+            "signInAudience": "Enter_the_Sign-in_Audience_Here"
+            }
+        } ]
+    }
+
+  ]
+}
