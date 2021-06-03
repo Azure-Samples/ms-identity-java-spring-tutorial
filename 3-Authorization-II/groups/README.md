@@ -19,10 +19,10 @@ description: "This sample demonstrates a Java Spring Boot web app that authentic
   - [Clone or download this repository](#clone-or-download-this-repository)
   - [Register the sample application with your Azure Active Directory tenant](#register-the-sample-application-with-your-azure-active-directory-tenant)
   - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
-  - [Register the web app (java-servlet-webapp-groups)](#register-the-web-app-java-servlet-webapp-groups)
+  - [Register the web app (java-spring-webapp-groups)](#register-the-web-app-java-spring-webapp-groups)
   - [Create Security Groups](#create-security-groups)
   - [Configure Security Groups](#configure-security-groups)
-  - [Configure your code sample to use your app registration and security groups (java-servlet-webapp-groups)](#configure-your-code-sample-to-use-your-app-registration-and-security-groups-java-servlet-webapp-groups)
+  - [Configure your code sample to use your app registration and security groups (java-spring-webapp-groups)](#configure-your-code-sample-to-use-your-app-registration-and-security-groups-java-spring-webapp-groups)
 - [Running the sample](#running-the-sample)
 - [Explore the sample](#explore-the-sample)
 - [We'd love your feedback!](#wed-love-your-feedback)
@@ -136,12 +136,12 @@ There is one project in this sample. To register it, you can:
 1. Sign in to the [Azure portal](https://portal.azure.com).
 1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory** to change your portal session to the desired Azure AD tenant.
 
-### Register the web app (java-servlet-webapp-groups)
+### Register the web app (java-spring-webapp-groups)
 
 1. Navigate to the [Azure portal](https://portal.azure.com) and select the **Azure AD** service.
 1. Select the **App Registrations** blade on the left, then select **New registration**.
 1. In the **Register an application page** that appears, enter your application's registration information:
-   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-servlet-webapp-groups`.
+   - In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-spring-webapp-groups`.
    - Under **Supported account types**, select **Accounts in this organizational directory only**.
    - In the **Redirect URI (optional)** section, select **Web** in the combo-box and enter the following redirect URI: `http://localhost:8080/login/oauth2/code/`.
 1. Select **Register** to create the application.
@@ -225,7 +225,7 @@ You have two different options available to you on how you can further configure
 >
 > When you set **User assignment required?** to **Yes**, Azure AD will check that only users assigned to your application in the **Users and groups** blade are able to sign-in to your app. You can assign users directly or by assigning security groups they belong to.
 
-### Configure your code sample to use your app registration and security groups (java-servlet-webapp-groups)
+### Configure your code sample to use your app registration and security groups (java-spring-webapp-groups)
 
 Open the project in your IDE (like Visual Studio or Visual Studio Code) to configure the code.
 
@@ -234,8 +234,8 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 Open the `src\main\resources\application.yml` file.
   
 1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant ID.
-2. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-servlet-webapp-groups` app copied from the Azure portal.
-3. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-servlet-webapp-groups` copied from the Azure portal.
+2. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapp-groups` app copied from the Azure portal.
+3. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-spring-webapp-groups` copied from the Azure portal.
 4. Find the key `Enter_Your_Admin_Group_ID_Here` and replace the existing value with objectId of your **AdminGroup**.
 5. Find the key `Enter_Your_User_Group_ID_Here` and replace the existing value with the objectId of your **UserGroup**
 
@@ -425,14 +425,14 @@ There is one web app in this sample. To deploy it to **Azure App Services**, you
 - publish the projects to the **App Services**, and
 - update its client(s) to call the website instead of the local environment.
 
-#### Update the Azure AD app registration (java-servlet-webapp-groups)
+#### Update the Azure AD app registration (java-spring-webapp-groups)
 
 1. Navigate back to to the [Azure portal](https://portal.azure.com).
 In the left-hand navigation pane, select the **Azure Active Directory** service, and then select **App registrations (Preview)**.
-1. In the resulting screen, select the `java-servlet-webapp-groups` application.
+1. In the resulting screen, select the `java-spring-webapp-groups` application.
 1. In the app's registration screen, select **Authentication** in the menu.
    - In the **Redirect URIs** section, update the reply URLs to match the site URL of your Azure deployment. For example:
-      - `https://java-servlet-webapp-groups.azurewebsites.net/login/oauth2/code/`
+      - `https://java-spring-webapp-groups.azurewebsites.net/login/oauth2/code/`
 
 > :warning: If your app is using an *in-memory* storage, **Azure App Services** will spin down your web site if it is inactive, and any records that your app was keeping will emptied. In addition, if you increase the instance count of your website, requests will be distributed among the instances. Your app's records, therefore, will not be the same on each instance.
 
