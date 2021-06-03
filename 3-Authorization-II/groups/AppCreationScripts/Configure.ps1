@@ -200,14 +200,14 @@ Function ConfigureApplications
     $user = Get-AzureADUser -ObjectId $creds.Account.Id
 
    # Create the webApp AAD application
-   Write-Host "Creating the AAD application (java-servlet-webapp-groups)"
+   Write-Host "Creating the AAD application (java-spring-webapp-groups)"
    # Get a 6 months application key for the webApp Application
    $pw = ComputePassword
    $fromDate = [DateTime]::Now;
    $key = CreateAppKey -fromDate $fromDate -durationInMonths 6 -pw $pw
    $webAppAppKey = $pw
    # create the application 
-   $webAppAadApplication = New-AzureADApplication -DisplayName "java-servlet-webapp-groups" `
+   $webAppAadApplication = New-AzureADApplication -DisplayName "java-spring-webapp-groups" `
                                                   -HomePage "http://localhost:8080/" `
                                                   -ReplyUrls "http://localhost:8080/login/oauth2/code/" `
                                                   -PasswordCredentials $key `
@@ -230,12 +230,12 @@ Function ConfigureApplications
    $AdminGroup = CreateSecurityGroup -name "AdminGroup" -description "Admin Security Group"
    $UserGroup = CreateSecurityGroup -name "UserGroup" -description "User Security Group"
 
-   Write-Host "Done creating the webApp application (java-servlet-webapp-groups)"
+   Write-Host "Done creating the webApp application (java-spring-webapp-groups)"
 
    # URL of the AAD application in the Azure portal
    # Future? $webAppPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$webAppAadApplication.AppId+"/objectId/"+$webAppAadApplication.ObjectId+"/isMSAApp/"
    $webAppPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$webAppAadApplication.AppId+"/objectId/"+$webAppAadApplication.ObjectId+"/isMSAApp/"
-   Add-Content -Value "<tr><td>webApp</td><td>$currentAppId</td><td><a href='$webAppPortalUrl'>java-servlet-webapp-groups</a></td></tr>" -Path createdApps.html
+   Add-Content -Value "<tr><td>webApp</td><td>$currentAppId</td><td><a href='$webAppPortalUrl'>java-spring-webapp-groups</a></td></tr>" -Path createdApps.html
 
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
 

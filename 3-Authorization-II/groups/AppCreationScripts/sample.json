@@ -9,7 +9,7 @@
     "AADApps": [
         {
             "Id": "webApp",
-            "Name": "java-servlet-webapp-groups",
+            "Name": "java-spring-webapp-groups",
             "Kind": "WebApp",
             "Audience": "AzureADMyOrg",
             "PasswordCredentials": "Auto",

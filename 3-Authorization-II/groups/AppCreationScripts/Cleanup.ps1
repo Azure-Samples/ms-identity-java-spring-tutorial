@@ -59,16 +59,16 @@ Function Cleanup
     # Removes the applications
     Write-Host "Cleaning-up applications from tenant '$tenantName'"
 
-    Write-Host "Removing 'webApp' (java-servlet-webapp-groups) if needed"
+    Write-Host "Removing 'webApp' (java-spring-webapp-groups) if needed"
     try
     {
-        Get-AzureADApplication -Filter "DisplayName eq 'java-servlet-webapp-groups'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
+        Get-AzureADApplication -Filter "DisplayName eq 'java-spring-webapp-groups'"  | ForEach-Object {Remove-AzureADApplication -ObjectId $_.ObjectId }
     }
     catch
     {
-	    Write-Host "Unable to remove the 'java-servlet-webapp-groups' . Try deleting manually." -ForegroundColor White -BackgroundColor Red
+	    Write-Host "Unable to remove the 'java-spring-webapp-groups' . Try deleting manually." -ForegroundColor White -BackgroundColor Red
     }
-    $apps = Get-AzureADApplication -Filter "DisplayName eq 'java-servlet-webapp-groups'"
+    $apps = Get-AzureADApplication -Filter "DisplayName eq 'java-spring-webapp-groups'"
     if ($apps)
     {
         Remove-AzureADApplication -ObjectId $apps.ObjectId
@@ -77,16 +77,16 @@ Function Cleanup
     foreach ($app in $apps) 
     {
         Remove-AzureADApplication -ObjectId $app.ObjectId
-        Write-Host "Removed java-servlet-webapp-groups.."
+        Write-Host "Removed java-spring-webapp-groups.."
     }
     # also remove service principals of this app
     try
     {
-        Get-AzureADServicePrincipal -filter "DisplayName eq 'java-servlet-webapp-groups'" | ForEach-Object {Remove-AzureADServicePrincipal -ObjectId $_.Id -Confirm:$false}
+        Get-AzureADServicePrincipal -filter "DisplayName eq 'java-spring-webapp-groups'" | ForEach-Object {Remove-AzureADServicePrincipal -ObjectId $_.Id -Confirm:$false}
     }
     catch
     {
-	    Write-Host "Unable to remove ServicePrincipal 'java-servlet-webapp-groups' . Try deleting manually from Enterprise applications." -ForegroundColor White -BackgroundColor Red
+	    Write-Host "Unable to remove ServicePrincipal 'java-spring-webapp-groups' . Try deleting manually from Enterprise applications." -ForegroundColor White -BackgroundColor Red
     }
 }
 
