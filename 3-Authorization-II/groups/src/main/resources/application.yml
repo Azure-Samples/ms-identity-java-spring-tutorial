@@ -12,10 +12,10 @@ azure:
     user-group:
       allowed-group-ids: Enter_Your_Admin_Group_ID_Here, Enter_Your_User_Group_ID_Here
       enable-full-list: true
-    # Specifies the Microsoft Graph scopes that your app needs access to - not required in this app.
+    # Specifies the Microsoft Graph scopes that your app needs access to - required in this app in case of too many groups to fit in token (overage)
     # authorization-clients:
-    #   graph:
-    #     scopes: https://graph.microsoft.com/User.Read
+      graph:
+        scopes: https://graph.microsoft.com/User.Read, https://graph.microsoft.com/GroupMember.Read.All
 
 # which routes to restrict to authenticated users only (see SecurityConfig.java):
 # enter String array (comma-separated) or just one route.

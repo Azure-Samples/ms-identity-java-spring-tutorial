@@ -16,70 +16,87 @@ description: "This sample demonstrates a Java Spring Boot web app that authentic
 - [Contents](#contents)
 - [Prerequisites](#prerequisites)
 - [Setup](#setup)
-  - [Step 1: Clone or download this repository](#step-1-clone-or-download-this-repository)
-  - [Step 2: Install project dependencies](#step-2-install-project-dependencies)
-  - [Registration](#registration)
+  - [Clone or download this repository](#clone-or-download-this-repository)
+  - [Register the sample application with your Azure Active Directory tenant](#register-the-sample-application-with-your-azure-active-directory-tenant)
   - [Choose the Azure AD tenant where you want to create your applications](#choose-the-azure-ad-tenant-where-you-want-to-create-your-applications)
-  - [Register the webApp app (java-servlet-webapp-groups)](#register-the-webapp-app-java-servlet-webapp-groups)
+  - [Register the web app (java-servlet-webapp-groups)](#register-the-web-app-java-servlet-webapp-groups)
   - [Create Security Groups](#create-security-groups)
   - [Configure Security Groups](#configure-security-groups)
+  - [Configure your code sample to use your app registration and security groups (java-servlet-webapp-groups)](#configure-your-code-sample-to-use-your-app-registration-and-security-groups-java-servlet-webapp-groups)
 - [Running the sample](#running-the-sample)
 - [Explore the sample](#explore-the-sample)
 - [We'd love your feedback!](#wed-love-your-feedback)
 - [About the code](#about-the-code)
+  - [Project Initialization](#project-initialization)
+  - [ID Token Claims](#id-token-claims)
+  - [Processing Groups claim in the ID token](#processing-groups-claim-in-the-id-token)
+  - [Sign-in and sign-out links](#sign-in-and-sign-out-links)
+  - [Authentication-dependent UI elements](#authentication-dependent-ui-elements)
+  - [Protecting routes with AADWebSecurityConfigurerAdapter](#protecting-routes-with-aadwebsecurityconfigureradapter)
   - [The Groups Overage Claim](#the-groups-overage-claim)
-- [Deployment](#deployment)
   - [Deploying web app to Azure App Services](#deploying-web-app-to-azure-app-services)
 - [More information](#more-information)
 - [Community Help and Support](#community-help-and-support)
 - [Contributing](#contributing)
 
-![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/<BuildNumber>/badge)
+<!-- ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/<BuildNumber>/badge) -->
 
 ## Overview
 
-This sample demonstrates a Java Spring Boot web app that authenticates users against Azure AD.
-
-## Scenario
-
-1. The client Java Spring Boot web app uses the Microsoft Authentication Library (MSAL) to obtain an ID Token from **Azure AD**.
-2. The **ID Token** proves that the user has successfully authenticated against **Azure AD**.
+This sample demonstrates a Java Spring Boot web app that uses the [Azure AD Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory) for authentication, authorization, and token acquisition with the [OpenID Connect](https://docs.microsoft.com/azure/active-directory/develop/v1-protocols-openid-connect-code) protocol to sign in users, and restricts access to pages based on Azure Active Directory security group membership.
 
 ![Overview](./ReadmeFiles/topology.png)
 
-## Contents
+An Identity Developer session covered Azure AD App roles and security groups, featuring this scenario and how to handle the overage claim. [Watch the video Using Security Groups and Application Roles in your apps](https://www.youtube.com/watch?v=LRoc-na27l0)
 
-> Give a high-level folder structure of the sample.
+## Scenario
+
+1. This web application uses **Azure AD Spring Boot Starter client library for Java** to sign in users an Azure AD tenant and obtains an [ID Token](https://docs.microsoft.com/azure/active-directory/develop/id-tokens) from **Azure AD**.
+2. The **ID Token** contains the **groups** claim. The application loads these claims into Spring GrantedAuthorities list for the signed-in user. These values determine which pages the user is authorized to access.
+
+## Contents
 
 | File/folder       | Description                                |
 |-------------------|--------------------------------------------|
-| `CHANGELOG.md`    | List of changes to the sample.             |
-| `CONTRIBUTING.md` | Guidelines for contributing to the sample. |
-| `LICENSE`         | The license for the sample.                |
+| `AppCreationScripts/`                                                               | Scripts to automatically configure Azure AD app registrations.                              |
+| `pom.xml`                                                                           | Application dependencies.                                                                   |
+| `src/main/resources/templates/`                                                     | Thymeleaf Templates for UI.                                                                 |
+| `src/main/resources/application.yml`                                                | Application and Azure AD Boot Starter Library Configuration.                                |
+| `src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/`       | This directory contains the main application entry point, controller, and config classes.   |
+| `.../MsIdentitySpringBootWebappApplication.java`                                    | Main class.                                                                                 |
+| `.../SampleController.java`                                                         | Controller with endpoint mappings.                                                          |
+| `.../SecurityConfig.java`                                                           | Security Configuration (e.g., which routes require authentication?).                        |
+| `.../Utilities.java`                                                                | Utility Class (e.g., filter ID token claims)                                                |
+| `CHANGELOG.md`                                                                      | List of changes to the sample.                                                              |
+| `CONTRIBUTING.md`                                                                   | Guidelines for contributing to the sample.                                                  |
+| `LICENSE`                                                                           | The license for the sample.                                                                 |
 
 ## Prerequisites
 
- // Enter Java Environment Requirements
-- An **Azure AD** tenant. For more information, see: [How to get an Azure AD tenant](https://docs.microsoft.com/azure/active-directory/develop/quickstart-create-new-tenant)
-- A user account in your **Azure AD** tenant. This sample will not work with a **personal Microsoft account**.  If you're signed in to the [Azure portal](https://portal.azure.com) with a personal Microsoft account and have not created a user account in your directory before, you will need to create one before proceeding.
+- [JDK Version 15](https://jdk.java.net/15/). This sample has been developed on a system with Java 15 but may be compatible with other versions.
+- [Maven 3](https://maven.apache.org/download.cgi)
+- [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample in VSCode.
+- An **Azure AD** tenant. For more information see: [How to get an Azure AD tenant](https://docs.microsoft.com/azure/active-directory/develop/quickstart-create-new-tenant)
+- A user account in your **Azure AD** tenant. This sample will not work with a **personal Microsoft account**. Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a personal account and have never created a user account in your directory before, you need to do that now.
+- Two security groups, **AdminGroup** and **UserGroup**, containing users you want to test with.
 
 ## Setup
 
-### Step 1: Clone or download this repository
+### Clone or download this repository
 
 From your shell or command line:
 
 ```console
     git clone https://github.com/Azure-Samples/ms-identity-java-spring-tutorial.git
+    cd ms-identity-java-spring-tutorial
+    cd 3-Authorization-II/groups
 ```
 
 or download and extract the repository .zip file.
 
 > :warning: To avoid path length limitations on Windows, we recommend cloning into a directory near the root of your drive.
 
-### Step 2: Install project dependencies
-// Java install
-### Registration
+### Register the sample application with your Azure Active Directory tenant
 
 There is one project in this sample. To register it, you can:
 
@@ -119,7 +136,7 @@ There is one project in this sample. To register it, you can:
 1. Sign in to the [Azure portal](https://portal.azure.com).
 1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory** to change your portal session to the desired Azure AD tenant.
 
-### Register the webApp app (java-servlet-webapp-groups)
+### Register the web app (java-servlet-webapp-groups)
 
 1. Navigate to the [Azure portal](https://portal.azure.com) and select the **Azure AD** service.
 1. Select the **App Registrations** blade on the left, then select **New registration**.
@@ -142,19 +159,6 @@ There is one project in this sample. To register it, you can:
    - In the *Commonly used Microsoft APIs* section, select **Microsoft Graph**
    - In the **Delegated permissions** section, select the **GroupMember.Read.All** in the list. Use the search box if necessary.
    - Select the **Add permissions** button at the bottom.
-
-#### Configure the webApp app (java-servlet-webapp-groups) to use your app registration
-
-Open the project in your IDE (like Visual Studio or Visual Studio Code) to configure the code.
-
-> In the steps below, "ClientID" is the same as "Application ID" or "AppId".
-
-1. Open the `src\main\resources\application.yml` file.
-1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant ID.
-1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-servlet-webapp-groups` app copied from the Azure portal.
-1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-servlet-webapp-groups` copied from the Azure portal.
-1. Find the key `Enter_Your_Admin_Group_ID_Here` and replace the existing value with $AdminGroup.objectId.
-1. Find the key `Enter_Your_User_Group_ID_Here` and replace the existing value with $UserGroup.objectId.
 
 ### Create Security Groups
 
@@ -221,14 +225,49 @@ You have two different options available to you on how you can further configure
 >
 > When you set **User assignment required?** to **Yes**, Azure AD will check that only users assigned to your application in the **Users and groups** blade are able to sign-in to your app. You can assign users directly or by assigning security groups they belong to.
 
+### Configure your code sample to use your app registration and security groups (java-servlet-webapp-groups)
+
+Open the project in your IDE (like Visual Studio or Visual Studio Code) to configure the code.
+
+> In the steps below, "ClientID" is the same as "Application ID" or "AppId".
+
+Open the `src\main\resources\application.yml` file.
+  
+1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant ID.
+2. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-servlet-webapp-groups` app copied from the Azure portal.
+3. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `java-servlet-webapp-groups` copied from the Azure portal.
+4. Find the key `Enter_Your_Admin_Group_ID_Here` and replace the existing value with objectId of your **AdminGroup**.
+5. Find the key `Enter_Your_User_Group_ID_Here` and replace the existing value with the objectId of your **UserGroup**
+
+Open the `src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SampleController.java` file.
+
+1. Find the key `Enter_Your_Admin_Group_ID_Here` and replace the existing value with objectId of your **AdminGroup**.
+2. Find the key `Enter_Your_User_Group_ID_Here` and replace the existing value with the objectId of your **UserGroup**
+
 ## Running the sample
 
-// Java start
+To run the sample in Visual Studio Code, ensure that you have installed the [Java Extension Pack](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack).
+To run this sample from the terminal, follow the steps below.
+
+1. Open a terminal or the integrated VSCode terminal.
+1. In the same directory as this readme file, run `mvn clean compile spring-boot:run`.
+1. Open your browser and navigate to `http://localhost:8080`.
+
+![Experience](./ReadmeFiles/app.png)
 
 ## Explore the sample
 
-> Explain how to explore the sample.
-> Insert a screenshot of the client application.
+- Note the signed-in or signed-out status displayed at the center of the screen.
+- Click the context-sensitive button at the top right (it will read `Sign In` on first run)
+- Alternatively, click the link to `token details`, `admins only` or `regular users`. Since these are protected pages that require authentication, you'll be automatically redirected to the sign-in page.
+- Follow the instructions on the next page to sign in with an account in the Azure AD tenant.
+- On the consent screen, note the scopes that are being requested.
+- Upon successful completion of the sign-in flow, you should be redirected to the home page (`sign in status`), or one of the other pages, depending on which button triggered your sign-in flow.
+- Note the context-sensitive button now says `Sign out` and displays your username to its left.
+- If you are on the home page, you'll see an option to click **ID Token Details**: click it to see some of the ID token's decoded claims, including **groups**.
+- Click the **Admins Only** button to view the `/admin_only`. Only users belonging to the **AdminGroup** security group will be able to view this page. Otherwise an authorization failure message will be displayed.
+- Click the **Regular Users** button to view the `/regular_user` page. Only users belonging to the **UserGroup** security group will be able to view this page. Otherwise an authorization failure message will be displayed.
+- You can also use the button on the top right to sign out. The status page will reflect this.
 
 > :information_source: Did the sample not work for you as expected? Then please reach out to us using the [GitHub Issues](../../../../issues) page.
 
@@ -238,14 +277,135 @@ Were we successful in addressing your learning objective? Consider taking a mome
 
 ## About the code
 
-> - Describe where the code uses auth libraries, or calls the graph
-> - Describe specific aspects (e.g. caching, validation etc.)
+
+This sample demonstrates how to use [Azure AD Spring Boot Starter client library for Java](https://docs.microsoft.com/java/api/overview/azure/active-directory-spring-boot-starter-readme?view=azure-java-stable) to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web** boot starters. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user, and to restrict access to some pages by using the groups claim for authorization.
+
+### Project Initialization
+
+Create a new Java Maven project and copy the `pom.xml` file from this project, and the `src` folder of this repository.
+
+If you'd like to create a project like this from scratch, you may use [Spring Initializer](https://start.spring.io):
+
+- For **Packaging**, select `Jar`
+- For **Java** select version `11`
+- For **Dependencies**, add the following:
+  - Azure Active Directory
+  - Spring Oauth2 Client
+  - Spring Web
+- Be sure that it comes with Azure SDK version 3.5 or higher. If not, please consider replacing the pre-configured `pom.xml` with the `pom.xml` from this repository.
+
+### ID Token Claims
+
+To extract token details, make use of Spring Security's `AuthenticationPrincipal` and `OidcUser` object in a request mapping. See the [Sample Controller](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SampleController.java) for an example of this app making use of ID Token claims.
+
+```java
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+//...
+@GetMapping(path = "/some_path")
+public String tokenDetails(@AuthenticationPrincipal OidcUser principal) {
+    Map<String, Object> claims = principal.getIdToken().getClaims();
+}
+```
+
+### Processing Groups claim in the ID token
+
+The name of the the roles that the signed-in user is assigned to is returned in the `groups` claim of the token.
+
+```JSON
+{
+  ...
+  "groups": [
+    "xyz-id-xyz",
+    "xyz-id-xyz",]
+  ...
+}
+```
+
+A common way to access them is documented in the **ID Token Claims** section above.
+Azure AD Boot Starter (v3.5 and above) parses the groups claim automatically and adds each group to the signed in user's **Authorities**. This allows developers to make use of groups with Spring **PrePost** condition annotations using the `hasAuthority` method. For example, you'll find the following `@PreAuthorize` conditions demonstrated in `SampleController.java`:
+
+```java
+@GetMapping(path = "/admin_only")
+@PreAuthorize("hasAuthority('enter-admin-group-id-here')")
+public String adminOnly(Model model) {
+    // restrict to users who belong to AdminGroup
+}
+@GetMapping(path = "/regular_user")
+@PreAuthorize("hasAnyAuthority('enter-user-group-id-here','enter-admin-group-id-here')")
+public String regularUser(Model model) {
+    // restrict to users who belong to any of UserGroup or AdminGroup
+}
+```
+
+To see a full list of authorities for a given user:
+
+ ```java
+@GetMapping(path = "/some_path")
+public String tokenDetails(@AuthenticationPrincipal OidcUser principal) {
+    Collection<? extends GrantedAuthority> authorities = principal.getAuthorities();
+}
+```
+
+### Sign-in and sign-out links
+
+To sign in, you must make a request to the Azure Active Directory sign-in endpoint that is automatically configured by **Azure AD Spring Boot Starter client library for Java**.
+
+```html
+<a class="btn btn-success" href="/oauth2/authorization/azure">Sign In</a>
+```
+
+To sign out, you must make POST request to the **logout** endpoint.
+
+```HTML
+<form action="#" th:action="@{/logout}" method="post">
+  <input class="btn btn-warning" type="submit" value="Sign Out" />
+</form>
+```
+
+### Authentication-dependent UI elements
+
+This app has some simple logic in the UI template pages for determining content to display based on whether the user is authenticated or not. For example, the following Spring Security Thymeleaf tags may be used:
+
+```html
+<div sec:authorize="isAuthenticated()">
+  this content only shows to authenticated users
+</div>
+<div sec:authorize="isAnonymous()">
+  this content only shows to not-authenticated users
+</div>
+```
+
+### Protecting routes with AADWebSecurityConfigurerAdapter
+
+By default, this app protects the **ID Token Details**, **Admins Only** and **Regular Users** pages so that only logged-in users can access them. This app uses configures these routes from the `app.protect.authenticated` property from the `application.yml` file. To configure your app's specific requirements, extend `AADWebSecurityConfigurationAdapter` in one of your classes. For an example, see this app's [SecurityConfig](./src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapp/SecurityConfig.java) class.
+
+```java
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class SecurityConfig extends AADWebSecurityConfigurerAdapter{
+  @Value( "${app.protect.authenticated}" )
+  private String[] protectedRoutes;
+
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+    // use required configuration form AADWebSecurityAdapter.configure:
+    super.configure(http);
+    // add custom configuration:
+    http.authorizeRequests()
+      .antMatchers(protectedRoutes).authenticated()     // limit these pages to authenticated users (default: /token_details, /admin_only, /regular_user)
+      .antMatchers("/**").permitAll();                  // allow all other routes.
+    }
+}
+```
 
 ### The Groups Overage Claim
 
 To ensure that the token size doesn’t exceed HTTP header size limits, the Microsoft Identity Platform limits the number of object Ids that it includes in the **groups** claim.
 
 If a user is member of more groups than the overage limit (**150 for SAML tokens, 200 for JWT tokens, 6 for single-page applications**), then the Microsoft identity platform does not emit the group IDs in the `groups` claim in the token. Instead, it includes an **overage** claim in the token that indicates to the application to query the [MS Graph API](https://graph.microsoft.com) to retrieve the user’s group membership.
+
+Azure AD Boot Starter (v3.5 and above) parses the groups claim automatically and adds each group to the signed in user's **Authorities**. It **automatically** handles the groups overage scenario.
 
 > We strongly advise you use the [group filtering feature](#configure-your-application-to-receive-the-groups-claim-values-from-a-filtered-set-of-groups-a-user-may-be-assigned-to) (if possible) to avoid running into group overages.
 
@@ -257,9 +417,6 @@ When attending to overage scenarios, which requires a call to [Microsoft Graph](
 
 > :warning: For the overage scenario, make sure you have granted **Admin Consent** for the MS Graph API's **GroupMember.Read.All** scope for both the Client and the Service apps (see the **App Registration** steps above).
 
-## Deployment
-
-
 ### Deploying web app to Azure App Services
 
 There is one web app in this sample. To deploy it to **Azure App Services**, you'll need to:
@@ -267,6 +424,7 @@ There is one web app in this sample. To deploy it to **Azure App Services**, you
 - create an **Azure App Service**
 - publish the projects to the **App Services**, and
 - update its client(s) to call the website instead of the local environment.
+
 #### Update the Azure AD app registration (java-servlet-webapp-groups)
 
 1. Navigate back to to the [Azure portal](https://portal.azure.com).
