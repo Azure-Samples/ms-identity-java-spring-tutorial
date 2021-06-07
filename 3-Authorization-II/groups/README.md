@@ -78,7 +78,7 @@ An Identity Developer session covered Azure AD App roles and security groups, fe
 - [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample in VSCode.
 - An **Azure AD** tenant. For more information see: [How to get an Azure AD tenant](https://docs.microsoft.com/azure/active-directory/develop/quickstart-create-new-tenant)
 - A user account in your **Azure AD** tenant. This sample will not work with a **personal Microsoft account**. Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a personal account and have never created a user account in your directory before, you need to do that now.
-- Two security groups, **AdminGroup** and **UserGroup**, containing users you want to test with.
+- Two security groups, named **AdminGroup** and **UserGroup**, containing the user(s) with whom you want to sign and test this sample. Or, you may add the user to two existing security groups in your tenant. If you choose to use existing groups, be sure to modify the sample configuration to use your existing security groups' name and object ID.
 
 ## Setup
 
@@ -157,7 +157,8 @@ There is one project in this sample. To register it, you can:
    - Select the **Add a permission** button and then,
    - Ensure that the **Microsoft APIs** tab is selected.
    - In the *Commonly used Microsoft APIs* section, select **Microsoft Graph**
-   - In the **Delegated permissions** section, select the **GroupMember.Read.All** in the list. Use the search box if necessary.
+   - In the **Delegated permissions** section, select the **GroupMember.Read.All** in the list. Use the search box if necessary. This permission is necessary for getting group memberships via Graph if the overage scenario occurs.
+   - Click the button to grant admin consent for GroupMember.Read.All.
    - Select the **Add permissions** button at the bottom.
 
 ### Create Security Groups
@@ -168,13 +169,13 @@ There is one project in this sample. To register it, you can:
     - For **Group Type**, select **Security**
     - For **Group Name**, enter **AdminGroup**
     - For **Group Description**, enter **Admin Security Group**
-    - Add **Group Owners** and **Group Members** as you see fit.
+    - Add **Group Owners** and **Group Members** that you want to use and test in this sample.
     - Select **Create**.
 1. In the **Groups** blade, select **New Group**.
     - For **Group Type**, select **Security**
     - For **Group Name**, enter **UserGroup**
     - For **Group Description**, enter **User Security Group**
-    - Add **Group Owners** and **Group Members** as you see fit.
+    - Add **Group Owners** and **Group Members** that you want to use and test in this sample.
     - Select **Create**.
 
 For more information, visit: [Create a basic group and add members using Azure AD](https://docs.microsoft.com/azure/active-directory/fundamentals/active-directory-groups-create-azure-portal)
