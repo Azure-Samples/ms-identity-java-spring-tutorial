@@ -62,7 +62,7 @@ Please refer to each sample's README for sample-specific recommendations.
 |                |               |
 |----------------|---------------|
 | <img src="./ReadmeFiles/sign-in.png" width="200"> | [**3.1 Acquire an ID Token with the roles claim**](./3-Authorization-II/roles) </br> Enable your web app to acquire an ID Token with the **Roles** claim. Filter access to routes based on the role membership. |
-<!-- | <img src="./ReadmeFiles/sign-in.png" width="200"> | [**3.2 Acquire an ID Token with the Groups claim**](./3-Authorization-II/groups) </br> Enable your web app to acquire an ID Token with a **Groups** claim. Filter access to routes based on the role membership. Learn how to call Graph to handle edge cases where the user is a member of too many groups to fit into an ID Token. | -->
+| <img src="./ReadmeFiles/sign-in.png" width="200"> | [**3.2 Acquire an ID Token with the Groups claim**](./3-Authorization-II/groups) </br> Enable your web app to acquire an ID Token with a **Groups** claim. Filter access to routes based on the role membership. Learn how to call Graph to handle edge cases where the user is a member of too many groups to fit into an ID Token. |
 
 ### Chapter 4: Deploy your app to Azure
 
