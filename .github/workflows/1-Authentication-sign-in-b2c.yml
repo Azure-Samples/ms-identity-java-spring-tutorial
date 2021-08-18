@@ -2,10 +2,10 @@ name: Sign-in B2C
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths: ['1-Authentication/sign-in-b2c/**', '.github/workflows/**']
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     paths: ['1-Authentication/sign-in-b2c/**', '.github/workflows/**']
 
   workflow_dispatch:

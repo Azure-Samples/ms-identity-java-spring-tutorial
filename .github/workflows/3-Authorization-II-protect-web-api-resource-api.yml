@@ -2,10 +2,10 @@ name: 3 II Protect Web API Resource Sample CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths: ['3-Authorization-II/protect-web-api/resource-api/**', '.github/workflows/**']
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     paths: ['3-Authorization-II/protect-web-api/resource-api/**', '.github/workflows/**']
 
   workflow_dispatch:
