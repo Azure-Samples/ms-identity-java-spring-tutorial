@@ -1,0 +1,27 @@
+name: 3 II Roles Sample CI
+
+on:
+  push:
+    branches: [ main ]
+    paths: ['3-Authorization-II/roles/**', '.github/workflows/**']
+  pull_request:
+    branches: [ main ]
+    paths: ['3-Authorization-II/roles/**', '.github/workflows/**']
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      relativePath: ./3-Authorization-II/roles
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 16
+      - name: Build with Maven
+        run: mvn --batch-mode --update-snapshots verify
+        working-directory: ${{ env.relativePath }}

@@ -1,0 +1,37 @@
+version: 2
+updates:
+- package-ecosystem: maven
+  directory: "/1-Authentication/sign-in"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: maven
+  directory: "/1-Authentication/sign-in-b2c"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: maven
+  directory: "/2-Authorization-I/call-graph"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: maven
+  directory: "/3-Authorization-II/groups"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: maven
+  directory: "/3-Authorization-II/protect-web-api/resource-api"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: maven
+  directory: "/3-Authorization-II/protect-web-api/webapp"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+- package-ecosystem: maven
+  directory: "/3-Authorization-II/roles"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
