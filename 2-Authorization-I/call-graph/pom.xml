@@ -31,6 +31,12 @@
       <artifactId>microsoft-graph</artifactId>  
       <version>5.5.0</version> 
     </dependency>
+    <!-- Guava required by azure spring -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>31.0.1-jre</version>
+    </dependency>
     <!-- Spring OAuth2 Client -->  
     <dependency> 
       <groupId>org.springframework.boot</groupId>  
