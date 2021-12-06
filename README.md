@@ -23,7 +23,7 @@ We recommend following the chapters in successive order. However, the code sampl
 
 ## Prerequisites
 
-- [JDK Version 15](https://jdk.java.net/15/). This sample has been developed on a system with Java 15 but may be compatible with other versions.
+- Java 8. This sample has been developed on Java 8 but should be compatible with some higher versions.
 - [Maven 3](https://maven.apache.org/download.cgi)
 - [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample in VSCode.
 - [Visual Studio Code](https://code.visualstudio.com/download)
