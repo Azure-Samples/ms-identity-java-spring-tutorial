@@ -15,7 +15,7 @@
 	<description>Microsoft identity platform Spring Boot sample</description>
 	<properties>
 		<java.version>11</java.version>
-		<azure.version>3.9.0</azure.version>
+		<azure.version>3.14.0</azure.version>
 	</properties>
 	<dependencies>
 		<!-- Azure Active Directory Spring Boot Starter  -->
