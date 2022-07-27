@@ -24,37 +24,51 @@
       <groupId>com.azure.spring</groupId>  
       <artifactId>azure-spring-boot-starter-active-directory</artifactId>  
       <version>${azure.version}</version> 
-    </dependency>  
+    </dependency>
+    <!-- MS Graph SDK -->  
+    <dependency> 
+      <groupId>com.microsoft.graph</groupId>  
+      <artifactId>microsoft-graph</artifactId>  
+      <version>5.5.0</version> 
+    </dependency>
+    <!-- Guava required by azure spring -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>31.0.1-jre</version>
+    </dependency>
     <!-- Spring OAuth2 Client -->  
     <dependency> 
       <groupId>org.springframework.boot</groupId>  
       <artifactId>spring-boot-starter-oauth2-client</artifactId> 
-    </dependency>
-    <!-- Spring Web App -->
+    </dependency>  
+    <!-- Spring Web App -->  
     <dependency> 
       <groupId>org.springframework.boot</groupId>  
       <artifactId>spring-boot-starter-web</artifactId> 
     </dependency>
+    <!-- Thymeleaf templates -->
     <dependency> 
       <groupId>org.springframework.boot</groupId>  
       <artifactId>spring-boot-starter-thymeleaf</artifactId> 
     </dependency>
+    <!-- Spring Security tags for Thymeleaf -->
     <dependency> 
       <groupId>org.thymeleaf.extras</groupId>  
       <artifactId>thymeleaf-extras-springsecurity5</artifactId> 
     </dependency>
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-test</artifactId>
-		<scope>test</scope>
-		<exclusions>
-			<exclusion>
-				<groupId>org.junit.vintage</groupId>
-				<artifactId>junit-vintage-engine</artifactId>
-			</exclusion>
-		</exclusions>
-	</dependency>
-  </dependencies>
+    <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+  </dependencies>  
   <build> 
     <plugins> 
       <plugin> 
