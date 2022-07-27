@@ -21,10 +21,10 @@ app:
     authenticated: /token_details
 
 # un-comment the following lines if you are deploying to a reverse proxy (e.g. Azure App Service)
-# server:
-#   forward-headers-strategy: native
-#   tomcat:
-#     remoteip:
-#       protocol-header: "X-Forwarded-Proto"
-#       remote-ip-header: "X-Forwarded-For"
-#       internal-proxies: ".*"
+server:
+   forward-headers-strategy: native
+   tomcat:
+     remoteip:
+       protocol-header: "X-Forwarded-Proto"
+       remote-ip-header: "X-Forwarded-For"
+       internal-proxies: ".*"

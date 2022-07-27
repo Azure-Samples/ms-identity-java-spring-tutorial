@@ -4,8 +4,11 @@
 
 server:
   port: 8082
-
+logging:
+  level:
+    root: DEBUG
 azure:
  activedirectory:
    client-id: Enter_Your_Client_ID_Here
+   tenant-id: Enter_Your_Tenant_ID_Here
    app-id-uri: api://Enter_Your_Client_ID_Here
