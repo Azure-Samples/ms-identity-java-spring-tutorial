@@ -325,13 +325,14 @@ Function ConfigureApplications
     # Future? $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.Id+"/isMSAApp/"
     $clientPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.Id+"/isMSAApp/"
     Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>java-spring-webapp-auth</a></td></tr>" -Path createdApps.html
-    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphRequiredResourceAccess]
     
     # Add Required Resources Access (from 'client' to 'service')
     Write-Host "Getting access from 'client' to 'service'"
     $requiredPermissions = GetRequiredPermissions -applicationDisplayName "java-spring-webapi-auth" `
         -requiredDelegatedPermissions "Read|ReadWrite" `
-    $requiredResourcesAccess.Add($requiredPermissions)
+    
+	$requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphRequiredResourceAccess]
+	$requiredResourcesAccess.Add($requiredPermissions)
     Update-MgApplication -ApplicationId $clientAadApplication.Id -RequiredResourceAccess $requiredResourcesAccess
     Write-Host "Granted permissions."
 
@@ -421,7 +422,9 @@ try
 catch
 {
     $message = $_
-    Write-Warning $Error[0]
+	$line = $_.InvocationInfo.ScriptLineNumber
+	Write-Host -ForegroundColor Red "caught exception: $e at $line"
+	Write-Warning $Error[0]
     Write-Host "Unable to register apps. Error is $message." -ForegroundColor White -BackgroundColor Red
 }
 Write-Host "Disconnecting from tenant"
