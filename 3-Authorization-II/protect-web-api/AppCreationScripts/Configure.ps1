@@ -1,49 +1,32 @@
+ 
 [CmdletBinding()]
 param(
-    [PSCredential] $Credential,
     [Parameter(Mandatory=$False, HelpMessage='Tenant ID (This is a GUID which represents the "Directory ID" of the AzureAD tenant into which you want to create the apps')]
     [string] $tenantId,
-    [Parameter(Mandatory=$False, HelpMessage='Azure environment to use while running the script (it defaults to AzureCloud)')]
+    [Parameter(Mandatory=$False, HelpMessage='Azure environment to use while running the script. Default = Global')]
     [string] $azureEnvironmentName
 )
-
-#Requires -Modules AzureAD -RunAsAdministrator
 
 <#
  This script creates the Azure AD applications needed for this sample and updates the configuration files
  for the visual Studio projects from the data in the Azure AD applications.
 
- Before running this script you need to install the AzureAD cmdlets as an administrator. 
- For this:
- 1) Run Powershell as an administrator
- 2) in the PowerShell window, type: Install-Module AzureAD
-
+ In case you don't have Microsoft.Graph.Applications already installed, the script will automatically install it for the current user
+ 
  There are four ways to run this script. For more information, read the AppCreationScripts.md file in the same folder as this script.
 #>
 
-# Create a password that can be used as an application key
-Function ComputePassword
-{
-    $aesManaged = New-Object "System.Security.Cryptography.AesManaged"
-    $aesManaged.Mode = [System.Security.Cryptography.CipherMode]::CBC
-    $aesManaged.Padding = [System.Security.Cryptography.PaddingMode]::Zeros
-    $aesManaged.BlockSize = 128
-    $aesManaged.KeySize = 256
-    $aesManaged.GenerateKey()
-    return [System.Convert]::ToBase64String($aesManaged.Key)
-}
-
 # Create an application key
 # See https://www.sabin.io/blog/adding-an-azure-active-directory-application-and-key-using-powershell/
-Function CreateAppKey([DateTime] $fromDate, [double] $durationInYears, [string]$pw)
+Function CreateAppKey([DateTime] $fromDate, [double] $durationInMonths)
 {
-    $endDate = $fromDate.AddYears($durationInYears) 
-    $keyId = (New-Guid).ToString();
-    $key = New-Object Microsoft.Open.AzureAD.Model.PasswordCredential
-    $key.StartDate = $fromDate
-    $key.EndDate = $endDate
-    $key.Value = $pw
-    $key.KeyId = $keyId
+    $key = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphPasswordCredential
+
+    $key.StartDateTime = $fromDate
+    $key.EndDateTime = $fromDate.AddMonths($durationInMonths)
+    $key.KeyId = (New-Guid).ToString()
+    $key.DisplayName = "app secret"
+
     return $key
 }
 
@@ -53,19 +36,19 @@ Function CreateAppKey([DateTime] $fromDate, [double] $durationInYears, [string]$
 Function AddResourcePermission($requiredAccess, `
                                $exposedPermissions, [string]$requiredAccesses, [string]$permissionType)
 {
-        foreach($permission in $requiredAccesses.Trim().Split("|"))
+    foreach($permission in $requiredAccesses.Trim().Split("|"))
+    {
+        foreach($exposedPermission in $exposedPermissions)
         {
-            foreach($exposedPermission in $exposedPermissions)
-            {
-                if ($exposedPermission.Value -eq $permission)
-                 {
-                    $resourceAccess = New-Object Microsoft.Open.AzureAD.Model.ResourceAccess
-                    $resourceAccess.Type = $permissionType # Scope = Delegated permissions | Role = Application permissions
-                    $resourceAccess.Id = $exposedPermission.Id # Read directory data
-                    $requiredAccess.ResourceAccess.Add($resourceAccess)
-                 }
-            }
+            if ($exposedPermission.Value -eq $permission)
+                {
+                $resourceAccess = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphResourceAccess
+                $resourceAccess.Type = $permissionType # Scope = Delegated permissions | Role = Application permissions
+                $resourceAccess.Id = $exposedPermission.Id # Read directory data
+                $requiredAccess.ResourceAccess += $resourceAccess
+                }
         }
+    }
 }
 
 #
@@ -80,17 +63,17 @@ Function GetRequiredPermissions([string] $applicationDisplayName, [string] $requ
     }
     else
     {
-        $sp = Get-AzureADServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
+        $sp = Get-MgServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
     }
     $appid = $sp.AppId
-    $requiredAccess = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
+    $requiredAccess = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphRequiredResourceAccess
     $requiredAccess.ResourceAppId = $appid 
-    $requiredAccess.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.ResourceAccess]
+    $requiredAccess.ResourceAccess = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphResourceAccess]
 
     # $sp.Oauth2Permissions | Select Id,AdminConsentDisplayName,Value: To see the list of all the Delegated permissions for the application:
     if ($requiredDelegatedPermissions)
     {
-        AddResourcePermission $requiredAccess -exposedPermissions $sp.Oauth2Permissions -requiredAccesses $requiredDelegatedPermissions -permissionType "Scope"
+        AddResourcePermission $requiredAccess -exposedPermissions $sp.Oauth2PermissionScopes -requiredAccesses $requiredDelegatedPermissions -permissionType "Scope"
     }
     
     # $sp.AppRoles | Select Id,AdminConsentDisplayName,Value: To see the list of all the Application permissions for the application
@@ -132,115 +115,314 @@ Function ReplaceInTextFile([string] $configFilePath, [System.Collections.HashTab
 
     Set-Content -Path $configFilePath -Value $lines -Force
 }
+<#.Description
+   This function creates a new Azure AD scope (OAuth2Permission) with default and provided values
+#>  
+Function CreateScope( [string] $value, [string] $userConsentDisplayName, [string] $userConsentDescription, [string] $adminConsentDisplayName, [string] $adminConsentDescription)
+{
+    $scope = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphPermissionScope
+    $scope.Id = New-Guid
+    $scope.Value = $value
+    $scope.UserConsentDisplayName = $userConsentDisplayName
+    $scope.UserConsentDescription = $userConsentDescription
+    $scope.AdminConsentDisplayName = $adminConsentDisplayName
+    $scope.AdminConsentDescription = $adminConsentDescription
+    $scope.IsEnabled = $true
+    $scope.Type = "User"
+    return $scope
+}
+
+<#.Description
+   This function creates a new Azure AD AppRole with default and provided values
+#>  
+Function CreateAppRole([string] $types, [string] $name, [string] $description)
+{
+    $appRole = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphAppRole
+    $appRole.AllowedMemberTypes = New-Object System.Collections.Generic.List[string]
+    $typesArr = $types.Split(',')
+    foreach($type in $typesArr)
+    {
+        $appRole.AllowedMemberTypes += $type;
+    }
+    $appRole.DisplayName = $name
+    $appRole.Id = New-Guid
+    $appRole.IsEnabled = $true
+    $appRole.Description = $description
+    $appRole.Value = $name;
+    return $appRole
+}
+Function CreateOptionalClaim([string] $name)
+{
+    <#.Description
+    This function creates a new Azure AD optional claims  with default and provided values
+    #>  
+
+    $appClaim = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphOptionalClaim
+    $appClaim.AdditionalProperties =  New-Object System.Collections.Generic.List[string]
+    $appClaim.Source =  $null
+    $appClaim.Essential = $false
+    $appClaim.Name = $name
+    return $appClaim
+}
+
+Function ConfigureApplications
+{
+    $isOpenSSl = 'N' #temporary disable open certificate creation 
+
+    <#.Description
+       This function creates the Azure AD applications for the sample in the provided Azure AD tenant and updates the
+       configuration files in the client and service project  of the visual studio solution (App.Config and Web.Config)
+       so that they are consistent with the Applications parameters
+    #> 
+    
+    if (!$azureEnvironmentName)
+    {
+        $azureEnvironmentName = "Global"
+    }
+
+    # Connect to the Microsoft Graph API, non-interactive is not supported for the moment (Oct 2021)
+    Write-Host "Connecting to Microsoft Graph"
+    if ($tenantId -eq "") {
+        Connect-MgGraph -Scopes "Application.ReadWrite.All" -Environment $azureEnvironmentName
+        $tenantId = (Get-MgContext).TenantId
+    }
+    else {
+        Connect-MgGraph -TenantId $tenantId -Scopes "Application.ReadWrite.All" -Environment $azureEnvironmentName
+    }
+    
+
+   # Create the service AAD application
+   Write-Host "Creating the AAD application (java-spring-webapi-auth)"
+   
+   # create the application 
+   $serviceAadApplication = New-MgApplication -DisplayName "java-spring-webapi-auth" `
+                                                       -Web `
+                                                       @{ `
+                                                         } `
+                                                         -Api `
+                                                         @{ `
+                                                            RequestedAccessTokenVersion = 2 `
+                                                         } `
+                                                        -SignInAudience AzureADMyOrg `
+                                                       #end of command
+    $serviceIdentifierUri = 'api://'+$serviceAadApplication.AppId
+    Update-MgApplication -ApplicationId $serviceAadApplication.Id -IdentifierUris @($serviceIdentifierUri)
+    
+    # create the service principal of the newly created application 
+    $currentAppId = $serviceAadApplication.AppId
+    $serviceServicePrincipal = New-MgServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
+
+    # add the user running the script as an app owner if needed
+    $owner = Get-MgApplicationOwner -ApplicationId $serviceAadApplication.Id
+    if ($owner -eq $null)
+    { 
+        New-MgApplicationOwnerByRef -ApplicationId $serviceAadApplication.Id  -BodyParameter = @{"@odata.id" = "htps://graph.microsoft.com/v1.0/directoryObjects/$user.ObjectId"}
+        Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($serviceServicePrincipal.DisplayName)'"
+    }
+
+    # Add Claims
+
+    $optionalClaims = New-Object Microsoft.Graph.PowerShell.Models.MicrosoftGraphOptionalClaims
+    $optionalClaims.AccessToken = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphOptionalClaim]
+    $optionalClaims.IdToken = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphOptionalClaim]
+    $optionalClaims.Saml2Token = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphOptionalClaim]
+
+
+    # Add Optional Claims
+
+    $newClaim =  CreateOptionalClaim  -name "idtyp" 
+    $optionalClaims.AccessToken += ($newClaim)
+    Update-MgApplication -ApplicationId $serviceAadApplication.Id -OptionalClaims $optionalClaims
+    
+    # Add application Roles
+    $appRoles = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphAppRole]
+    Update-MgApplication -ApplicationId $serviceAadApplication.Id -AppRoles $appRoles
+    
+    # rename the user_impersonation scope if it exists to match the readme steps or add a new scope
+       
+    # delete default scope i.e. User_impersonation
+    # Alex: the scope deletion doesn't work - see open issue - https://github.com/microsoftgraph/msgraph-sdk-powershell/issues/1054
+    $scopes = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphPermissionScope]
+    $scope = $serviceAadApplication.Api.Oauth2PermissionScopes | Where-Object { $_.Value -eq "User_impersonation" }
+    
+    if($scope -ne $null)
+    {    
+        # disable the scope
+        $scope.IsEnabled = $false
+        $scopes.Add($scope)
+        Update-MgApplication -ApplicationId $serviceAadApplication.Id -Api @{Oauth2PermissionScopes = @($scopes)}
+
+        # clear the scope
+        Update-MgApplication -ApplicationId $serviceAadApplication.Id -Api @{Oauth2PermissionScopes = @()}
+    }
+
+    $scopes = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphPermissionScope]
+    $scope = CreateScope -value Read  `
+    -userConsentDisplayName "Access java-spring-webapi-auth"  `
+    -userConsentDescription "Allow the application to access java-spring-webapi-auth on your behalf."  `
+    -adminConsentDisplayName "Access java-spring-webapi-auth"  `
+    -adminConsentDescription "Allows the app to have the same access to information in the directory on behalf of an admin."
+            
+    $scopes.Add($scope)
+    $scope = CreateScope -value ReadWrite  `
+    -userConsentDisplayName "Access java-spring-webapi-auth"  `
+    -userConsentDescription "Allow the application to access java-spring-webapi-auth on your behalf."  `
+    -adminConsentDisplayName "Access java-spring-webapi-auth"  `
+    -adminConsentDescription "Allows the app to have the same access to information in the directory on behalf of an admin."
+            
+    $scopes.Add($scope)
+    
+    # add/update scopes
+    Update-MgApplication -ApplicationId $serviceAadApplication.Id -Api @{Oauth2PermissionScopes = @($scopes)}
+    Write-Host "Done creating the service application (java-spring-webapi-auth)"
+
+    # URL of the AAD application in the Azure portal
+    # Future? $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.Id+"/isMSAApp/"
+    $servicePortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.Id+"/isMSAApp/"
+    Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>java-spring-webapi-auth</a></td></tr>" -Path createdApps.html
+
+   # Create the client AAD application
+   Write-Host "Creating the AAD application (java-spring-webapp-auth)"
+   # Get a 6 months application key for the client Application
+   $fromDate = [DateTime]::Now;
+   $key = CreateAppKey -fromDate $fromDate -durationInMonths 6
+   
+   
+   # create the application 
+   $clientAadApplication = New-MgApplication -DisplayName "java-spring-webapp-auth" `
+                                                      -Web `
+                                                      @{ `
+                                                          RedirectUris = "http://localhost:8080/login/oauth2/code/"; `
+                                                          HomePageUrl = "http://localhost:8080/"; `
+                                                        } `
+                                                       -SignInAudience AzureADMyOrg `
+                                                      #end of command
+    #add a secret to the application
+    $pwdCredential = Add-MgApplicationPassword -ApplicationId $clientAadApplication.Id -PasswordCredential $key
+    $clientAppKey = $pwdCredential.SecretText
+
+    $tenantName = (Get-MgApplication -ApplicationId $clientAadApplication.Id).PublisherDomain
+    Update-MgApplication -ApplicationId $clientAadApplication.Id -IdentifierUris @("https://$tenantName/java-spring-webapp-auth")
+    
+    # create the service principal of the newly created application 
+    $currentAppId = $clientAadApplication.AppId
+    $clientServicePrincipal = New-MgServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
+
+    # add the user running the script as an app owner if needed
+    $owner = Get-MgApplicationOwner -ApplicationId $clientAadApplication.Id
+    if ($owner -eq $null)
+    { 
+        New-MgApplicationOwnerByRef -ApplicationId $clientAadApplication.Id  -BodyParameter = @{"@odata.id" = "htps://graph.microsoft.com/v1.0/directoryObjects/$user.ObjectId"}
+        Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($clientServicePrincipal.DisplayName)'"
+    }
+    
+    # Add application Roles
+    $appRoles = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphAppRole]
+    Update-MgApplication -ApplicationId $clientAadApplication.Id -AppRoles $appRoles
+    Write-Host "Done creating the client application (java-spring-webapp-auth)"
+
+    # URL of the AAD application in the Azure portal
+    # Future? $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.Id+"/isMSAApp/"
+    $clientPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.Id+"/isMSAApp/"
+    Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>java-spring-webapp-auth</a></td></tr>" -Path createdApps.html
+    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphRequiredResourceAccess]
+    
+    # Add Required Resources Access (from 'client' to 'service')
+    Write-Host "Getting access from 'client' to 'service'"
+    $requiredPermissions = GetRequiredPermissions -applicationDisplayName "java-spring-webapi-auth" `
+        -requiredDelegatedPermissions "Read|ReadWrite" `
+    $requiredResourcesAccess.Add($requiredPermissions)
+    Update-MgApplication -ApplicationId $clientAadApplication.Id -RequiredResourceAccess $requiredResourcesAccess
+    Write-Host "Granted permissions."
+
+    Write-Host "Successfully registered and configured that app registration for 'java-spring-webapp-auth' at" -ForegroundColor Green
+    $clientPortalUrl
+Function UpdateLine([string] $line, [string] $value)
+{
+    $index = $line.IndexOf(':')
+    $lineEnd = ''
+
+    if($line[$line.Length - 1] -eq ','){   $lineEnd = ',' }
+    
+    if ($index -ige 0)
+    {
+        $line = $line.Substring(0, $index+1) + " " + '"' + $value+ '"' + $lineEnd
+    }
+    return $line
+}
+
+Function UpdateTextFile([string] $configFilePath, [System.Collections.HashTable] $dictionary)
+{
+    $lines = Get-Content $configFilePath
+    $index = 0
+    while($index -lt $lines.Length)
+    {
+        $line = $lines[$index]
+        foreach($key in $dictionary.Keys)
+        {
+            if ($line.Contains($key))
+            {
+                $lines[$index] = UpdateLine $line $dictionary[$key]
+            }
+        }
+        $index++
+    }
+
+    Set-Content -Path $configFilePath -Value $lines -Force
+}
+    
+    # Update config file for 'service'
+    # $configFile = $pwd.Path + "\..\resource-api\src\main\resources\application.yml"
+    $configFile = $(Resolve-Path ($pwd.Path + "\..\resource-api\src\main\resources\application.yml"))
+    
+    $dictionary = @{ "Enter_Your_Tenant_ID_Here" = $tenantId;"Enter_Your_WebAPI_Client_ID_Here" = $serviceAadApplication.AppId };
+
+    Write-Host "Updating the sample config '$configFile' with the following config values"
+
+    ReplaceInTextFile -configFilePath $configFile -dictionary $dictionary
+    
+    # Update config file for 'client'
+    # $configFile = $pwd.Path + "\..\webapp\src\main\resources\application.yml"
+    $configFile = $(Resolve-Path ($pwd.Path + "\..\webapp\src\main\resources\application.yml"))
+    
+    $dictionary = @{ "Enter_Your_Tenant_ID_Here" = $tenantId;"Enter_Your_Client_ID_Here" = $clientAadApplication.AppId;"Enter_Your_Client_Secret_Here" = $clientAppKey;"Enter_Your_WebAPI_Client_ID_Here" = $serviceAadApplication.AppId };
+
+    Write-Host "Updating the sample config '$configFile' with the following config values"
+
+    ReplaceInTextFile -configFilePath $configFile -dictionary $dictionary
+    if($isOpenSSL -eq 'Y')
+    {
+        Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
+        Write-Host "You have generated certificate using OpenSSL so follow below steps: "
+        Write-Host "Install the certificate on your system from current folder."
+        Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
+    }
+    Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
+} # end of ConfigureApplications function
+
+# Pre-requisites
+if ($null -eq (Get-Module -ListAvailable -Name "Microsoft.Graph.Applications")) {
+    Install-Module "Microsoft.Graph.Applications" -Scope CurrentUser 
+}
+
+Import-Module Microsoft.Graph.Applications
 
 Set-Content -Value "<html><body><table>" -Path createdApps.html
 Add-Content -Value "<thead><tr><th>Application</th><th>AppId</th><th>Url in the Azure portal</th></tr></thead><tbody>" -Path createdApps.html
 
 $ErrorActionPreference = "Stop"
 
-Function ConfigureApplications
-{
-<#.Description
-   This function creates the Azure AD applications for the sample in the provided Azure AD tenant and updates the
-   configuration files in the client and service project  of the visual studio solution (App.Config and Web.Config)
-   so that they are consistent with the Applications parameters
-#> 
-    $commonendpoint = "common"
-    
-    if (!$azureEnvironmentName)
-    {
-        $azureEnvironmentName = "AzureCloud"
-    }
-
-    # $tenantId is the Active Directory Tenant. This is a GUID which represents the "Directory ID" of the AzureAD tenant
-    # into which you want to create the apps. Look it up in the Azure portal in the "Properties" of the Azure AD.
-
-    # Login to Azure PowerShell (interactive if credentials are not already provided:
-    # you'll need to sign-in with creds enabling your to create apps in the tenant)
-    if (!$Credential -and $TenantId)
-    {
-        $creds = Connect-AzureAD -TenantId $tenantId -AzureEnvironmentName $azureEnvironmentName
-    }
-    else
-    {
-        if (!$TenantId)
-        {
-            $creds = Connect-AzureAD -Credential $Credential -AzureEnvironmentName $azureEnvironmentName
-        }
-        else
-        {
-            $creds = Connect-AzureAD -TenantId $tenantId -Credential $Credential -AzureEnvironmentName $azureEnvironmentName
-        }
-    }
-
-    if (!$tenantId)
-    {
-        $tenantId = $creds.Tenant.Id
-    }
-
-    
-
-    $tenant = Get-AzureADTenantDetail
-    $tenantName =  ($tenant.VerifiedDomains | Where { $_._Default -eq $True }).Name
-
-    # Get the user running the script to add the user as the app owner
-    $user = Get-AzureADUser -ObjectId $creds.Account.Id
-
-   # Create the webApp AAD application
-   Write-Host "Creating the AAD application (java-spring-webapp-auth)"
-   # Get a 2 years application key for the webApp Application
-   $pw = ComputePassword
-   $fromDate = [DateTime]::Now;
-   $key = CreateAppKey -fromDate $fromDate -durationInYears 2 -pw $pw
-   $webAppAppKey = $pw
-   # create the application 
-   $webAppAadApplication = New-AzureADApplication -DisplayName "java-spring-webapp-auth" `
-                                                  -HomePage "http://localhost:8080/" `
-                                                  -ReplyUrls "http://localhost:8080/login/oauth2/code/" `
-                                                  -IdentifierUris "https://$tenantName/java-spring-webapp-auth" `
-                                                  -PasswordCredentials $key `
-                                                  -PublicClient $False
-
-   # create the service principal of the newly created application 
-   $currentAppId = $webAppAadApplication.AppId
-   $webAppServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
-
-   # add the user running the script as an app owner if needed
-   $owner = Get-AzureADApplicationOwner -ObjectId $webAppAadApplication.ObjectId
-   if ($owner -eq $null)
-   { 
-        Add-AzureADApplicationOwner -ObjectId $webAppAadApplication.ObjectId -RefObjectId $user.ObjectId
-        Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($webAppServicePrincipal.DisplayName)'"
-   }
-
-
-   Write-Host "Done creating the webApp application (java-spring-webapp-auth)"
-
-   # URL of the AAD application in the Azure portal
-   # Future? $webAppPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$webAppAadApplication.AppId+"/objectId/"+$webAppAadApplication.ObjectId+"/isMSAApp/"
-   $webAppPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$webAppAadApplication.AppId+"/objectId/"+$webAppAadApplication.ObjectId+"/isMSAApp/"
-   Add-Content -Value "<tr><td>webApp</td><td>$currentAppId</td><td><a href='$webAppPortalUrl'>java-spring-webapp-auth</a></td></tr>" -Path createdApps.html
-
-   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
-
-   Set-AzureADApplication -ObjectId $webAppAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
-   Write-Host "Granted permissions."
-
-   # Update config file for 'webApp'
-   $configFile = $pwd.Path + "\..\webapp\src\main\resources\application.yml"
-   Write-Host "Updating the sample code ($configFile)"
-   $dictionary = @{ "Enter_Your_Tenant_ID_Here" = $tenantId;"Enter_Your_Client_ID_Here" = $webAppAadApplication.AppId;"Enter_Your_Client_Secret_Here" = $webAppAppKey };
-   ReplaceInTextFile -configFilePath $configFile -dictionary $dictionary
-  
-   Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html  
-}
-
-# Pre-requisites
-if ((Get-Module -ListAvailable -Name "AzureAD") -eq $null) { 
-    Install-Module "AzureAD" -Scope CurrentUser 
-}
-
-Import-Module AzureAD
-
 # Run interactively (will ask you for the tenant ID)
-ConfigureApplications -Credential $Credential -tenantId $TenantId
+
+try
+{
+    ConfigureApplications -tenantId $tenantId -environment $azureEnvironmentName
+}
+catch
+{
+    $message = $_
+    Write-Warning $Error[0]
+    Write-Host "Unable to register apps. Error is $message." -ForegroundColor White -BackgroundColor Red
+}
+Write-Host "Disconnecting from tenant"
+Disconnect-MgGraph

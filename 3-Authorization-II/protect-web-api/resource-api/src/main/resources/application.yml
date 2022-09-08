@@ -9,6 +9,7 @@ logging:
     root: DEBUG
 azure:
  activedirectory:
-   client-id: Enter_Your_Client_ID_Here
-   tenant-id: Enter_Your_Tenant_ID_Here
-   app-id-uri: api://Enter_Your_Client_ID_Here
+   client-id: 2abacc25-7883-489e-b942-3b91b3aab676
+   tenant-id: 1f481a32-c0c4-4374-a5c7-834e822ff423
+   app-id-uri: api://2abacc25-7883-489e-b942-3b91b3aab676
+   instance-uri: https://login.microsoftonline.com/

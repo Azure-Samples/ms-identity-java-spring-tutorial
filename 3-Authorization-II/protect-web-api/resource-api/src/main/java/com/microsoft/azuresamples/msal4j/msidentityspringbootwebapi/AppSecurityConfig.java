@@ -19,61 +19,54 @@ import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.util.StringUtils;
 
+import com.microsoft.azuresamples.msal4j.msidentityspringbootwebapi.experimental.*;
+
 @Configuration
 public class AppSecurityConfig {
 
     @Value("${azure.activedirectory.client-id}")
-    String audience;
+    String clientid;
     
     @Value("${azure.activedirectory.tenant-id}")
     String tenantId;
     
-    /*
-    private final OAuth2ResourceServerProperties.Jwt properties;
+    @Value("${azure.activedirectory.instance-uri}")
+    String instanceUri;   
     
-    public AppSecurityConfig(OAuth2ResourceServerProperties properties) {
-        this.properties = properties.getJwt();
-    }*/
-
+    /**
+     * JwtDecoder for signature and claim validation 
+     */
     @Bean
     JwtDecoder jwtDecoder() {
-    	String JWKSet = "https://login.microsoftonline.com/" + tenantId + "/discovery/v2.0/keys";
+    	String JWKSet = instanceUri + tenantId + "/discovery/v2.0/keys";
         NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withJwkSetUri(JWKSet).build();
-        /*NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withJwkSetUri(properties.getJwkSetUri()).build();*/
         nimbusJwtDecoder.setJwtValidator(jwtValidator());
         return nimbusJwtDecoder;
     }
-
+    
+    /* 
+     * Adds standard and optional extended validation for AAD token
+     */
     private OAuth2TokenValidator<Jwt> jwtValidator() {
         List<OAuth2TokenValidator<Jwt>> validators = new ArrayList<>();
-        String issuerUri = "https://login.microsoftonline.com/" + tenantId + "/v2.0";      		
-        //String issuerUri = properties.getIssuerUri();
-        if (StringUtils.hasText(issuerUri)) {
-            validators.add(new JwtIssuerValidator(issuerUri));
+        
+        // Add standard claim validation for valid issuer, audience, and timestamp claims
+        String issuerUri =  instanceUri + tenantId + "/v2.0";
+        validators = AADHelpers.AADStandardValidators(validators, issuerUri, clientid);
+        
+        /*Extended Validation 
+         * Uncomment to allow user to limit access of API to specific client apps
+         * Add client Id of your client apps to allowedClientApps
+         * Extended Validation will add azp and appid validation for the id's provided
+         */
+        /*
+        String[] allowedClientApps = new String[] {""};
+        for (int i = 0; i < allowedClientApps.length; i++ ) {
+			validators = AADHelpers.AADExtendedValidators(validators, allowedClientApps[i]);
         }
-        if (StringUtils.hasText(audience)) {
-            validators.add(new JwtClaimValidator<>(JwtClaimNames.AUD, claimPredicate(audience)));
-        }
-        if (StringUtils.hasText(tenantId)) {
-            validators.add(new JwtClaimValidator<>("tid", claimPredicate(tenantId)));
-        } 
-        validators.add(new JwtTimestampValidator());
-        return new DelegatingOAuth2TokenValidator<>(validators);
+        */           
+        return new AADDelegatingOAuth2TokenValidator<>(validators);
     }
-    
-    
-    Predicate<Object> claimPredicate(String claim) {
-        return clm -> {
-            if (clm == null) {
-                return false;
-            } else if (clm instanceof String) {
-                return clm.equals(claim);
-            } else if (clm instanceof List) {
-                return ((List<?>) clm).contains(claim);
-            } else {
-                return false;
-            }
-        };
-    }   
+          
     
 }
