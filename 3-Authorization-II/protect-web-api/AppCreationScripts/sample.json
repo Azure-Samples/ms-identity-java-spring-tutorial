@@ -1,14 +1,43 @@
 {
     "Sample": {
-        "Title": "Enable your Java Spring Boot web app to sign in users on your Azure Active Directory tenant with the Microsoft identity platform",
+        "Title": "Enable your Java Spring Boot web app to sign in users on your Azure Active Directory and call a protected Web api",
         "Level": 100,
-        "Client": "Java Spring Boot web app",
+        "Client": "Java Spring Web application",
+		"Service": "Java Spring Web API",
         "RepositoryUrl": "ms-identity-java-spring-tutorial",
-        "Endpoint": "AAD v2.0"
+        "Endpoint": "AAD v2.0",
+		"Description": "Enable your Java Spring Boot web app to sign in users in your Azure AD tenant and call a protected Web api protected with Spring Security",
+		"Languages": [ "java" ],
+		"Products": [ "java", "spring-boot", "azure-active-directory", "msal-java" ],
+		"Platform": "Java"
     },
+	
+	  "ReadmeSetup": {
+		"UseNewSetup": "1", /* when set to 0, only legacy setup will be used */
+		"CertificateOption": "0", /* 1 when a certificate can be used instead of secret*/
+		"AppRegistrationIncludeFilePath": "",
+		"RunSampleIncludeFilePath": "./ReadmeFiles/RunSample.md"
+	  },
+	  
+	  "ReadMeExploretheSample": {
+		 "IncludeFilePath": "./ReadmeFiles/Explore.md"
+	  },
+		 
+	  "ReadmeAboutTheCode": {
+		"IncludeFilePath": "./ReadmeFiles/AboutCode.md"
+	  },
+
     "AADApps": [
+		{
+			"Id": "service",
+			"Name": "java-spring-webapi-auth",
+			"Kind": "WebApi",
+			"Audience": "AzureADMyOrg",
+			"AppRoles":[],
+			"Scopes": [ "Read", "ReadWrite"]
+		},
         {
-            "Id": "webApp",
+            "Id": "client",
             "Name": "java-spring-webapp-auth",
             "Kind": "WebApp",
             "Audience": "AzureADMyOrg",
@@ -16,14 +45,35 @@
             "AllowImplicitFlow": false,
             "HomePage": "http://localhost:8080/",
             "ReplyUrls": "http://localhost:8080/login/oauth2/code/",
-            "RequiredResourcesAccess": []
+			"AppRoles":[],
+            "RequiredResourcesAccess": [
+				{
+					"Resource": "service",
+					"DelegatedPermissions": [ "Read", "ReadWrite" ]
+				}
+			]
         }
     ],
     "CodeConfiguration": [
-        {
-            "App": "webApp",
+                {
+            "App": "service",
             "SettingKind": "Replace",
-            "SettingFile": "\\..\\src\\main\\resources\\application.yml",
+            "SettingFile": "\\..\\resource-api\\src\\main\\resources\\application.yml",
+            "Mappings": [
+                {
+                    "key": "Enter_Your_Tenant_ID_Here",
+                    "value": "$tenantId"
+                },
+                {
+                    "key": "Enter_Your_WebAPI_Client_ID_Here",
+                    "value": "service.AppId"
+                }
+            ]
+        },
+		{
+            "App": "client",
+            "SettingKind": "Replace",
+            "SettingFile": "\\..\\webapp\\src\\main\\resources\\application.yml",
             "Mappings": [
                 {
                     "key": "Enter_Your_Tenant_ID_Here",
@@ -31,12 +81,16 @@
                 },
                 {
                     "key": "Enter_Your_Client_ID_Here",
-                    "value": "webApp.AppId"
+                    "value": "client.AppId"
                 },
                 {
                     "key": "Enter_Your_Client_Secret_Here",
-                    "value": ".AppKey"
-                }
+                    "value": "client.AppKey"
+                },
+                {
+                    "key": "Enter_Your_WebAPI_Client_ID_Here",
+                    "value": "service.AppId"
+                }				
             ]
         }
     ]
