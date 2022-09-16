@@ -13,10 +13,9 @@
     },
 	
 	  "ReadmeSetup": {
-		"UseNewSetup": "1", /* when set to 0, only legacy setup will be used */
-		"CertificateOption": "0", /* 1 when a certificate can be used instead of secret*/
+		"UseNewSetup": "1", 
+		"CertificateOption": "0", 
 		"AppRegistrationIncludeFilePath": "",
-		"RunSampleIncludeFilePath": "./ReadmeFiles/RunSample.md"
 	  },
 	  
 	  "ReadMeExploretheSample": {
