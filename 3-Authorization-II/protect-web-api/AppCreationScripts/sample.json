@@ -70,7 +70,7 @@
       "RequiredResourcesAccess": [
         {
           "Resource": "service",
-          "DelegatedPermissions": [ "Read", "ReadWrite" ]
+          "DelegatedPermissions": [ "ToDoList.Read", "ToDoList.ReadWrite" ]
         }
       ]
     }
