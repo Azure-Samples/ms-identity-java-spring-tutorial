@@ -42,3 +42,30 @@ public class SecurityConfig extends AADResourceServerWebSecurityConfigurerAdapte
     }
 }
 ```
+
+### Validate your Azure access tokens using routes with AADDelegatingOAuth2TokenValidator
+
+While `AADWebSecurityConfigurationAdapter` can be used to protect your routes so only valid users can access it, Azure protected API's require additional claims validation to ensure only valid users are calling you routes. For this, see this app's [AppSecurityConfig](.resource-api/src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapi/AppSecurityConfig.java) class.
+
+This class configures your `AADWebSecurityConfigurationAdapter` with signature validation using `NimbusJwtDecoder` as well as custom validation for the `iss`, `aud`, `nbf`, and `exp` claims using `AADDelegatingOAuth2TokenValidator`
+
+```java
+    @Bean
+    JwtDecoder jwtDecoder() {
+    	String JWKSet = instanceUri + tenantId + "/discovery/v2.0/keys";
+        NimbusJwtDecoder nimbusJwtDecoder = NimbusJwtDecoder.withJwkSetUri(JWKSet).build();
+        nimbusJwtDecoder.setJwtValidator(jwtValidator());
+        return nimbusJwtDecoder;
+    }
+```
+Additionally, you may also configure this class to perform custom extended claim validation of the `azp` and `appid` claim to restrict access of your API to only select web applications. 
+```java
+	/*Extended Validation 
+	 * Uncomment to allow user to limit access of API to specific client apps
+	 * Add client Id of your client apps to allowedClientApps
+	 */
+	String[] allowedClientApps = new String[] {""};
+	for (int i = 0; i < allowedClientApps.length; i++ ) {
+		validators = AADHelpers.AADExtendedValidators(validators, allowedClientApps[i]);
+	}
+```	
