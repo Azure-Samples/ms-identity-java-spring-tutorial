@@ -21,16 +21,16 @@ public class SampleController {
 
     @GetMapping("/api/date")
     @ResponseBody
-    @PreAuthorize("hasAuthority('SCOPE_Read') || hasAuthority('SCOPE_ReadWrite')"
-    + "|| hasAuthority('APPROLE_ReadWrite.All') || hasAuthority('APPROLE_Read.All')")
+    @PreAuthorize("hasAuthority('SCOPE_ToDoList.Read') || hasAuthority('SCOPE_ToDoList.ReadWrite')"
+    + "|| hasAuthority('APPROLE_ToDoList.ReadWrite.All') || hasAuthority('APPROLE_ToDoList.Read.All')")
     public String date(BearerTokenAuthentication bearerTokenAuth) {
          
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
         if (isAppToken(principal)) {
-        	System.out.println("this principal is an App");
+            System.out.println("this principal is an App");
         }
         else {
-        	System.out.println("this principal is a User");
+            System.out.println("this principal is a User");
         }
         
         return new DateResponse().toString();
@@ -56,13 +56,13 @@ public class SampleController {
      * @param principal
      * @return
      */
-	public static boolean isAppToken(OAuth2AuthenticatedPrincipal principal) {
+    public static boolean isAppToken(OAuth2AuthenticatedPrincipal principal) {
         String idtyp = principal.getAttribute("idtyp");
         if (idtyp != null & idtyp == "app") {
-        		return true;
+                return true;
         }      
         return false;
         
-	}
+    }
     
 }

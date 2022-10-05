@@ -7,6 +7,7 @@ param(
     [string] $azureEnvironmentName
 )
 
+
 Function Cleanup
 {
     if (!$azureEnvironmentName)
@@ -24,11 +25,15 @@ Function Cleanup
 
     # Connect to the Microsoft Graph API
     Write-Host "Connecting to Microsoft Graph"
-    if ($tenantId -eq "") {
+
+
+    if ($tenantId -eq "") 
+    {
         Connect-MgGraph -Scopes "Application.ReadWrite.All" -Environment $azureEnvironmentName
         $tenantId = (Get-MgContext).TenantId
     }
-    else {
+    else 
+    {
         Connect-MgGraph -TenantId $tenantId -Scopes "Application.ReadWrite.All" -Environment $azureEnvironmentName
     }
     
@@ -57,7 +62,7 @@ Function Cleanup
 
     foreach ($app in $apps) 
     {
-        Remove-MgApplication -ApplicationId $app.Id -Debug
+        Remove-MgApplication -ApplicationId $app.Id
         Write-Host "Removed java-spring-webapi-auth.."
     }
 
@@ -94,7 +99,7 @@ Function Cleanup
 
     foreach ($app in $apps) 
     {
-        Remove-MgApplication -ApplicationId $app.Id -Debug
+        Remove-MgApplication -ApplicationId $app.Id
         Write-Host "Removed java-spring-webapp-auth.."
     }
 
@@ -111,14 +116,39 @@ Function Cleanup
     }
 }
 
-if ($null -eq (Get-Module -ListAvailable -Name "Microsoft.Graph.Applications")) { 
-    Install-Module "Microsoft.Graph.Applications" -Scope CurrentUser                                            
-} 
+# Pre-requisites
+if ($null -eq (Get-Module -ListAvailable -Name "Microsoft.Graph.Applications")) {
+    Install-Module "Microsoft.Graph.Applications" -Scope CurrentUser 
+}
+
 Import-Module Microsoft.Graph.Applications
+
+if ($null -eq (Get-Module -ListAvailable -Name "Microsoft.Graph.Groups")) {
+    Install-Module "Microsoft.Graph.Groups" -Scope CurrentUser 
+}
+
+Import-Module Microsoft.Graph.Groups
+
+if ($null -eq (Get-Module -ListAvailable -Name "Microsoft.Graph.Users")) {
+    Install-Module "Microsoft.Graph.Users" -Scope CurrentUser 
+}
+
+Import-Module Microsoft.Graph.Users
+
 $ErrorActionPreference = "Stop"
 
 
-Cleanup -tenantId $tenantId -environment $azureEnvironmentName
+try
+{
+    Cleanup -tenantId $tenantId -environment $azureEnvironmentName
+}
+catch
+{
+    $_.Exception.ToString() | out-host
+    $message = $_
+    Write-Warning $Error[0]    
+    Write-Host "Unable to register apps. Error is $message." -ForegroundColor White -BackgroundColor Red
+}
 
 Write-Host "Disconnecting from tenant"
 Disconnect-MgGraph

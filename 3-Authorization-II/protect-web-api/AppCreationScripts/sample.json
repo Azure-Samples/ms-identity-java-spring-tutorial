@@ -3,7 +3,7 @@
     "Title": "Enable your Java Spring Boot web app to sign in users with Azure Active Directory and call a protected Web api",
     "Level": 200,
     "Client": "Java Spring Web application",
-    "Service": "Java Spring Web API",
+    "Service": "Java Spring Web Api",
     "RepositoryUrl": "ms-identity-java-spring-tutorial",
     "SampleSubPath": "5-AccessControl\\1-call-api-roles",
     "Endpoint": "AAD v2.0",

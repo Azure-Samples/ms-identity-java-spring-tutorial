@@ -1,5 +1,6 @@
 ## About the code
-This sample demonstrates how to use [Azure AD Spring Boot Starter client library for Java](https://docs.microsoft.com/java/api/overview/azure/active-directory-spring-boot-starter-readme?view=azure-java-stable) to sign in users into your Azure AD tenant. It also makes use of **Spring Oauth2 Client** and **Spring Web** boot starters. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user.
+
+This sample demonstrates how to use [Azure AD Spring Boot Starter client library for Java](https://docs.microsoft.com/java/api/overview/azure/active-directory-spring-boot-starter-readme?view=azure-java-stable) to sign in users into your Azure AD tenant. It also makes use of **Spring OAuth2 Client** and **Spring Web** boot starters. It uses claims from **ID Token** obtained from Azure Active Directory to display details of the signed-in user.
 
 ### Project Initialization
 
@@ -58,14 +59,16 @@ This class configures your `AADWebSecurityConfigurationAdapter` with signature v
         return nimbusJwtDecoder;
     }
 ```
-Additionally, you may also configure this class to perform custom extended claim validation of the `azp` and `appid` claim to restrict access of your API to only select web applications. 
+
+Additionally, you may also configure this class to perform custom extended claim validation of the `azp` and `appid` claim to restrict access of your API to only select web applications.
+
 ```java
-	/*Extended Validation 
-	 * Uncomment to allow user to limit access of API to specific client apps
-	 * Add client Id of your client apps to allowedClientApps
-	 */
-	String[] allowedClientApps = new String[] {""};
-	for (int i = 0; i < allowedClientApps.length; i++ ) {
-		validators = AADHelpers.AADExtendedValidators(validators, allowedClientApps[i]);
-	}
-```	
+/*Extended Validation 
+    * Uncomment to allow user to limit access of API to specific client apps
+    * Add client Id of your client apps to allowedClientApps
+    */
+String[] allowedClientApps = new String[] {""};
+for (int i = 0; i < allowedClientApps.length; i++ ) {
+    validators = AADHelpers.AADExtendedValidators(validators, allowedClientApps[i]);
+}
+```
