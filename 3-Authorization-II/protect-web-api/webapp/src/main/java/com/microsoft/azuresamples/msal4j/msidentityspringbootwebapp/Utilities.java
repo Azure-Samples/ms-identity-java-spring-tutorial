@@ -32,4 +32,11 @@ public class Utilities {
         });
         return filteredClaims;
     }
+    
+    public static String getUsername(OidcUser principal) {
+        if (principal.getIdToken().getClaims().containsKey("preferred_username")) {
+            return principal.getIdToken().getClaims().get("preferred_username").toString();
+        }
+        return "";
+    }
 }

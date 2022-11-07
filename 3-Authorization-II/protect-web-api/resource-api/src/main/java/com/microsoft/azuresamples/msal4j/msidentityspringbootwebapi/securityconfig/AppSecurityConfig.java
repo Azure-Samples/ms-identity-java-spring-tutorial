@@ -1,4 +1,4 @@
-package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapi;
+package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapi.securityconfig;
 
 import java.util.ArrayList;
 import java.util.List;

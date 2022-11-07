@@ -4,7 +4,15 @@
 package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapp;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClient.RequestBodySpec;
+import org.springframework.web.reactive.function.client.WebClient.RequestHeadersSpec;
+import org.springframework.web.reactive.function.client.WebClient.UriSpec;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -14,10 +22,13 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Controller
 public class SampleController {
@@ -65,6 +76,13 @@ public class SampleController {
         return hydrateUI(model, "token");
     }
 
+    // survey endpoint - did the sample address your needs?
+    // not an integral a part of this tutorial.
+    @GetMapping(path = "/survey")
+    public String survey(Model model) {
+        return hydrateUI(model, "survey");
+    }
+    
     /**
      *  Call API  endpoint
      *  Demonstrates how to call a protected API
@@ -81,23 +99,67 @@ public class SampleController {
             .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
             .build();
 
-        Map<String,String> apiResp;
-        try {
+        //Map<String,String> apiResp;
+        //try {
             String response = apiClient.get().uri(apiEndpoint).retrieve().toEntity(String.class).block().getBody();
-            apiResp =  new ObjectMapper().readValue(response, HashMap.class);
-        } catch (Exception ex) {
+            //apiResp =  new ObjectMapper().readValue(response, HashMap.class);
+        /*} catch (Exception ex) {
             apiResp = new HashMap<>();
             apiResp.put("Error", "Response was null or other error");
-        }
+        }*/
 
-        model.addAttribute("apiResp", apiResp);
+        model.addAttribute("apiResp", response);
         return hydrateUI(model, "api");
     }
-
-    // survey endpoint - did the sample address your needs?
-    // not an integral a part of this tutorial.
-    @GetMapping(path = "/survey")
-    public String survey(Model model) {
-        return hydrateUI(model, "survey");
+    
+    @GetMapping(path = "/table")
+    public String tableView(Model model, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient) {
+        final WebClient apiClient = WebClient.builder()
+                .baseUrl(apiAddress)
+                .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
+                .build();
+        HashMap response = apiClient.get().uri("/api/table").retrieve().toEntity(HashMap.class).block().getBody();
+        model.addAttribute("apiResp", response);
+        return hydrateUI(model, "table");
+    }   
+    
+    @PostMapping(path = "/add")
+    public String add (Model model, @ModelAttribute ToDoListItem todolistitem, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient) {
+        final WebClient apiClient = WebClient.builder()
+                .baseUrl(apiAddress)
+                .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
+                .build();
+        
+        HashMap response = apiClient.post().uri("/api/add").bodyValue(todolistitem).retrieve().toEntity(HashMap.class).block().getBody();
+        model.addAttribute("apiResp", response);
+        return hydrateUI(model, "table");
+    } 
+    
+    @GetMapping(path = "/delete")
+    public String delete (Model model, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient, @RequestParam Integer id) {
+        final WebClient apiClient = WebClient.builder()
+                .baseUrl(apiAddress)
+                .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
+                .build();
+        HashMap response = apiClient.delete().uri("/api/delete/" + id).retrieve().toEntity(HashMap.class).block().getBody();
+        model.addAttribute("apiResp", response);
+        return hydrateUI(model, "table");
+    }
+    
+    @GetMapping(path = "/details")
+    public String details (Model model, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient, @RequestParam Integer id) {
+        final WebClient apiClient = WebClient.builder()
+                .baseUrl(apiAddress)
+                .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
+                .build();
+        HashMap response = apiClient.get().uri("/api/details/" + id).retrieve().toEntity(HashMap.class).block().getBody();
+        model.addAttribute("apiResp", response);
+        return hydrateUI(model, "details");
+    }
+    
+    @GetMapping(path = "/addPage")
+    public String addPage(Model model, @AuthenticationPrincipal OidcUser principal) {
+        model.addAttribute("ToDoListItem", new ToDoListItem());
+        return hydrateUI(model, "addPage");
     }
 }
