@@ -5,8 +5,8 @@
     <div class="card-body">
         <p class="card-text">
             <th:block th:each="item : ${apiResp}">
-                <strong><th:block th:text="${item.key}"></th:block>: </strong>
-                <th:block th:text="${item.value}"></th:block>
+                <!--<strong><th:block th:text="${item.key}"></th:block>: </strong>-->
+                <th:block th:text="${item}"></th:block>
                 <br>
             </th:block>
             <br>

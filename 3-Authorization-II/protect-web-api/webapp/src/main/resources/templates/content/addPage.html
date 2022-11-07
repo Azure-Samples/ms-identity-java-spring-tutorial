@@ -1,0 +1,18 @@
+<div class="card">
+    <h5 class="card-header bg-primary">
+        Add To Do
+    </h5>
+    <div class="card-body">
+        <p class="card-text">
+        	<form method="post" th:action="@{/add}" th:object="${ToDoListItem}">
+		        <input id="owner" placeholder="Owner" required type="text" th:field="*{owner}"/>
+		        <input id="todo" placeholder="To Do" required type="text" th:field="*{todo}"/>        	
+        		<input class="btn btn-success" type="submit" value="Create User">
+        	</form>
+        	<br>
+            <a class="btn btn-success" href="/sign_in_status">Sign-in Status</a>
+            <a class="btn btn-success" href="/token_details">Token Details</a>
+            <a class="btn btn-success" href="/table">To Do List</a>
+        </p>
+    </div>
+</div>

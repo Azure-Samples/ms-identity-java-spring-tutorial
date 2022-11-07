@@ -11,7 +11,7 @@ azure:
     # Specifies the Microsoft Graph scopes that your app needs access to - not required in this app.
     authorization-clients:
       web-api:
-        scopes: api://Enter_Your_WebAPI_Client_ID_Here/ReadWrite
+        scopes: api://Enter_Your_WebAPI_Client_ID_Here/ToDoList.ReadWrite
 
 # which routes to restrict to authenticated users only (see SecurityConfig.java):
 # enter String array (comma-separated) or just one route.
@@ -24,3 +24,11 @@ app:
   api:
     base-address: http://localhost:8082
     date-endpoint: /api/date
+
+server:
+  forward-headers-strategy: native
+  tomcat:
+    remoteip:
+      protocol-header: "X-Forwarded-Proto"
+      remote-ip-header: "X-Forwarded-For"
+      internal-proxies: ".*"
