@@ -6,26 +6,33 @@ package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapi;
 import java.util.Date;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 // import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 // import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.microsoft.azuresamples.msal4j.msidentityspringbootwebapi.experimental.*;
+
 @RestController
 public class SampleController {
 
     @GetMapping("/api/date")
     @ResponseBody
-    @PreAuthorize("hasAuthority('SCOPE_access_as_user')")
-    public String date(/**BearerTokenAuthentication bearerTokenAuth*/) {
-        /** 
-        //uncomment the parameter in the function params above and the line below to get access to the principal.
+    @PreAuthorize("hasAuthority('SCOPE_ToDoList.Read') || hasAuthority('SCOPE_ToDoList.ReadWrite')"
+    + "|| hasAuthority('APPROLE_ToDoList.ReadWrite.All') || hasAuthority('APPROLE_ToDoList.Read.All')")
+    public String date(BearerTokenAuthentication bearerTokenAuth) {
+         
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
-        // You can then access attributes of the principal, e.g., attributes (claims), the raw tokenValue, and authorities.
-        // For example:
-        principal.getAttribute("scp");
-        */
+        if (isAppToken(principal)) {
+            System.out.println("this principal is an App");
+        }
+        else {
+            System.out.println("this principal is a User");
+        }
+        
         return new DateResponse().toString();
     }
 
@@ -43,4 +50,19 @@ public class SampleController {
             return String.format("{\"humanReadable\": \"%s\", \"timeStamp\": \"%s\"}", humanReadable, timeStamp);
         }
     }
+    
+    /**
+     * Checks the idtyp claim to determine if principal is an app or a user
+     * @param principal
+     * @return
+     */
+    public static boolean isAppToken(OAuth2AuthenticatedPrincipal principal) {
+        String idtyp = principal.getAttribute("idtyp");
+        if (idtyp != null & idtyp == "app") {
+                return true;
+        }      
+        return false;
+        
+    }
+    
 }

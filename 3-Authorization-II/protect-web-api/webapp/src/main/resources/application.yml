@@ -11,7 +11,7 @@ azure:
     # Specifies the Microsoft Graph scopes that your app needs access to - not required in this app.
     authorization-clients:
       web-api:
-        scopes: api://Enter_Your_WebAPI_Client_ID_Here/access_as_user
+        scopes: api://Enter_Your_WebAPI_Client_ID_Here/ToDoList.ReadWrite
 
 # which routes to restrict to authenticated users only (see SecurityConfig.java):
 # enter String array (comma-separated) or just one route.
