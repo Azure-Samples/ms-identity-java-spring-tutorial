@@ -132,7 +132,7 @@ public class SampleController {
         
         HashMap response = apiClient.post().uri("/api/add").bodyValue(todo).retrieve().toEntity(HashMap.class).block().getBody();
         model.addAttribute("apiResp", response);
-        return hydrateUI(model, "table");
+        return "redirect:table";
     } 
     
     @GetMapping(path = "/delete")
@@ -143,7 +143,7 @@ public class SampleController {
                 .build();
         HashMap response = apiClient.delete().uri("/api/delete/" + id).retrieve().toEntity(HashMap.class).block().getBody();
         model.addAttribute("apiResp", response);
-        return hydrateUI(model, "table");
+        return "redirect:table";
     }
     
     @GetMapping(path = "/details")
@@ -172,7 +172,7 @@ public class SampleController {
         map.add("todo", todo);        
         HashMap response = apiClient.post().uri("/api/edit").body(BodyInserters.fromMultipartData(map)).retrieve().toEntity(HashMap.class).block().getBody();
         model.addAttribute("apiResp", response);
-        return hydrateUI(model, "table");
+        return "redirect:table";
     }    
     
     @GetMapping(path = "/addPage")
