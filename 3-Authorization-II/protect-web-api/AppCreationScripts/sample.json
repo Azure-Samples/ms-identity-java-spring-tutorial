@@ -5,7 +5,6 @@
     "Client": "Java Spring Web application",
     "Service": "Java Spring Web API",
     "RepositoryUrl": "ms-identity-java-spring-tutorial",
-    "SampleSubPath": "3-Authorization-II\\protect-web-api",
     "Endpoint": "AAD v2.0",
     "Description": "Enable your Java Spring Boot web app to sign in users in your Azure AD tenant and call a Web api protected with Spring Security and Microsoft Identity Platform",
     "Languages": [ "java" ],
@@ -30,7 +29,10 @@
       "Name": "java-spring-webapi-auth",
       "Kind": "WebApi",
       "Audience": "AzureADMyOrg",
-
+      "Sample": {
+        "SampleSubPath": "3-Authorization-II\\protect-web-api",
+        "ProjectDirectory": "resource-api"
+      },
       "OptionalClaims": {
         "AccessTokenClaims": [ "idtyp" ]
       },
@@ -61,7 +63,7 @@
         "IdTokenClaims": [ "acct" ]
       },
       "Sample": { //this information is used when describing how to create and run the sample
-        "SampleSubPath": "5-AccessControl\\1-call-api-roles",
+        "SampleSubPath": "3-Authorization-II\\protect-web-api",
         "ProjectDirectory": "webapp"
       },
       "RequiredResourcesAccess": [
