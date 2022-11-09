@@ -34,7 +34,7 @@ public class SampleController {
     @GetMapping("/api/date")
     @ResponseBody
     @PreAuthorize("hasAuthority('SCOPE_ToDoList.Read') || hasAuthority('SCOPE_ToDoList.ReadWrite')"
-    + "|| hasAuthority('APPROLE_ReadWrite.All') || hasAuthority('APPROLE_Read.All')")
+    + "|| hasAuthority('APPROLE_ToDoList.ReadWrite.All') || hasAuthority('APPROLE_ToDoList.Read.All')")
     public String callAPI(BearerTokenAuthentication bearerTokenAuth) {        
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
         String response;
@@ -50,7 +50,7 @@ public class SampleController {
     @GetMapping("/api/table")
     @ResponseBody
     @PreAuthorize("hasAuthority('SCOPE_ToDoList.Read') || hasAuthority('SCOPE_ToDoList.ReadWrite')"
-    + "|| hasAuthority('APPROLE_ReadWrite.All') || hasAuthority('APPROLE_Read.All')")
+    + "|| hasAuthority('APPROLE_ToDoList.ReadWrite.All') || hasAuthority('APPROLE_ToDoList.Read.All')")
     public HashMap get(BearerTokenAuthentication bearerTokenAuth) {
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
         createIfNotCreated(principal);
@@ -65,7 +65,7 @@ public class SampleController {
     
     @GetMapping("/api/details/{id}")
     @ResponseBody
-    @PreAuthorize("hasAuthority('SCOPE_ToDoList.Read') || hasAuthority('APPROLE_Read.All')")
+    @PreAuthorize("hasAuthority('SCOPE_ToDoList.Read') || hasAuthority('APPROLE_ToDoList.Read.All')")
     public HashMap details(BearerTokenAuthentication bearerTokenAuth, @PathVariable("id") Integer id) {
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
         createIfNotCreated(principal);
@@ -94,7 +94,7 @@ public class SampleController {
     
     @DeleteMapping("/api/delete/{id}")
     @ResponseBody
-    @PreAuthorize("hasAuthority('SCOPE_ToDoList.ReadWrite') || hasAuthority('APPROLE_ReadWrite.All')")
+    @PreAuthorize("hasAuthority('SCOPE_ToDoList.ReadWrite') || hasAuthority('APPROLE_ToDoList.ReadWrite.All')")
     public HashMap delete(BearerTokenAuthentication bearerTokenAuth, @PathVariable("id") Integer id) {
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
         createIfNotCreated(principal);
@@ -123,7 +123,7 @@ public class SampleController {
     
     @PostMapping("/api/add")
     @ResponseBody
-    @PreAuthorize("hasAuthority('SCOPE_ToDoList.ReadWrite') || hasAuthority('APPROLE_ReadWrite.All')")
+    @PreAuthorize("hasAuthority('SCOPE_ToDoList.ReadWrite') || hasAuthority('APPROLE_ToDoList.ReadWrite.All')")
     public HashMap add(BearerTokenAuthentication bearerTokenAuth, @RequestBody String TBA) {
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
         createIfNotCreated(principal);
@@ -144,7 +144,7 @@ public class SampleController {
  
     @PostMapping("/api/edit")
     @ResponseBody
-    @PreAuthorize("hasAuthority('SCOPE_ToDoList.ReadWrite') || hasAuthority('APPROLE_ReadWrite.All')")
+    @PreAuthorize("hasAuthority('SCOPE_ToDoList.ReadWrite') || hasAuthority('APPROLE_ToDoList.ReadWrite.All')")
     public HashMap edit(BearerTokenAuthentication bearerTokenAuth, @RequestParam("todo") String todo, @RequestParam("id") Integer id) {
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
         createIfNotCreated(principal);
