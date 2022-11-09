@@ -65,7 +65,8 @@ public class SampleController {
     
     @GetMapping("/api/details/{id}")
     @ResponseBody
-    @PreAuthorize("hasAuthority('SCOPE_ToDoList.Read') || hasAuthority('APPROLE_ToDoList.Read.All')")
+    @PreAuthorize("hasAuthority('SCOPE_ToDoList.Read') || hasAuthority('APPROLE_ToDoList.Read.All')"
+    + "|| hasAuthority('APPROLE_ToDoList.ReadWrite.All') || hasAuthority('APPROLE_ToDoList.Read.All')") 
     public HashMap details(BearerTokenAuthentication bearerTokenAuth, @PathVariable("id") Integer id) {
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
         createIfNotCreated(principal);
