@@ -118,19 +118,19 @@ public class SampleController {
                 .baseUrl(apiAddress)
                 .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
                 .build();
-        HashMap response = apiClient.get().uri("/api/table").retrieve().toEntity(HashMap.class).block().getBody();
+        HashMap response = apiClient.get().uri("/api/table").retrieve().toEntity(HashMap.class).block().getBody();        
         model.addAttribute("apiResp", response);
         return hydrateUI(model, "table");
     }   
     
     @PostMapping(path = "/add")
-    public String add (Model model, @ModelAttribute ToDoListItem todolistitem, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient) {
+    public String add (Model model, @RequestParam("todo") String todo, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient) {
         final WebClient apiClient = WebClient.builder()
                 .baseUrl(apiAddress)
                 .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
                 .build();
         
-        HashMap response = apiClient.post().uri("/api/add").bodyValue(todolistitem).retrieve().toEntity(HashMap.class).block().getBody();
+        HashMap response = apiClient.post().uri("/api/add").bodyValue(todo).retrieve().toEntity(HashMap.class).block().getBody();
         model.addAttribute("apiResp", response);
         return hydrateUI(model, "table");
     } 
@@ -153,13 +153,36 @@ public class SampleController {
                 .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
                 .build();
         HashMap response = apiClient.get().uri("/api/details/" + id).retrieve().toEntity(HashMap.class).block().getBody();
+        if (response.containsKey("error")) {
+            model.addAttribute("apiResp", response.get("error"));
+            return hydrateUI(model, "api");
+        }        
         model.addAttribute("apiResp", response);
         return hydrateUI(model, "details");
     }
     
+    @PostMapping(path = "/edit")
+    public String edit (Model model, @RequestParam("todo") String todo, @RequestParam("id") Integer id, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient) {
+        final WebClient apiClient = WebClient.builder()
+                .baseUrl(apiAddress)
+                .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
+                .build();
+        LinkedMultiValueMap map = new LinkedMultiValueMap();
+        map.add("id", id);
+        map.add("todo", todo);        
+        HashMap response = apiClient.post().uri("/api/edit").body(BodyInserters.fromMultipartData(map)).retrieve().toEntity(HashMap.class).block().getBody();
+        model.addAttribute("apiResp", response);
+        return hydrateUI(model, "table");
+    }    
+    
     @GetMapping(path = "/addPage")
     public String addPage(Model model, @AuthenticationPrincipal OidcUser principal) {
-        model.addAttribute("ToDoListItem", new ToDoListItem());
         return hydrateUI(model, "addPage");
+    }
+    
+    @GetMapping(path = "/editPage")
+    public String editPage(Model model, @AuthenticationPrincipal OidcUser principal, @RequestParam Integer id) {
+        model.addAttribute("id", id);
+        return hydrateUI(model, "editPage");
     }
 }

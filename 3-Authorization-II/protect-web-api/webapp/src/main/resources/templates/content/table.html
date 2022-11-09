@@ -18,6 +18,7 @@
 		                <td th:text="${item.value.todo}"></td>
 		                <td> <a class="btn btn-success" th:href="|/delete?id=${item.key}|">Delete</a><td>
 		                <td> <a class="btn btn-success" th:href="|/details?id=${item.key}|">Details</a><td>
+		                <td> <a class="btn btn-success" th:href="|/editPage?id=${item.key}|">Edit</a><td>
 		            </tr>		           
 	            </th:block>			
 	        </table>

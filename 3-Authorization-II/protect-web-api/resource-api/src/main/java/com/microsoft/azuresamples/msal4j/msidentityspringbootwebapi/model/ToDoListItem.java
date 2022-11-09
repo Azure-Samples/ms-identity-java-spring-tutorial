@@ -6,7 +6,9 @@ package com.microsoft.azuresamples.msal4j.msidentityspringbootwebapi.model;
  */
 
 public class ToDoListItem {
-     
+    
+    private int id; 
+    
     private String owner;
     
     private String todo;
@@ -18,6 +20,14 @@ public class ToDoListItem {
         this.todo = todo;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    
     public String getOwner() {
         return owner;
     }

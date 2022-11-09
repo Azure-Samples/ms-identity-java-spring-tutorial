@@ -4,10 +4,9 @@
     </h5>
     <div class="card-body">
         <p class="card-text">
-        	<form method="post" th:action="@{/add}" th:object="${ToDoListItem}">
-		        <input id="owner" placeholder="Owner" required type="text" th:field="*{owner}"/>
-		        <input id="todo" placeholder="To Do" required type="text" th:field="*{todo}"/>        	
-        		<input class="btn btn-success" type="submit" value="Create User">
+        	<form method="post" th:action="@{/add}">
+		        <input th:id="todo" th:name="todo" placeholder="To Do" required type="text" th:value="*{todo}"/>        	
+        		<input class="btn btn-success" type="submit" value="Create">
         	</form>
         	<br>
             <a class="btn btn-success" href="/sign_in_status">Sign-in Status</a>
