@@ -105,12 +105,13 @@ public class SampleController {
         }
         else {
             HashMap response = new HashMap();
-            ToDoListItem toBeDelete = TDL.getById(id);
-            if (toBeDelete == null) {
+            ToDoListItem toBeDeleted = TDL.getById(id);
+            if (toBeDeleted == null) {
                 response.put("error", "To Do does not exist");
+                return response;
             }
             else {
-                if (toBeDelete.getOwner().equals(principal.getAttribute("oid"))) {
+                if (toBeDeleted.getOwner().equals(principal.getAttribute("oid"))) {
                     TDL.delete(id);
                 }
                 else {                    
@@ -149,25 +150,20 @@ public class SampleController {
     public HashMap edit(BearerTokenAuthentication bearerTokenAuth, @RequestParam("todo") String todo, @RequestParam("id") Integer id) {
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) bearerTokenAuth.getPrincipal();
         createIfNotCreated(principal);
-        
-        if (!isAppToken(principal)) {
             HashMap response = new HashMap();
             ToDoListItem toBeEdited = TDL.getById(id);
             if (toBeEdited == null) {
                 response.put("error", "To Do does not exist");
                 return response; 
             }
-            else {
-                if (toBeEdited.getOwner().equals(principal.getAttribute("oid"))) {                    
-                    toBeEdited.setTodo(todo);
-                    TDL.edit(id, toBeEdited);
-                }
-                else {
+        if (!isAppToken(principal)) {
+            if (!(toBeEdited.getOwner().equals(principal.getAttribute("oid")))) {                    
                     response.put("error", "You do not have permission to edit this");
                     return response;                    
-                }
-            }         
         }       
+        }
+        toBeEdited.setTodo(todo);
+        TDL.edit(id, toBeEdited);
         return get(bearerTokenAuth);
     }
     
@@ -178,7 +174,7 @@ public class SampleController {
      */
     public static boolean isAppToken(OAuth2AuthenticatedPrincipal principal) {
         String idtyp = principal.getAttribute("idtyp");
-        if (idtyp != null & idtyp == "app") {
+        if (idtyp != null && idtyp.equals( "app")) {
                 return true;
         }      
         return false;
@@ -188,10 +184,10 @@ public class SampleController {
     private void createIfNotCreated(OAuth2AuthenticatedPrincipal principal) {
         if (TDL == null) {
             this.TDL = new ToDoList();
-            TDL.add(new ToDoListItem(principal.getAttribute("oid"), "finish todo"));
-            TDL.add(new ToDoListItem(principal.getAttribute("oid"), "overworked, seek help"));
-            TDL.add(new ToDoListItem("A man clearly burnt out", "overworked, seek help"));
-            TDL.add(new ToDoListItem("To test some oid functionality", "overworked, seek help"));
+            TDL.add(new ToDoListItem(principal.getAttribute("oid"), "fix readme"));
+            TDL.add(new ToDoListItem(principal.getAttribute("oid"), "add documentation"));
+            TDL.add(new ToDoListItem("Testing for different owner1", "This is meant to only be visible when viewed by an app"));
+            TDL.add(new ToDoListItem("Testing for different owner2", "This is a second test"));
         }
     }
     

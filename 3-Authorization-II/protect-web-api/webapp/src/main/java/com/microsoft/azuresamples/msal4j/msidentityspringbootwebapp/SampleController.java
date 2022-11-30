@@ -36,9 +36,6 @@ public class SampleController {
     @Value( "${app.api.base-address}" )
     private String apiAddress;
 
-    @Value( "${app.api.date-endpoint}" )
-    private String apiEndpoint;
-
     /**
      * Add HTML partial fragment from /templates/content folder to request and serve base html
      * @param model Model used for placing user param and bodyContent param in request before serving UI.
@@ -82,45 +79,21 @@ public class SampleController {
     public String survey(Model model) {
         return hydrateUI(model, "survey");
     }
-    
-    /**
-     *  Call API  endpoint
-     *  Demonstrates how to call a protected API
-     * 
-     * @param model Model used for placing user param and bodyContent param in request before serving UI.
-     * @param apiAuthorizedClient OAuth2AuthorizedClient this object contains API Access Token.
-     * @return String the UI.
-     */
-    @GetMapping(path = "/call_api")
-    public String callAPI(Model model, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient) {
-
-        final WebClient apiClient = WebClient.builder()
-            .baseUrl(apiAddress)
-            .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
-            .build();
-
-        //Map<String,String> apiResp;
-        //try {
-            String response = apiClient.get().uri(apiEndpoint).retrieve().toEntity(String.class).block().getBody();
-            //apiResp =  new ObjectMapper().readValue(response, HashMap.class);
-        /*} catch (Exception ex) {
-            apiResp = new HashMap<>();
-            apiResp.put("Error", "Response was null or other error");
-        }*/
-
-        model.addAttribute("apiResp", response);
-        return hydrateUI(model, "api");
-    }
-    
+       
     @GetMapping(path = "/table")
     public String tableView(Model model, @RegisteredOAuth2AuthorizedClient("web-api") OAuth2AuthorizedClient apiAuthorizedClient) {
         final WebClient apiClient = WebClient.builder()
                 .baseUrl(apiAddress)
                 .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
                 .build();
-        HashMap response = apiClient.get().uri("/api/table").retrieve().toEntity(HashMap.class).block().getBody();        
-        model.addAttribute("apiResp", response);
-        return hydrateUI(model, "table");
+        try {
+            HashMap response = apiClient.get().uri("/api/table").retrieve().toEntity(HashMap.class).block().getBody();        
+            model.addAttribute("apiResp", response);
+            return hydrateUI(model, "table");
+        } catch (Exception ex) {
+            model.addAttribute("apiResp", "an error has occured");
+            return hydrateUI(model, "api");
+        }
     }   
     
     @PostMapping(path = "/add")
@@ -129,10 +102,14 @@ public class SampleController {
                 .baseUrl(apiAddress)
                 .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
                 .build();
-        
-        HashMap response = apiClient.post().uri("/api/add").bodyValue(todo).retrieve().toEntity(HashMap.class).block().getBody();
-        model.addAttribute("apiResp", response);
-        return "redirect:table";
+        try {
+            HashMap response = apiClient.post().uri("/api/add").bodyValue(todo).retrieve().toEntity(HashMap.class).block().getBody();
+            model.addAttribute("apiResp", response);
+            return "redirect:table";
+        } catch (Exception ex) {
+            model.addAttribute("apiResp", "an error has occured");
+            return hydrateUI(model, "api");
+        }
     } 
     
     @GetMapping(path = "/delete")
@@ -141,9 +118,18 @@ public class SampleController {
                 .baseUrl(apiAddress)
                 .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
                 .build();
-        HashMap response = apiClient.delete().uri("/api/delete/" + id).retrieve().toEntity(HashMap.class).block().getBody();
-        model.addAttribute("apiResp", response);
-        return "redirect:table";
+        try {
+            HashMap response = apiClient.delete().uri("/api/delete/" + id).retrieve().toEntity(HashMap.class).block().getBody();
+            if (response.containsKey("error")) {
+                model.addAttribute("apiResp", response.get("error"));
+                return hydrateUI(model, "api");             
+            }            
+            model.addAttribute("apiResp", response);
+            return "redirect:table";
+        } catch (Exception ex) {
+            model.addAttribute("apiResp", "an error has occured");
+            return hydrateUI(model, "api");
+        }
     }
     
     @GetMapping(path = "/details")
@@ -152,13 +138,18 @@ public class SampleController {
                 .baseUrl(apiAddress)
                 .defaultHeader("Authorization", String.format("Bearer %s", apiAuthorizedClient.getAccessToken().getTokenValue()))
                 .build();
-        HashMap response = apiClient.get().uri("/api/details/" + id).retrieve().toEntity(HashMap.class).block().getBody();
-        if (response.containsKey("error")) {
-            model.addAttribute("apiResp", response.get("error"));
+        try {
+            HashMap response = apiClient.get().uri("/api/details/" + id).retrieve().toEntity(HashMap.class).block().getBody();
+            if (response.containsKey("error")) {
+                model.addAttribute("apiResp", response.get("error"));
+                return hydrateUI(model, "api");             
+            }
+            model.addAttribute("apiResp", response);
+            return hydrateUI(model, "details");
+        } catch (Exception ex) {
+            model.addAttribute("apiResp", "an error has occured");
             return hydrateUI(model, "api");
-        }        
-        model.addAttribute("apiResp", response);
-        return hydrateUI(model, "details");
+        }
     }
     
     @PostMapping(path = "/edit")
@@ -169,10 +160,15 @@ public class SampleController {
                 .build();
         LinkedMultiValueMap map = new LinkedMultiValueMap();
         map.add("id", id);
-        map.add("todo", todo);        
-        HashMap response = apiClient.post().uri("/api/edit").body(BodyInserters.fromMultipartData(map)).retrieve().toEntity(HashMap.class).block().getBody();
-        model.addAttribute("apiResp", response);
-        return "redirect:table";
+        map.add("todo", todo);
+        try {
+            HashMap response = apiClient.post().uri("/api/edit").body(BodyInserters.fromMultipartData(map)).retrieve().toEntity(HashMap.class).block().getBody();
+            model.addAttribute("apiResp", response);
+            return "redirect:table";
+        } catch (Exception ex) {
+            model.addAttribute("apiResp", "an error has occured");
+            return hydrateUI(model, "api");
+        }
     }    
     
     @GetMapping(path = "/addPage")
