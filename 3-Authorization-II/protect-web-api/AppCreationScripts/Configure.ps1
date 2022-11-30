@@ -87,6 +87,46 @@ Function GetRequiredPermissions([string] $applicationDisplayName, [string] $requ
 
 <#.Description
    This function takes a string input as a single line, matches a key value and replaces with the replacement value
+#> 
+Function UpdateLine([string] $line, [string] $value)
+{
+    $index = $line.IndexOf(':')
+    $lineEnd = ''
+
+    if($line[$line.Length - 1] -eq ','){   $lineEnd = ',' }
+    
+    if ($index -ige 0)
+    {
+        $line = $line.Substring(0, $index+1) + " " + '"' + $value+ '"' + $lineEnd
+    }
+    return $line
+}
+
+<#.Description
+   This function takes a dictionary of keys to search and their replacements and replaces the placeholders in a text file
+#> 
+Function UpdateTextFile([string] $configFilePath, [System.Collections.HashTable] $dictionary)
+{
+    $lines = Get-Content $configFilePath
+    $index = 0
+    while($index -lt $lines.Length)
+    {
+        $line = $lines[$index]
+        foreach($key in $dictionary.Keys)
+        {
+            if ($line.Contains($key))
+            {
+                $lines[$index] = UpdateLine $line $dictionary[$key]
+            }
+        }
+        $index++
+    }
+
+    Set-Content -Path $configFilePath -Value $lines -Force
+}
+
+<#.Description
+   This function takes a string input as a single line, matches a key value and replaces with the replacement value
 #>     
 Function ReplaceInLine([string] $line, [string] $key, [string] $value)
 {
@@ -158,45 +198,6 @@ Function CreateAppRole([string] $types, [string] $name, [string] $description)
     $appRole.Value = $name;
     return $appRole
 }
-<#.Description
-   This function takes a string input as a single line, matches a key value and replaces with the replacement value
-#> 
-Function UpdateLine([string] $line, [string] $value)
-{
-    $index = $line.IndexOf(':')
-    $lineEnd = ''
-
-    if($line[$line.Length - 1] -eq ','){   $lineEnd = ',' }
-    
-    if ($index -ige 0)
-    {
-        $line = $line.Substring(0, $index+1) + " " + '"' + $value+ '"' + $lineEnd
-    }
-    return $line
-}
-
-<#.Description
-   This function takes a dictionary of keys to search and their replacements and replaces the placeholders in a text file
-#> 
-Function UpdateTextFile([string] $configFilePath, [System.Collections.HashTable] $dictionary)
-{
-    $lines = Get-Content $configFilePath
-    $index = 0
-    while($index -lt $lines.Length)
-    {
-        $line = $lines[$index]
-        foreach($key in $dictionary.Keys)
-        {
-            if ($line.Contains($key))
-            {
-                $lines[$index] = UpdateLine $line $dictionary[$key]
-            }
-        }
-        $index++
-    }
-
-    Set-Content -Path $configFilePath -Value $lines -Force
-}
 
 <#.Description
    This function takes a string as input and creates an instance of an Optional claim object
@@ -236,19 +237,33 @@ Function ConfigureApplications
     # Connect to the Microsoft Graph API, non-interactive is not supported for the moment (Oct 2021)
     Write-Host "Connecting to Microsoft Graph"
     if ($tenantId -eq "") {
-        Connect-MgGraph -Scopes "Application.ReadWrite.All" -Environment $azureEnvironmentName
-        $tenantId = (Get-MgContext).TenantId
+        Connect-MgGraph -Scopes "User.Read.All Organization.Read.All Application.ReadWrite.All" -Environment $azureEnvironmentName
     }
     else {
-        Connect-MgGraph -TenantId $tenantId -Scopes "Application.ReadWrite.All" -Environment $azureEnvironmentName
+        Connect-MgGraph -TenantId $tenantId -Scopes "User.Read.All Organization.Read.All Application.ReadWrite.All" -Environment $azureEnvironmentName
     }
     
+    $context = Get-MgContext
+    $tenantId = $context.TenantId
+
+    # Get the user running the script
+    $currentUserPrincipalName = $context.Account
+    $user = Get-MgUser -Filter "UserPrincipalName eq '$($context.Account)'"
+
+    # get the tenant we signed in to
+    $Tenant = Get-MgOrganization
+    $tenantName = $Tenant.DisplayName
+    
+    $verifiedDomain = $Tenant.VerifiedDomains | where {$_.Isdefault -eq $true}
+    $verifiedDomainName = $verifiedDomain.Name
+    $tenantId = $Tenant.Id
+
+    Write-Host ("Connected to Tenant {0} ({1}) as account '{2}'. Domain is '{3}'" -f  $Tenant.DisplayName, $Tenant.Id, $currentUserPrincipalName, $verifiedDomainName)
 
    # Create the service AAD application
-   Write-Host "Creating the AAD application (resource-api)"
-   
+   Write-Host "Creating the AAD application (java-spring-webapi-auth)"
    # create the application 
-   $serviceAadApplication = New-MgApplication -DisplayName "resource-api" `
+   $serviceAadApplication = New-MgApplication -DisplayName "java-spring-webapi-auth" `
                                                        -Web `
                                                        @{ `
                                                          } `
@@ -259,19 +274,20 @@ Function ConfigureApplications
                                                         -SignInAudience AzureADMyOrg `
                                                        #end of command
 
-    $serviceIdentifierUri = 'api://'+$serviceAadApplication.AppId
-    Update-MgApplication -ApplicationId $serviceAadApplication.Id -IdentifierUris @($serviceIdentifierUri)
-
-    
-    # create the service principal of the newly created application 
     $currentAppId = $serviceAadApplication.AppId
+    $currentAppObjectId = $serviceAadApplication.Id
+
+    $serviceIdentifierUri = 'api://'+$currentAppId
+    Update-MgApplication -ApplicationId $currentAppObjectId -IdentifierUris @($serviceIdentifierUri)
+    
+    # create the service principal of the newly created application     
     $serviceServicePrincipal = New-MgServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 
     # add the user running the script as an app owner if needed
-    $owner = Get-MgApplicationOwner -ApplicationId $serviceAadApplication.Id
+    $owner = Get-MgApplicationOwner -ApplicationId $currentAppObjectId
     if ($owner -eq $null)
     { 
-        New-MgApplicationOwnerByRef -ApplicationId $serviceAadApplication.Id  -BodyParameter = @{"@odata.id" = "htps://graph.microsoft.com/v1.0/directoryObjects/$user.ObjectId"}
+        New-MgApplicationOwnerByRef -ApplicationId $currentAppObjectId  -BodyParameter = @{"@odata.id" = "htps://graph.microsoft.com/v1.0/directoryObjects/$user.ObjectId"}
         Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($serviceServicePrincipal.DisplayName)'"
     }
 
@@ -286,15 +302,15 @@ Function ConfigureApplications
 
     $newClaim =  CreateOptionalClaim  -name "idtyp" 
     $optionalClaims.AccessToken += ($newClaim)
-    Update-MgApplication -ApplicationId $serviceAadApplication.Id -OptionalClaims $optionalClaims
+    Update-MgApplication -ApplicationId $currentAppObjectId -OptionalClaims $optionalClaims
     
     # Publish Application Permissions
     $appRoles = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphAppRole]
-    $newRole = CreateAppRole -types "Application" -name "ToDoList.Read.All" -description "Allow the app to read every user's ToDo list using the 'resource-api'"
+    $newRole = CreateAppRole -types "Application" -name "ToDoList.Read.All" -description "Allow the app to read every user's ToDo list using the 'java-spring-webapi-auth'"
     $appRoles.Add($newRole)
-    $newRole = CreateAppRole -types "Application" -name "ToDoList.ReadWrite.All" -description "Allow the app to read every user's ToDo list using the 'resource-api'"
+    $newRole = CreateAppRole -types "Application" -name "ToDoList.ReadWrite.All" -description "Allow the app to read every user's ToDo list using the 'java-spring-webapi-auth'"
     $appRoles.Add($newRole)
-    Update-MgApplication -ApplicationId $serviceAadApplication.Id -AppRoles $appRoles
+    Update-MgApplication -ApplicationId $currentAppObjectId -AppRoles $appRoles
     
     # rename the user_impersonation scope if it exists to match the readme steps or add a new scope
        
@@ -308,50 +324,48 @@ Function ConfigureApplications
         # disable the scope
         $scope.IsEnabled = $false
         $scopes.Add($scope)
-        Update-MgApplication -ApplicationId $serviceAadApplication.Id -Api @{Oauth2PermissionScopes = @($scopes)}
+        Update-MgApplication -ApplicationId $currentAppObjectId -Api @{Oauth2PermissionScopes = @($scopes)}
 
         # clear the scope
-        Update-MgApplication -ApplicationId $serviceAadApplication.Id -Api @{Oauth2PermissionScopes = @()}
+        Update-MgApplication -ApplicationId $currentAppObjectId -Api @{Oauth2PermissionScopes = @()}
     }
 
     $scopes = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphPermissionScope]
     $scope = CreateScope -value ToDoList.Read  `
-        -userConsentDisplayName "Read users ToDo list using the 'resource-api'"  `
-        -userConsentDescription "Allow the app to read your ToDo list items via the 'resource-api'"  `
-        -adminConsentDisplayName "Read users ToDo list using the 'resource-api'"  `
-        -adminConsentDescription "Allow the app to read the user's ToDo list using the 'resource-api'"
+        -userConsentDisplayName "Read users ToDo list using the 'java-spring-webapi-auth'"  `
+        -userConsentDescription "Allow the app to read your ToDo list items via the 'java-spring-webapi-auth'"  `
+        -adminConsentDisplayName "Read users ToDo list using the 'java-spring-webapi-auth'"  `
+        -adminConsentDescription "Allow the app to read the user's ToDo list using the 'java-spring-webapi-auth'"
             
     $scopes.Add($scope)
     $scope = CreateScope -value ToDoList.ReadWrite  `
-        -userConsentDisplayName "Read and Write user's ToDo list using the 'resource-api'"  `
-        -userConsentDescription "Allow the app to read and write your ToDo list items via the 'resource-api'"  `
-        -adminConsentDisplayName "Read and Write user's ToDo list using the 'resource-api'"  `
-        -adminConsentDescription "Allow the app to read and write user's ToDo list using the 'resource-api'"
+        -userConsentDisplayName "Read and Write user's ToDo list using the 'java-spring-webapi-auth'"  `
+        -userConsentDescription "Allow the app to read and write your ToDo list items via the 'java-spring-webapi-auth'"  `
+        -adminConsentDisplayName "Read and Write user's ToDo list using the 'java-spring-webapi-auth'"  `
+        -adminConsentDescription "Allow the app to read and write user's ToDo list using the 'java-spring-webapi-auth'"
             
     $scopes.Add($scope)
     
     # add/update scopes
-    Update-MgApplication -ApplicationId $serviceAadApplication.Id -Api @{Oauth2PermissionScopes = @($scopes)}
-    Write-Host "Done creating the service application (resource-api)"
+    Update-MgApplication -ApplicationId $currentAppObjectId -Api @{Oauth2PermissionScopes = @($scopes)}
+    Write-Host "Done creating the service application (java-spring-webapi-auth)"
 
     # URL of the AAD application in the Azure portal
-    # Future? $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.Id+"/isMSAApp/"
-    $servicePortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.Id+"/isMSAApp/"
+    # Future? $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$currentAppId+"/objectId/"+$currentAppObjectId+"/isMSAApp/"
+    $servicePortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$currentAppId+"/objectId/"+$currentAppObjectId+"/isMSAApp/"
 
-    Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>resource-api</a></td></tr>" -Path createdApps.html
+    Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>java-spring-webapi-auth</a></td></tr>" -Path createdApps.html
 
     # print the registered app portal URL for any further navigation
-    Write-Host "Successfully registered and configured that app registration for 'resource-api' at `n $servicePortalUrl" -ForegroundColor Red 
-
+    Write-Host "Successfully registered and configured that app registration for 'java-spring-webapi-auth' at `n $servicePortalUrl" -ForegroundColor Green 
    # Create the client AAD application
-   Write-Host "Creating the AAD application (webapp)"
+   Write-Host "Creating the AAD application (java-spring-webapp-auth)"
    # Get a 6 months application key for the client Application
    $fromDate = [DateTime]::Now;
    $key = CreateAppKey -fromDate $fromDate -durationInMonths 6
    
-   
    # create the application 
-   $clientAadApplication = New-MgApplication -DisplayName "webapp" `
+   $clientAadApplication = New-MgApplication -DisplayName "java-spring-webapp-auth" `
                                                       -Web `
                                                       @{ `
                                                           RedirectUris = "http://localhost:8080/login/oauth2/code/"; `
@@ -364,19 +378,20 @@ Function ConfigureApplications
     $pwdCredential = Add-MgApplicationPassword -ApplicationId $clientAadApplication.Id -PasswordCredential $key
     $clientAppKey = $pwdCredential.SecretText
 
-    $tenantName = (Get-MgApplication -ApplicationId $clientAadApplication.Id).PublisherDomain
-    # Update-MgApplication -ApplicationId $clientAadApplication.Id -IdentifierUris @("https://$tenantName/webapp")
-
-    
-    # create the service principal of the newly created application 
     $currentAppId = $clientAadApplication.AppId
+    $currentAppObjectId = $clientAadApplication.Id
+
+    $tenantName = (Get-MgApplication -ApplicationId $currentAppObjectId).PublisherDomain
+    #Update-MgApplication -ApplicationId $currentAppObjectId -IdentifierUris @("https://$tenantName/java-spring-webapp-auth")
+    
+    # create the service principal of the newly created application     
     $clientServicePrincipal = New-MgServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 
     # add the user running the script as an app owner if needed
-    $owner = Get-MgApplicationOwner -ApplicationId $clientAadApplication.Id
+    $owner = Get-MgApplicationOwner -ApplicationId $currentAppObjectId
     if ($owner -eq $null)
     { 
-        New-MgApplicationOwnerByRef -ApplicationId $clientAadApplication.Id  -BodyParameter = @{"@odata.id" = "htps://graph.microsoft.com/v1.0/directoryObjects/$user.ObjectId"}
+        New-MgApplicationOwnerByRef -ApplicationId $currentAppObjectId  -BodyParameter = @{"@odata.id" = "htps://graph.microsoft.com/v1.0/directoryObjects/$user.ObjectId"}
         Write-Host "'$($user.UserPrincipalName)' added as an application owner to app '$($clientServicePrincipal.DisplayName)'"
     }
 
@@ -391,20 +406,20 @@ Function ConfigureApplications
 
     $newClaim =  CreateOptionalClaim  -name "acct" 
     $optionalClaims.IdToken += ($newClaim)
-    Update-MgApplication -ApplicationId $clientAadApplication.Id -OptionalClaims $optionalClaims
-    Write-Host "Done creating the client application (webapp)"
+    Update-MgApplication -ApplicationId $currentAppObjectId -OptionalClaims $optionalClaims
+    Write-Host "Done creating the client application (java-spring-webapp-auth)"
 
     # URL of the AAD application in the Azure portal
-    # Future? $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.Id+"/isMSAApp/"
-    $clientPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.Id+"/isMSAApp/"
+    # Future? $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/Overview/appId/"+$currentAppId+"/objectId/"+$currentAppObjectId+"/isMSAApp/"
+    $clientPortalUrl = "https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/CallAnAPI/appId/"+$currentAppId+"/objectId/"+$currentAppObjectId+"/isMSAApp/"
 
-    Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>webapp</a></td></tr>" -Path createdApps.html
+    Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>java-spring-webapp-auth</a></td></tr>" -Path createdApps.html
     # Declare a list to hold RRA items    
     $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Graph.PowerShell.Models.MicrosoftGraphRequiredResourceAccess]
 
     # Add Required Resources Access (from 'client' to 'service')
     Write-Host "Getting access from 'client' to 'service'"
-    $requiredPermission = GetRequiredPermissions -applicationDisplayName "resource-api"`
+    $requiredPermission = GetRequiredPermissions -applicationDisplayName "java-spring-webapi-auth"`
         -requiredDelegatedPermissions "ToDoList.Read|ToDoList.ReadWrite"
 
     $requiredResourcesAccess.Add($requiredPermission)
@@ -413,12 +428,12 @@ Function ConfigureApplications
     # $requiredResourcesAccess.Count
     # $requiredResourcesAccess
     
-    Update-MgApplication -ApplicationId $clientAadApplication.Id -RequiredResourceAccess $requiredResourcesAccess
-    Write-Host "Granted permissions."    
+    Update-MgApplication -ApplicationId $currentAppObjectId -RequiredResourceAccess $requiredResourcesAccess
+    Write-Host "Granted permissions."
     
 
     # print the registered app portal URL for any further navigation
-    Write-Host "Successfully registered and configured that app registration for 'webapp' at `n $clientPortalUrl" -ForegroundColor Red 
+    Write-Host "Successfully registered and configured that app registration for 'java-spring-webapp-auth' at `n $clientPortalUrl" -ForegroundColor Green 
     
     # Update config file for 'service'
     # $configFile = $pwd.Path + "\..\resource-api\src\main\resources\application.yml"
@@ -426,7 +441,7 @@ Function ConfigureApplications
     
     $dictionary = @{ "Enter_Your_Tenant_ID_Here" = $tenantId;"Enter_Your_WebAPI_Client_ID_Here" = $serviceAadApplication.AppId };
 
-    Write-Host "Updating the sample config '$configFile' with the following config values:" -ForegroundColor Green 
+    Write-Host "Updating the sample config '$configFile' with the following config values:" -ForegroundColor Yellow 
     $dictionary
     Write-Host "-----------------"
 
@@ -438,7 +453,7 @@ Function ConfigureApplications
     
     $dictionary = @{ "Enter_Your_Tenant_ID_Here" = $tenantId;"Enter_Your_Client_ID_Here" = $clientAadApplication.AppId;"Enter_Your_Client_Secret_Here" = $clientAppKey;"Enter_Your_WebAPI_Client_ID_Here" = $serviceAadApplication.AppId };
 
-    Write-Host "Updating the sample config '$configFile' with the following config values:" -ForegroundColor Green 
+    Write-Host "Updating the sample config '$configFile' with the following config values:" -ForegroundColor Yellow 
     $dictionary
     Write-Host "-----------------"
 
@@ -447,7 +462,7 @@ Function ConfigureApplications
     Write-Host "IMPORTANT: Please follow the instructions below to complete a few manual step(s) in the Azure portal":
     Write-Host "- For service"
     Write-Host "  - Navigate to $servicePortalUrl"
-    Write-Host "  - Application 'service' publishes application permissions. Do remember to navigate to any client app(s) registration in the app portal and consent for those, if required" -ForegroundColor Red 
+    Write-Host "  - Application 'service' publishes application permissions. Do remember to navigate to any client app(s) registration in the app portal and consent for those, (if required)" -ForegroundColor Red 
     Write-Host -ForegroundColor Green "------------------------------------------------------------------------------------------------" 
    
 if($isOpenSSL -eq 'Y')
@@ -461,6 +476,25 @@ Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html
 } # end of ConfigureApplications function
 
 # Pre-requisites
+
+if ($null -eq (Get-Module -ListAvailable -Name "Microsoft.Graph")) {
+    Install-Module "Microsoft.Graph" -Scope CurrentUser 
+}
+
+#Import-Module Microsoft.Graph
+
+if ($null -eq (Get-Module -ListAvailable -Name "Microsoft.Graph.Authentication")) {
+    Install-Module "Microsoft.Graph.Authentication" -Scope CurrentUser 
+}
+
+Import-Module Microsoft.Graph.Authentication
+
+if ($null -eq (Get-Module -ListAvailable -Name "Microsoft.Graph.Identity.DirectoryManagement")) {
+    Install-Module "Microsoft.Graph.Identity.DirectoryManagement" -Scope CurrentUser 
+}
+
+Import-Module Microsoft.Graph.Identity.DirectoryManagement
+
 if ($null -eq (Get-Module -ListAvailable -Name "Microsoft.Graph.Applications")) {
     Install-Module "Microsoft.Graph.Applications" -Scope CurrentUser 
 }
