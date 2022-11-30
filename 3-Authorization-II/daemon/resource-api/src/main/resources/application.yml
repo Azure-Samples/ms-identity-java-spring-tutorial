@@ -1,0 +1,11 @@
+server:
+  port: 8082
+logging:
+  level:
+    root: DEBUG
+azure:
+ activedirectory:
+   client-id: e68d81d3-f5c7-44e3-b119-7e9b1a142002
+   tenant-id: 1f481a32-c0c4-4374-a5c7-834e822ff423
+   app-id-uri: api://e68d81d3-f5c7-44e3-b119-7e9b1a142002
+   instance-uri: https://login.microsoftonline.com/
