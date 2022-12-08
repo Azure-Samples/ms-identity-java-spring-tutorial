@@ -1,7 +1,7 @@
 ---
 page_type: sample
-name: Enable your Java Spring Boot daemon tp call a protected Web API with its own identity
-description: Enable your Java Spring Boot daemon tp call a protected Web API with its own identity
+name: Enable your Java Spring Boot daemon to call a protected Web API with its own identity
+description: Enable your Java Spring Boot daemon to call a protected Web API with its own identity
 languages:
  - java
 products:
@@ -17,7 +17,7 @@ extensions:
 - service: Java Spring Web API
 ---
 
-# Enable your Java Spring Boot daemon tp call a protected Web API with its own identity
+# Enable your Java Spring Boot daemon to call a protected Web API with its own identity
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/ASP.NET%20Core%20Web%20App%20tutorial)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=XXX)
 
