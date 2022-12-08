@@ -163,7 +163,7 @@ To manually register the apps, as a first step you'll need to:
 1. Still on the same app registration, select the **Token configuration** blade to the left.
 1. Select **Add optional claim**:
     1. Select **optional claim type**, then choose **Access**.
-     1. Select the optional claim **idtyp**.
+    1. Select the optional claim **idtyp**.
     > Indicates token type. This claim is the most accurate way for an API to determine if a token is an app token or an app+user token. This is not issued in tokens issued to users.
     1. Select **Add** to save your changes.
 
