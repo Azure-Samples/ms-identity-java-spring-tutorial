@@ -463,7 +463,7 @@ In the left-hand navigation pane, select the **Azure Active Directory** service,
 
 Learn how to:
 
-* [Enable your Java Spring Boot daemon tp call a protected Web API with its own identity](https://github.com/Azure-Samples/ms-identity-java-spring-tutorial/tree/spring-3-Auth/3-Authorization-II/3-App-CallAPI)
+* [Enable your Java Spring Boot daemon to call a protected Web API with its own identity](https://github.com/Azure-Samples/ms-identity-java-spring-tutorial/tree/spring-3-Auth/3-Authorization-II/3-App-CallAPI)
 
 
 ## Contributing
