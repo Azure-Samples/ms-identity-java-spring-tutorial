@@ -19,7 +19,6 @@ extensions:
 
 # Enable your Java Spring Boot daemon to call a protected Web API with its own identity
 
-[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/ASP.NET%20Core%20Web%20App%20tutorial)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=XXX)
 
 * [Overview](#overview)
 * [Scenario](#scenario)
