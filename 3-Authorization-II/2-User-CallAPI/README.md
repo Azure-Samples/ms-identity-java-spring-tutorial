@@ -1,8 +1,8 @@
 ---
 page_type: sample
 name: Enable your Java Spring Boot web app to sign in users with Azure Active Directory and call a protected Web api
-description: Enable your Java Spring Boot web app to sign in users in your Azure AD tenant and call a protected Web api protected with Spring Security
-- languages:
+description: Enable your Java Spring Boot web app to sign in users in your Azure AD tenant and call a Web api protected with Spring Security and Microsoft Identity Platform
+languages:
   - java
 products:
     - java
@@ -21,7 +21,19 @@ extensions:
 
 # Enable your Java Spring Boot web app to sign in users with Azure Active Directory and call a protected Web api
 
-<!-- ![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/<BuildNumber>/badge) -->
+[![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/ASP.NET%20Core%20Web%20App%20tutorial)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=XXX)
+
+* [Overview](#overview)
+* [Scenario](#scenario)
+* [Prerequisites](#prerequisites)
+* [Setup the sample](#setup-the-sample)
+* [Explore the sample](#explore-the-sample)
+* [Troubleshooting](#troubleshooting)
+* [About the code](#about-the-code)
+* [How to deploy this sample to Azure](#how-to-deploy-this-sample-to-azure)
+* [Next Steps](#next-steps)
+* [Contributing](#contributing)
+* [Learn More](#learn-more)
 
 ## Overview
 
@@ -31,11 +43,10 @@ This sample demonstrates a Java Spring Web application calling a Java Spring Web
 
 This sample demonstrates a Java Spring Web application calling a Java Spring Web API that is secured using Azure AD.
 
-1. The client Java Spring Web application uses the [Microsoft.Identity.Web](https://aka.ms/microsoft-identity-web) to sign-in a user and obtain a JWT [Access Token](https://aka.ms/access-tokens) from **Azure AD**.
-1. The access token is used as a *bearer* token to authorize the user to call the Java Spring Web API protected by **Azure AD**.
-1. The service uses the [Microsoft.Identity.Web](https://aka.ms/microsoft-identity-web) to protect the Web api, check permissions and validate tokens.
+1. The client Java Spring Web application uses the [MSAL.java](https://aka.ms/identityplatform) to sign-in a user and obtain a JWT [ID Token](https://aka.ms/id-tokens) and an [Access Token](https://aka.ms/access-tokens) from **Azure AD**.
+1. The **access token** is used as a *bearer* token to authorize the user to call the Java Spring Web API protected by **Azure AD**.
 
-![Scenario Image](./ReadmeFiles/topology.png)
+![Scenario Image](./AppCreationScripts/ReadmeFiles/topology.png)
 
 ## Prerequisites
 
@@ -43,7 +54,8 @@ This sample demonstrates a Java Spring Web application calling a Java Spring Web
 * [Maven 3](https://maven.apache.org/download.cgi)
 * [Java Extension Pack for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) is recommended for running this sample in VSCode.
 * An **Azure AD** tenant. For more information, see: [How to get an Azure AD tenant](https://docs.microsoft.com/azure/active-directory/develop/test-setup-environment#get-a-test-tenant)
-* A user account in your **Azure AD** tenant. This sample will not work with a **personal Microsoft account**. If you're signed in to the [Azure portal](https://portal.azure.com) with a personal Microsoft account and have not created a user account in your directory before, you will need to create one before proceeding.
+* A user account in your **Azure AD** tenant.
+>This sample will not work with a **personal Microsoft account**. If you're signed in to the [Azure portal](https://portal.azure.com) with a personal Microsoft account and have not created a user account in your directory before, you will need to create one before proceeding.
 
 ## Setup the sample
 
@@ -99,32 +111,32 @@ To manually register the apps, as a first step you'll need to:
 1. Sign in to the [Azure portal](https://portal.azure.com).
 1. If your account is present in more than one Azure AD tenant, select your profile at the top right corner in the menu on top of the page, and then **switch directory** to change your portal session to the desired Azure AD tenant.
 
-#### Register the service app (resource-api)
+#### Register the service app (java-spring-webapi-auth)
 
 1. Navigate to the [Azure portal](https://portal.azure.com) and select the **Azure Active Directory** service.
 1. Select the **App Registrations** blade on the left, then select **New registration**.
 1. In the **Register an application page** that appears, enter your application's registration information:
-    1. In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `resource-api`.
+    1. In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-spring-webapi-auth`.
     1. Under **Supported account types**, select **Accounts in this organizational directory only**
     1. Select **Register** to create the application.
 1. In the **Overview** blade, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
 1. In the app's registration screen, select the **Expose an API** blade to the left to open the page where you can publish the permission as an API for which client applications can obtain [access tokens](https://aka.ms/access-tokens) for. The first thing that we need to do is to declare the unique [resource](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow) URI that the clients will be using to obtain access tokens for this API. To declare an resource URI(Application ID URI), follow the following steps:
     1. Select **Set** next to the **Application ID URI** to generate a URI that is unique for this app.
-    1. For this sample, accept the proposed Application ID URI (`api://{clientId}`) by selecting **Save**. Read more about Application ID URI at [Validation differences by supported account types \(signInAudience\)](https://docs.microsoft.com/azure/active-directory/develop/supported-accounts-validation).
-
+    1. For this sample, accept the proposed Application ID URI (`api://{clientId}`) by selecting **Save**.
+        > :information_source: Read more about Application ID URI at [Validation differences by supported account types (signInAudience)](https://docs.microsoft.com/azure/active-directory/develop/supported-accounts-validation).
+    
 ##### Publish Delegated Permissions
 
 1. All APIs must publish a minimum of one [scope](https://docs.microsoft.com/azure/active-directory/develop/v2-oauth2-auth-code-flow#request-an-authorization-code), also called [Delegated Permission](https://docs.microsoft.com/azure/active-directory/develop/v2-permissions-and-consent#permission-types), for the client apps to obtain an access token for a *user* successfully. To publish a scope, follow these steps:
 1. Select **Add a scope** button open the **Add a scope** screen and Enter the values as indicated below:
     1. For **Scope name**, use `ToDoList.Read`.
     1. Select **Admins and users** options for **Who can consent?**.
-    1. For **Admin consent display name** type in *Read users ToDo list using the 'resource-api'*.
-    1. For **Admin consent description** type in *Allow the app to read the user's ToDo list using the 'resource-api'*.
-    1. For **User consent display name** type in *Read your ToDo list items via the 'resource-api'*.
-    1. For **User consent description** type in *Allow the app to read your ToDo list items via the 'resource-api'*.
+    1. For **Admin consent display name** type in *Read users ToDo list using the 'java-spring-webapi-auth'*.
+    1. For **Admin consent description** type in *Allow the app to read the user's ToDo list using the 'java-spring-webapi-auth'*.
+    1. For **User consent display name** type in *Read your ToDo list items via the 'java-spring-webapi-auth'*.
+    1. For **User consent description** type in *Allow the app to read your ToDo list items via the 'java-spring-webapi-auth'*.
     1. Keep **State** as **Enabled**.
     1. Select the **Add scope** button on the bottom to save this scope.
-
     > Repeat the steps above for another scope named **ToDoList.ReadWrite**
 1. Select the **Manifest** blade on the left.
     1. Set `accessTokenAcceptedVersion` property to **2**.
@@ -140,7 +152,7 @@ To manually register the apps, as a first step you'll need to:
     1. For **Display name**, enter a suitable name for your application permission, for instance **ToDoList.Read.All**.
     1. For **Allowed member types**, choose **Application** to ensure other applications can be granted this permission.
     1. For **Value**, enter **ToDoList.Read.All**.
-    1. For **Description**, enter *Allow the app to read every user's ToDo list using the 'resource-api'*.
+    1. For **Description**, enter *Allow the app to read every user's ToDo list using the 'java-spring-webapi-auth'*.
     1. Select **Apply** to save your changes.
 
     > Repeat the steps above for another app permission named **ToDoList.ReadWrite.All**
@@ -154,7 +166,7 @@ To manually register the apps, as a first step you'll need to:
     > Indicates token type. This claim is the most accurate way for an API to determine if a token is an app token or an app+user token. This is not issued in tokens issued to users.
     1. Select **Add** to save your changes.
 
-##### Configure the service app (resource-api) to use your app registration
+##### Configure the service app (java-spring-webapi-auth) to use your app registration
 
 Open the project in your IDE (like Visual Studio or Visual Studio Code) to configure the code.
 
@@ -162,14 +174,14 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 
 1. Open the `resource-api\src\main\resources\application.yml` file.
 1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant/directory ID.
-1. Find the key `Enter_Your_WebAPI_Client_ID_Here` and replace the existing value with the application ID (clientId) of `resource-api` app copied from the Azure portal.
+1. Find the key `Enter_Your_WebAPI_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapi-auth` app copied from the Azure portal.
 
-#### Register the client app (webapp)
+#### Register the client app (java-spring-webapp-auth)
 
 1. Navigate to the [Azure portal](https://portal.azure.com) and select the **Azure Active Directory** service.
 1. Select the **App Registrations** blade on the left, then select **New registration**.
 1. In the **Register an application page** that appears, enter your application's registration information:
-    1. In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `webapp`.
+    1. In the **Name** section, enter a meaningful application name that will be displayed to users of the app, for example `java-spring-webapp-auth`.
     1. Under **Supported account types**, select **Accounts in this organizational directory only**
     1. Select **Register** to create the application.
 1. In the **Overview** blade, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
@@ -183,9 +195,8 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
     1. In the app's registration screen, select the **API permissions** blade in the left to open the page where we add access to the APIs that your application needs:
     1. Select the **Add a permission** button and then:
     1. Ensure that the **My APIs** tab is selected.
-    1. In the list of APIs, select the API `resource-api`.
-      * Since this app signs-in users, we will now proceed to select **delegated permissions**, which is requested by apps that sign-in users.
-      * In the **Delegated permissions** section, select **ToDoList.Read**, **ToDoList.ReadWrite** in the list. Use the search box if necessary.
+    1. In the list of APIs, select the API `java-spring-webapi-auth`.
+    1. In the **Delegated permissions** section, select **ToDoList.Read**, **ToDoList.ReadWrite** in the list. Use the search box if necessary.
     1. Select the **Add permissions** button at the bottom.
 
 ##### Configure Optional Claims
@@ -197,7 +208,7 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
     > Provides user's account status in tenant. If the user is a **member** of the tenant, the value is *0*. If they're a **guest**, the value is *1*.
     1. Select **Add** to save your changes.
 
-##### Configure the client app (webapp) to use your app registration
+##### Configure the client app (java-spring-webapp-auth) to use your app registration
 
 Open the project in your IDE (like Visual Studio or Visual Studio Code) to configure the code.
 
@@ -205,25 +216,23 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 
 1. Open the `webapp\src\main\resources\application.yml` file.
 1. Find the key `Enter_Your_Tenant_ID_Here` and replace the existing value with your Azure AD tenant/directory ID.
-1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `webapp` app copied from the Azure portal.
-1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the key you saved during the creation of `webapp` copied from the Azure portal.
-1. Find the key `Enter_Your_WebAPI_Client_ID_Here` and replace the existing value with the application ID (clientId) of `resource-api` app copied from the Azure portal.
+1. Find the key `Enter_Your_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapp-auth` app copied from the Azure portal.
+1. Find the key `Enter_Your_Client_Secret_Here` and replace the existing value with the generated secret that you saved during the creation of `java-spring-webapp-auth` copied from the Azure portal.
+1. Find the key `Enter_Your_WebAPI_Client_ID_Here` and replace the existing value with the application ID (clientId) of `java-spring-webapi-auth` app copied from the Azure portal.
 
 ### Step 4: Running the sample
 
-From your shell or command line, execute the following commands:
-
 1. Open a terminal or the integrated VSCode terminal.
-1. In the root directory as this project, run `cd resource-api`. 
+1. In the root directory as this project, run `cd 3-Authorization-II\2-User-CAllAPI\resource-api`.
 1. run `mvn clean compile spring-boot:run`.
 1. Open a terminal or the integrated VSCode terminal.
-1. In the root directory as this project, run `cd webapp`. 
+1. In the root directory as this project, run `cd 3-Authorization-II\2-User-CAllAPI\webapp`.
 1. run `mvn clean compile spring-boot:run`.
 1. Open your browser and navigate to `http://localhost:8080`.
 
 ## Explore the sample
 
-![Experience](./ReadmeFiles/app.png)
+![Experience](./AppCreationScripts/ReadmeFiles/app.png)
 
 - Note the signed-in or signed-out status displayed at the center of the screen.
 - Click the context-sensitive button at the top right (it will read `Sign In` on first run)
@@ -234,16 +243,15 @@ From your shell or command line, execute the following commands:
 - Note the context-sensitive button now says `Sign out` and displays your username to its left.
 - If you are on the home page, you'll see an option to click **ID Token Details**: click it to see some of the ID token's decoded claims.
 - You can also use the button on the top right to sign out. The status page will reflect this.
-
 ## Troubleshooting
 
 <details>
 	<summary>Expand for troubleshooting info</summary>
 
-> Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community.
-Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
-
+Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get support from the community. Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before.
+Make sure that your questions or comments are tagged with [`azure-active-directory` `msal-java` `ms-identity` `msal`].
 If you find a bug in the sample, raise the issue on [GitHub Issues](../../../issues).
+
 </details>
 
 ## About the code
@@ -319,9 +327,6 @@ Additionally, you may also configure this class to perform custom extended claim
 ```	
 ## How to deploy this sample to Azure
 
-<details>
- <summary>Expand the section</summary>
-
 ### Deploying web API to Azure App Services
 
 There is one web API in this sample. To deploy it to **Azure App Services**, you'll need to:
@@ -331,26 +336,26 @@ There is one web API in this sample. To deploy it to **Azure App Services**, you
 
 > :warning: Please make sure that you have not switched on the *[Automatic authentication provided by App Service](https://docs.microsoft.com/en-us/azure/app-service/scenario-secure-app-authentication-app-service)*. It interferes the authentication code used in this code example.
 
-#### Deploying using Visual Studio
+#### Publishing using Visual Studio
 
 ##### Step 1: Create a new app on Azure App Service
 
 1. Install the Visual Studio Code extension [Azure App Service](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice).
 1. Open the Azure App Service Extension and navigate to the App Services tab located under Resources
 1. Right-click on the App Services tab and select "Create New Web App..."
-1. Enter a globally unique name for your web app (e.g. `spring-resource-api-domain`) and press enter. Make a note of this name. If you chose `spring-resource-api-domain` for your app name, your app's domain name will be `https://spring-resource-api-domain.azurewebsites.net`
+1. Enter a globally unique name for your web app (e.g. `java-spring-webapi-auth`) and press enter. Make a note of this name. If you chose `java-spring-webapi-auth` for your app name, your app's domain name will be `https://java-spring-webapi-auth.azurewebsites.net`
 1. Select `Java 11` for your runtime stack.
 1. Select `Java SE (Embedded Web Server)` for your Java web server stack.
 1. If you are asked for an OS, choose `Linux`.
 1. Select `Basic(B1)` or any other option for your pricing tier.
 
-##### Step 2: Publish your files for (resource-api)
+##### Step 2: Publish your files for (java-spring-webapi-auth)
 
 1. Right-click on your newly created web app and select "Deploy to Web App"
 1. Progress through the flow until deployment begins, a prompt should appear notifying you that deployment is in progress
 1. A prompt should appear after a few minutes stating that deployment is complete.
 
-#### Deploying using Maven
+#### Publishing using Maven
 
 ##### Step 1: Set up the configuration for the azure webapp maven plugin
 
@@ -367,7 +372,7 @@ There is one web API in this sample. To deploy it to **Azure App Services**, you
 1. Finally, press enter on the last prompt to confirm your selections.
 1. Open your pom.xml, it should now be updated with build information for deploying to Azure App Services
 
-#### Step 2: Publish your files using Maven (resource-api)
+#### Step 2: Publish your files using Maven (java-spring-webapi-auth)
 
 1. In the terminal window, enter the following command:
 
@@ -387,14 +392,15 @@ There is one web app in this sample. To deploy it to **Azure App Services**, you
 * create an **Azure App Service**,
 * update its client(s) to call the website instead of the local environment and,
 * publish the projects to the **App Services**
-#### Deploying using Visual Studio
+
+#### Publishing using Visual Studio
 
 #### Step 1: Create a new app on Azure App Service
 
 1. Install the Visual Studio Code extension [Azure App Service](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice).
 1. Open the Azure App Service Extension and navigate to the App Services tab located under Resources
 1. Right-click on the App Services tab and select "Create New Web App"
-1. Enter a globally unique name for your web app (e.g. `spring-webapp-domain`) and press enter. Make a note of this name. If you chose `spring-webapp-domain` for your app name, your app's domain name will be `https://spring-webapp-domain.azurewebsites.net`
+1. Enter a globally unique name for your web app (e.g. `java-spring-webapp-auth`) and press enter. Make a note of this name. If you chose `spring-webapi-domain` for your app name, your app's domain name will be `https://java-spring-webapp-auth.azurewebsites.net`
 1. Select `Java 11` for your runtime stack.
 1. Select `Java SE (Embedded Web Server)` for your Java web server stack.
 1. If you are asked for an OS, choose `Linux`.
@@ -406,7 +412,7 @@ There is one web app in this sample. To deploy it to **Azure App Services**, you
 1. Progress through the flow until deployment begins, a prompt should appear notifying you that deployment is in progress
 1. A prompt should appear after a few minutes stating that deployment is complete.
 
-#### Deploying using Maven
+#### Publishing Web App using Maven
 
 #### Step 1: Set up the configuration for the azure webapp maven plugin
 
@@ -423,7 +429,7 @@ There is one web app in this sample. To deploy it to **Azure App Services**, you
 1. Finally, press enter on the last prompt to confirm your selections.
 1. Go to your pom.xml, it should now be updated with build information for deploying to Azure App Services
 
-#### Step 2: Publish your files (webapp)
+#### Step 2: Publish your files (java-spring-webapp-auth)
 
 1. In the terminal window in the base directory of your Java Spring project and enter the following command:
 
@@ -435,30 +441,30 @@ There is one web app in this sample. To deploy it to **Azure App Services**, you
 
 > :note: The maven plugin uses information from the subscription Id you provide to deploy to Azure App Services. Deployment is subject to the limtations of your subscription. Modify your pom.xml to meet your subscription limits.
 
-#### Update the Azure AD app registration (webapp)
+#### Update the Azure AD app registration (java-spring-webapp-auth)
 
 1. Navigate back to to the [Azure portal](https://portal.azure.com).
 In the left-hand navigation pane, select the **Azure Active Directory** service, and then select **App registrations (Preview)**.
-1. In the resulting screen, select the `webapp` application.
+1. In the resulting screen, select the `java-spring-webapp-auth` application.
 1. In the app's registration screen, select **Authentication** in the menu.
     1. In the **Redirect URIs** section, update the reply URLs to match the site URL of your Azure deployment. For example:
-        1. `https://webapp.azurewebsites.net/login/oauth2/code/`
+        1. `https://java-spring-webapp-auth.azurewebsites.net/login/oauth2/code/`
 
-#### Update authentication configuration parameters (webapp)
+#### Update authentication configuration parameters (java-spring-webapp-auth)
 
-1. In your IDE, locate the `webapp` project. Then, open `webapp\src\main\resources\application.yml`.
-2. Find the key for **redirect URI** and replace its value with the address of the web app you published, for example, [https://webapp.azurewebsites.net/redirect](https://webapp.azurewebsites.net/redirect).
-3. Find the key for **web API endpoint** and replace its value with the address of the web API you published, for example, [https://resource-api.azurewebsites.net/api](https://resource-api.azurewebsites.net/api).
-1. Re-deploy using the same process as Step 2 to update your web app on Azure Web Apps with the updated configuration parameters.
+1. In your IDE, locate the `java-spring-webapp-auth` project. Then, open `webapp\src\main\resources\application.yml`.
+2. Find the key for **redirect URI** and replace its value with the address of the web app you published, for example, [https://java-spring-webapp-auth.azurewebsites.net/redirect](https://java-spring-webapp-auth.azurewebsites.net/redirect).
+3. Find the key for **web API endpoint** and replace its value with the address of the web API you published, for example, [https://java-spring-webapi-auth.azurewebsites.net/api](https://java-spring-webapi-auth.azurewebsites.net/api).
+1. Re-dploy using the same process as Step 2 to update your web app on Azure Web Apps with the updated configuration parameters.
 
 > :warning: If your app is using an *in-memory* storage, **Azure App Services** will spin down your web site if it is inactive, and any records that your app was keeping will be empty. In addition, if you increase the instance count of your website, requests will be distributed among the instances. Your app's records, therefore, will not be the same on each instance.
-</details>
 
 ## Next Steps
 
 Learn how to:
 
-> * Check back for more updates!
+* [Enable your Java Spring Boot daemon tp call a protected Web API with its own identity](https://github.com/Azure-Samples/ms-identity-java-spring-tutorial/tree/spring-3-Auth/3-Authorization-II/3-App-CallAPI)
+
 
 ## Contributing
 
@@ -479,7 +485,6 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 * [Authentication Scenarios for Azure AD](https://docs.microsoft.com/azure/active-directory/develop/authentication-flows-app-scenarios)
 * [Building Zero Trust ready apps](https://aka.ms/ztdevsession)
 * [National Clouds](https://docs.microsoft.com/azure/active-directory/develop/authentication-national-cloud#app-registration-endpoints)
-
 * [Microsoft Authentication Library for Java (MSAL4J)](https://github.com/AzureAD/microsoft-authentication-library-for-java)
 * [MSAL4J Wiki](https://github.com/AzureAD/microsoft-authentication-library-for-java/wiki)
 * [Azure Active Directory Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory)
