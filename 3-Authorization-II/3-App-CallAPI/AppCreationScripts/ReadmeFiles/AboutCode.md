@@ -1,31 +1,47 @@
 ### Obtain an Access Token for your App using Client Credentials
 
-Since daemon apps do not allow for user interface, there is no way for a user to sign in and authorize themselves as they would in a client app.
+As a daemon application, this sample creates a confidential client application to obtain the access token used to call your protected Web APIs. The confidential client application is configured in [OAuthClientConfiguration](".daemon\src\main\java\com\microsoft\azuresamples\msal4j\configuration\OAuthClientConfiguration.java") class.
 
-Fortunatly Spring OAuth supports an On-Behalf-Of flow that allows apps to be granted permission on behalf of the user to access protected resources. For this, see the class app's [OAuthClientConfiguration](.daemon/src/main/java/com/microsoft/azuresamples/msal4j/configuration/OAuthClientConfiguration.java) class.
-
-This class configures an AuthorizedClientServiceOAuth2AuthorizedClientManager with the nessecary parameters to obtain an access token from authorized provider to then be used to call protect resources
-
+In this class, we define a ClientRegistration object using information obtained defined in the application.yml file. The ClientRegistration represents a client registered with OAuth2 and holds all the information pertaining to the client
 ```java
     @Bean
-    public AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceAndManager (
-            ClientRegistrationRepository ADclientRegistrationRepository,
-            OAuth2AuthorizedClientService authorizedClientService) {
-        
-
-    	OAuth2AuthorizedClientProvider authorizedClientProvider =
-                OAuth2AuthorizedClientProviderBuilder.builder()
-                        .clientCredentials()
-                        .build();
-    	
-        AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
-                new AuthorizedClientServiceOAuth2AuthorizedClientManager(
-                		ADclientRegistrationRepository, authorizedClientService);
-        
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-        return authorizedClientManager;
+    ClientRegistration ADClientRegistration(
+            @Value("${spring.security.oauth2.client.provider.azure.token-uri}") String token_uri,
+            @Value("${spring.security.oauth2.client.registration.azure.client-id}") String client_id,
+            @Value("${spring.security.oauth2.client.registration.azure.client-secret}") String client_secret,
+            @Value("${spring.security.oauth2.client.registration.azure.scope}") String scope,
+            @Value("${spring.security.oauth2.client.registration.azure.authorization-grant-type}") String authorizationGrantType,
+            @Value("${spring.security.oauth2.client.registration.azure.client-authentication-method}") String authMethod
+    ) {
+        return ClientRegistration
+                .withRegistrationId("azure")
+                .tokenUri(token_uri)
+                .clientId(client_id)
+                .clientSecret(client_secret)
+                .scope(scope)
+                .authorizationGrantType(new AuthorizationGrantType(authorizationGrantType))
+                .clientAuthenticationMethod(new ClientAuthenticationMethod(authMethod))
+                .build();
     }
+```
+
+We use this client registration to create an AuthorizedClientServiceOAuth2AuthorizedClientManager object, which is used by our daemon application to obtain an OAuth2AuthorizedClient.
+ ```java
+    	OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("azure")
+				.principal("Test Tenant")
+				.build();
+		OAuth2AuthorizedClient authorizedClient = this.authorizedClientServiceAndManager.authorize(authorizeRequest);
+```
+
+The OAuth2AuthorizedClient represents a successfully authorized client that houses the access token and refresh token needed to call our protected Web APIs.
+```java
+		OAuth2AccessToken accessToken = Objects.requireNonNull(authorizedClient).getAccessToken();
+		String accessTokenValue = accessToken.getTokenValue();
+		
+    	final WebClient apiClient = WebClient.builder()
+                .baseUrl(apiAddress)
+                .defaultHeader("Authorization", String.format("Bearer %s", accessTokenValue))
+                .build();
 ```
 
 ### Validate your Azure access tokens using routes with AADDelegatingOAuth2TokenValidator

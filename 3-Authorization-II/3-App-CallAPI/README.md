@@ -1,7 +1,7 @@
 ---
 page_type: sample
-name: Enable your Java Spring Boot daemon to sign in users with Azure Active Directory and call a protected Web api
-description: Enable your Java Spring Boot daemon to sign in users in your Azure AD tenant and call a Web api protected with Spring Security and Microsoft Identity Platform
+name: Enable your Java Spring Boot daemon tp call a protected Web API with its own identity
+description: Enable your Java Spring Boot daemon tp call a protected Web API with its own identity
 languages:
  - java
 products:
@@ -17,7 +17,7 @@ extensions:
 - service: Java Spring Web API
 ---
 
-# Enable your Java Spring Boot daemon to sign in users with Azure Active Directory and call a protected Web api
+# Enable your Java Spring Boot daemon tp call a protected Web API with its own identity
 
 [![Build status](https://identitydivision.visualstudio.com/IDDP/_apis/build/status/AAD%20Samples/.NET%20client%20samples/ASP.NET%20Core%20Web%20App%20tutorial)](https://identitydivision.visualstudio.com/IDDP/_build/latest?definitionId=XXX)
 
@@ -40,8 +40,9 @@ This sample demonstrates a Java Spring Daemon calling a Java Spring Web API that
 
 This sample demonstrates a Java Spring Daemon calling a Java Spring Web API that is secured using Azure AD.
 
-1. The client Java Spring Daemon uses the [MSAL Java](https://aka.ms/identityplatform) to sign-in a user and obtain a JWT [ID Token](https://aka.ms/id-tokens) and an [Access Token](https://aka.ms/access-tokens) from **Azure AD**.
-1. The **access token** is used as a *bearer* token to authorize the user to call the Java Spring Web API protected by **Azure AD**.
+ 
+1. The Daemon uses Spring OAuth 2.0 to aquire an [Access Token](https://aka.ms/access-tokens) from Azure AD using its own identity (without a user).
+1. The Daemon then calls the Web API that is secured using by [Azure AD Spring Boot Starter client library for Java](https://github.com/Azure/azure-sdk-for-java/tree/master/sdk/spring/azure-spring-boot-starter-active-directory) to get the a list of ToDo's, and displays the result. 
 
 ![Scenario Image](./AppCreationScripts/ReadmeFiles/topology.png)
 
@@ -222,7 +223,6 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 1. Open a terminal or the integrated VSCode terminal.
 1. In the root directory as this project, run `cd 3-Authorization-II\3-App-CallAPI\daemon`.
 1. run `mvn clean compile spring-boot:run`.
-1. Open your browser and navigate to `http://localhost:8080`.
 
 ## Explore the sample
 ![Experience](./AppCreationScripts/ReadmeFiles/app.png)
@@ -242,32 +242,48 @@ If you find a bug in the sample, raise the issue on [GitHub Issues](../../../iss
 
 ### Obtain an Access Token for your App using Client Credentials
 
-Since daemon apps do not allow for user interface, there is no way for a user to sign in and authorize themselves as they would in a client app.
+As a daemon application, this sample creates a confidential client application to obtain the access token used to call your protected Web APIs. The confidential client application is configured in [OAuthClientConfiguration](".daemon\src\main\java\com\microsoft\azuresamples\msal4j\configuration\OAuthClientConfiguration.java") class.
 
-Fortunatly Spring OAuth supports an On-Behalf-Of flow that allows apps to be granted permission on behalf of the user to access protected resources. For this, see the class app's [OAuthClientConfiguration](.daemon/src/main/java/com/microsoft/azuresamples/msal4j/configuration/OAuthClientConfiguration.java) class.
-
-This class configures an AuthorizedClientServiceOAuth2AuthorizedClientManager with the nessecary parameters to obtain an access token from authorized provider to then be used to call protect resources
-
+In this class, we define a ClientRegistration object using information obtained defined in the application.yml file. The ClientRegistration represents a client registered with OAuth2 and holds all the information pertaining to the client
 ```java
     @Bean
-    public AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientServiceAndManager (
-            ClientRegistrationRepository ADclientRegistrationRepository,
-            OAuth2AuthorizedClientService authorizedClientService) {
-        
-
-    	OAuth2AuthorizedClientProvider authorizedClientProvider =
-                OAuth2AuthorizedClientProviderBuilder.builder()
-                        .clientCredentials()
-                        .build();
-    	
-        AuthorizedClientServiceOAuth2AuthorizedClientManager authorizedClientManager =
-                new AuthorizedClientServiceOAuth2AuthorizedClientManager(
-                		ADclientRegistrationRepository, authorizedClientService);
-        
-        authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-
-        return authorizedClientManager;
+    ClientRegistration ADClientRegistration(
+            @Value("${spring.security.oauth2.client.provider.azure.token-uri}") String token_uri,
+            @Value("${spring.security.oauth2.client.registration.azure.client-id}") String client_id,
+            @Value("${spring.security.oauth2.client.registration.azure.client-secret}") String client_secret,
+            @Value("${spring.security.oauth2.client.registration.azure.scope}") String scope,
+            @Value("${spring.security.oauth2.client.registration.azure.authorization-grant-type}") String authorizationGrantType,
+            @Value("${spring.security.oauth2.client.registration.azure.client-authentication-method}") String authMethod
+    ) {
+        return ClientRegistration
+                .withRegistrationId("azure")
+                .tokenUri(token_uri)
+                .clientId(client_id)
+                .clientSecret(client_secret)
+                .scope(scope)
+                .authorizationGrantType(new AuthorizationGrantType(authorizationGrantType))
+                .clientAuthenticationMethod(new ClientAuthenticationMethod(authMethod))
+                .build();
     }
+```
+
+We use this client registration to create an AuthorizedClientServiceOAuth2AuthorizedClientManager object, which is used by our daemon application to obtain an OAuth2AuthorizedClient.
+ ```java
+    	OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest.withClientRegistrationId("azure")
+				.principal("Test Tenant")
+				.build();
+		OAuth2AuthorizedClient authorizedClient = this.authorizedClientServiceAndManager.authorize(authorizeRequest);
+```
+
+The OAuth2AuthorizedClient represents a successfully authorized client that houses the access token and refresh token needed to call our protected Web APIs.
+```java
+		OAuth2AccessToken accessToken = Objects.requireNonNull(authorizedClient).getAccessToken();
+		String accessTokenValue = accessToken.getTokenValue();
+        
+    	final WebClient apiClient = WebClient.builder()
+                .baseUrl(apiAddress)
+                .defaultHeader("Authorization", String.format("Bearer %s", accessTokenValue))
+                        .build();
 ```
 
 ### Validate your Azure access tokens using routes with AADDelegatingOAuth2TokenValidator
@@ -298,9 +314,6 @@ Additionally, you may also configure this class to perform custom extended claim
 ```	
 ## How to deploy this sample to Azure
 
-<details>
-<summary>Expand the section</summary>
-
 ### Deploying web API to Azure App Services
 
 There is one web API in this sample. To deploy it to **Azure App Services**, you'll need to:
@@ -317,7 +330,7 @@ There is one web API in this sample. To deploy it to **Azure App Services**, you
 1. Install the Visual Studio Code extension [Azure App Service](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice).
 1. Open the Azure App Service Extension and navigate to the App Services tab located under Resources
 1. Right-click on the App Services tab and select "Create New Web App..."
-1. Enter a globally unique name for your web app (e.g. `spring-webapi-domain`) and press enter. Make a note of this name. If you chose `spring-webapi-domain` for your app name, your app's domain name will be `https://spring-webapi-domain.azurewebsites.net`
+1. Enter a globally unique name for your web app (e.g. `java-spring-webapi-auth`) and press enter. Make a note of this name. If you chose `java-spring-webapi-auth` for your app name, your app's domain name will be `https://java-spring-webapi-auth.azurewebsites.net`
 1. Select `Java 11` for your runtime stack.
 1. Select `Java SE (Embedded Web Server)` for your Java web server stack.
 1. If you are asked for an OS, choose `Linux`.
@@ -363,7 +376,8 @@ There is one web API in this sample. To deploy it to **Azure App Services**, you
 
 Learn how to:
 
-> * Check back for more updates!
+>* [Enable your Java Spring Boot web app to sign in users with Azure Active Directory and call a protected Web api](https://github.com/Azure-Samples/ms-identity-java-spring-tutorial/tree/spring-3-Auth/3-Authorization-II/2-User-CallAPI)
+
 
 ## Contributing
 

@@ -1,12 +1,12 @@
 {
   "Sample": {
-    "Title": "Enable your Java Spring Boot daemon to sign in users with Azure Active Directory and call a protected Web api",
+    "Title": "Enable your Java Spring Boot daemon tp call a protected Web API with its own identity",
     "Level": 200,
     "Client": "Java Spring Daemon",
     "Service": "Java Spring Web API",
     "RepositoryUrl": "ms-identity-java-spring-tutorial",
     "Endpoint": "AAD v2.0",
-    "Description": "Enable your Java Spring Boot daemon to sign in users in your Azure AD tenant and call a Web api protected with Spring Security and Microsoft Identity Platform",
+    "Description": "Enable your Java Spring Boot daemon tp call a protected Web API with its own identity",
     "Languages": [ "java" ],
     "Products": [ "azure-active-directory", "msal-java" ],
     "Platform": "Java",

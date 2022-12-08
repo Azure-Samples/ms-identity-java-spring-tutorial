@@ -331,9 +331,6 @@ Additionally, you may also configure this class to perform custom extended claim
 ```	
 ## How to deploy this sample to Azure
 
-<details>
-<summary>Expand the section</summary>
-
 ### Deploying web API to Azure App Services
 
 There is one web API in this sample. To deploy it to **Azure App Services**, you'll need to:
@@ -350,7 +347,7 @@ There is one web API in this sample. To deploy it to **Azure App Services**, you
 1. Install the Visual Studio Code extension [Azure App Service](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice).
 1. Open the Azure App Service Extension and navigate to the App Services tab located under Resources
 1. Right-click on the App Services tab and select "Create New Web App..."
-1. Enter a globally unique name for your web app (e.g. `spring-webapi-domain`) and press enter. Make a note of this name. If you chose `spring-webapi-domain` for your app name, your app's domain name will be `https://spring-webapi-domain.azurewebsites.net`
+1. Enter a globally unique name for your web app (e.g. `java-spring-webapi-auth`) and press enter. Make a note of this name. If you chose `java-spring-webapi-auth` for your app name, your app's domain name will be `https://java-spring-webapi-auth.azurewebsites.net`
 1. Select `Java 11` for your runtime stack.
 1. Select `Java SE (Embedded Web Server)` for your Java web server stack.
 1. If you are asked for an OS, choose `Linux`.
@@ -400,6 +397,25 @@ There is one web app in this sample. To deploy it to **Azure App Services**, you
 * update its client(s) to call the website instead of the local environment and,
 * publish the projects to the **App Services**
 
+#### Publishing using Visual Studio
+
+#### Step 1: Create a new app on Azure App Service
+
+1. Install the Visual Studio Code extension [Azure App Service](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice).
+1. Open the Azure App Service Extension and navigate to the App Services tab located under Resources
+1. Right-click on the App Services tab and select "Create New Web App"
+1. Enter a globally unique name for your web app (e.g. `java-spring-webapp-auth`) and press enter. Make a note of this name. If you chose `spring-webapi-domain` for your app name, your app's domain name will be `https://java-spring-webapp-auth.azurewebsites.net`
+1. Select `Java 11` for your runtime stack.
+1. Select `Java SE (Embedded Web Server)` for your Java web server stack.
+1. If you are asked for an OS, choose `Linux`.
+1. Select `Basic(B1)` or any other option for your pricing tier.
+
+#### Step 2: Publish your files
+
+1. Right-click on your newly created web app and select "Deploy to Web App"
+1. Progress through the flow until deployment begins, a prompt should appear notifying you that deployment is in progress
+1. A prompt should appear after a few minutes stating that deployment is complete.
+
 #### Publishing Web App using Maven
 
 #### Step 1: Set up the configuration for the azure webapp maven plugin
@@ -428,25 +444,6 @@ There is one web app in this sample. To deploy it to **Azure App Services**, you
 1. The terminal log should display a successful build after a few minutes stating that the deployment was successful
 
 > :note: The maven plugin uses information from the subscription Id you provide to deploy to Azure App Services. Deployment is subject to the limtations of your subscription. Modify your pom.xml to meet your subscription limits.
-
-#### Publishing using Visual Studio
-
-#### Step 1: Create a new app on Azure App Service
-
-1. Install the Visual Studio Code extension [Azure App Service](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azureappservice).
-1. Open the Azure App Service Extension and navigate to the App Services tab located under Resources
-1. Right-click on the App Services tab and select "Create New Web App"
-1. Enter a globally unique name for your web app (e.g. `java-spring-webapp-auth`) and press enter. Make a note of this name. If you chose `spring-webapi-domain` for your app name, your app's domain name will be `https://java-spring-webapp-auth.azurewebsites.net`
-1. Select `Java 11` for your runtime stack.
-1. Select `Java SE (Embedded Web Server)` for your Java web server stack.
-1. If you are asked for an OS, choose `Linux`.
-1. Select `Basic(B1)` or any other option for your pricing tier.
-
-#### Step 2: Publish your files
-
-1. Right-click on your newly created web app and select "Deploy to Web App"
-1. Progress through the flow until deployment begins, a prompt should appear notifying you that deployment is in progress
-1. A prompt should appear after a few minutes stating that deployment is complete.
 
 #### Update the Azure AD app registration (java-spring-webapp-auth)
 
