@@ -241,7 +241,7 @@ If you find a bug in the sample, raise the issue on [GitHub Issues](../../../iss
 
 ### Obtain an Access Token for your App using Client Credentials
 
-As a daemon application, this sample creates a confidential client application to obtain the access token used to call your protected Web APIs. The confidential client application is configured in [OAuthClientConfiguration](".daemon\src\main\java\com\microsoft\azuresamples\msal4j\configuration\OAuthClientConfiguration.java") class.
+As a daemon application, this sample creates a **confidential client application** to obtain an access token that is used to call your protected web API. The confidential client application is configured in the [OAuthClientConfiguration](".daemon\src\main\java\com\microsoft\azuresamples\msal4j\configuration\OAuthClientConfiguration.java") class.
 
 In this class, we define a ClientRegistration object using information obtained defined in the application.yml file. The ClientRegistration represents a client registered with OAuth2 and holds all the information pertaining to the client
 ```java
