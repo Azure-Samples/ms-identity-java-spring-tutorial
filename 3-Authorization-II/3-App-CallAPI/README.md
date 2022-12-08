@@ -285,7 +285,7 @@ The OAuth2AuthorizedClient represents a successfully authorized client that hous
                         .build();
 ```
 
-### Validate your Azure access tokens using routes with AADDelegatingOAuth2TokenValidator
+### Validate your Azure access tokens using AADDelegatingOAuth2TokenValidator
 
 Azure protected web API's must perform both signature and claim validation on the incoming access tokens to authorize a call. For extended claim validation, refer to this web API's [AppSecurityConfig](.resource-api/src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapi/AppSecurityConfig.java) class.
 
