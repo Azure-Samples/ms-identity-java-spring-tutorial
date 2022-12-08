@@ -287,7 +287,7 @@ The OAuth2AuthorizedClient represents a successfully authorized client that hous
 
 ### Validate your Azure access tokens using routes with AADDelegatingOAuth2TokenValidator
 
-While `AADWebSecurityConfigurationAdapter` can be used to protect your routes so only valid users can access it, Azure protected API's require additional claims validation to ensure only valid users are calling you routes. For this, see this app's [AppSecurityConfig](.resource-api/src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapi/AppSecurityConfig.java) class.
+Azure protected web API's must perform both signature and claim validation on the incoming access tokens to authorize a call. For extended claim validation, refer to this web API's [AppSecurityConfig](.resource-api/src/main/java/com/microsoft/azuresamples/msal4j/msidentityspringbootwebapi/AppSecurityConfig.java) class.
 
 This class configures your `AADWebSecurityConfigurationAdapter` with signature validation using `NimbusJwtDecoder` as well as custom validation for the `iss`, `aud`, `nbf`, and `exp` claims using `AADDelegatingOAuth2TokenValidator`
 
