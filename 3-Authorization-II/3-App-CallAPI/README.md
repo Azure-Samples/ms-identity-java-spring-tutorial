@@ -375,7 +375,7 @@ There is one web API in this sample. To deploy it to **Azure App Services**, you
 
 Learn how to:
 
->* [Enable your Java Spring Boot web app to sign in users with Azure Active Directory and call a protected Web api](https://github.com/Azure-Samples/ms-identity-java-spring-tutorial/tree/spring-3-Auth/3-Authorization-II/2-User-CallAPI)
+* [Enable your Java Spring Boot web app to sign in users with Azure Active Directory and call a protected Web api](https://github.com/Azure-Samples/ms-identity-java-spring-tutorial/tree/spring-3-Auth/3-Authorization-II/2-User-CallAPI)
 
 
 ## Contributing
