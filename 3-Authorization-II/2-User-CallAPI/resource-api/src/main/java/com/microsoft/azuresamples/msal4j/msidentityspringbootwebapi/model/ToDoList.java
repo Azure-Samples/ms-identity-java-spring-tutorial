@@ -18,7 +18,8 @@ public class ToDoList {
         Iterator iterator = TDL.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry entry = (Map.Entry)iterator.next();
-            ToDoListItem currentTD = (ToDoListItem)entry.getValue();           
+            ToDoListItem currentTD = (ToDoListItem)entry.getValue();
+            
             if (currentTD.getOwner().equals(user)) {
                 userToDoList.put((Integer)entry.getKey(), currentTD);
             }

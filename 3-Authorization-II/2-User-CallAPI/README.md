@@ -80,7 +80,7 @@ There are two projects in this sample. Each needs to be separately registered in
   - **automatically** creates the Azure AD applications and related objects (passwords, permissions, dependencies) for you.
   - modify the projects' configuration files.
 
-  <details>
+<details>
   <summary>Expand this section if you want to use this automation:</summary>
 
     > :warning: If you have never used **Microsoft Graph PowerShell** before, we recommend you go through the [App Creation Scripts Guide](./AppCreationScripts/AppCreationScripts.md) once to ensure that your environment is prepared correctly for this step.
@@ -102,7 +102,7 @@ There are two projects in this sample. Each needs to be separately registered in
 
     > Other ways of running the scripts are described in [App Creation Scripts guide](./AppCreationScripts/AppCreationScripts.md). The scripts also provide a guide to automated application registration, configuration and removal which can help in your CI/CD scenarios.
 
-  </details>
+</details>
 
 #### Choose the Azure AD tenant where you want to create your applications
 
@@ -185,6 +185,11 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
     1. Under **Supported account types**, select **Accounts in this organizational directory only**
     1. Select **Register** to create the application.
 1. In the **Overview** blade, find and note the **Application (client) ID**. You use this value in your app's configuration file(s) later in your code.
+1. In the app's registration screen, select the **Authentication** blade to the left.
+1. If you don't have a platform added, select **Add a platform** and select the **Web** option.
+    1. In the **Redirect URI** section enter the following redirect URI:
+        1. `http://localhost:8080/login/oauth2/code/`
+    1. Click **Save** to save your changes.
 1. In the app's registration screen, select the **Certificates & secrets** blade in the left to open the page where you can generate secrets and upload certificates.
 1. In the **Client secrets** section, select **New client secret**:
     1. Type a key description (for instance `app secret`).
@@ -243,6 +248,7 @@ Open the project in your IDE (like Visual Studio or Visual Studio Code) to confi
 - Note the context-sensitive button now says `Sign out` and displays your username to its left.
 - If you are on the home page, you'll see an option to click **ID Token Details**: click it to see some of the ID token's decoded claims.
 - You can also use the button on the top right to sign out. The status page will reflect this.
+
 ## Troubleshooting
 
 <details>
@@ -252,6 +258,7 @@ Use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) to get supp
 Make sure that your questions or comments are tagged with [`azure-active-directory` `msal-java` `ms-identity` `msal`].
 If you find a bug in the sample, raise the issue on [GitHub Issues](../../../issues).
 
+To provide feedback on or suggest features for Azure Active Directory, visit [User Voice page](https://feedback.azure.com/d365community/forum/79b1327d-d925-ec11-b6e6-000d3a4f06a4).
 </details>
 
 ## About the code
@@ -314,7 +321,9 @@ This class configures your `AADWebSecurityConfigurationAdapter` with signature v
         return nimbusJwtDecoder;
     }
 ```
-Additionally, you may also configure this class to perform custom extended claim validation of the `azp` and `appid` claim to restrict access of your API to only select web applications. 
+
+Additionally, you may also configure this class to perform custom extended claim validation of the `azp` and `appid` claim to restrict access of your API to only select web applications.
+
 ```java
 	/*Extended Validation 
 	 * Uncomment to allow user to limit access of API to specific client apps
@@ -326,6 +335,8 @@ Additionally, you may also configure this class to perform custom extended claim
 	}
 ```	
 ## How to deploy this sample to Azure
+
+<details>
 
 ### Deploying web API to Azure App Services
 
