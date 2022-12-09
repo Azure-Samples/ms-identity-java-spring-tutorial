@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">  
+  <modelVersion>4.0.0</modelVersion>  
+  <parent> 
+    <groupId>org.springframework.boot</groupId>  
+    <artifactId>spring-boot-starter-parent</artifactId>  
+    <version>2.5.6</version>  
+    <relativePath/>  
+    <!-- lookup parent from repository --> 
+  </parent>  
+  <groupId>com.microsoft.azuresamples.msal4j</groupId>  
+  <artifactId>ms-identity-spring-boot-webapp</artifactId>  
+  <version>0.0.1-SNAPSHOT</version>  
+  <name>ms-identity-spring-boot-webapp</name>  
+  <description>Microsoft identity platform Spring Boot sample</description>  
+  <properties> 
+    <java.version>11</java.version>  
+    <azure.version>3.9.0</azure.version> 
+  </properties>  
+  <dependencies> 
+    <!-- Azure Active Directory Spring Boot Starter  -->  
+    <dependency> 
+      <groupId>com.azure.spring</groupId>  
+      <artifactId>azure-spring-boot-starter-active-directory</artifactId>  
+      <version>${azure.version}</version> 
+    </dependency>  
+    <!-- Spring OAuth2 Client -->  
+    <dependency> 
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-oauth2-client</artifactId> 
+    </dependency>  
+    <!-- Spring Web App -->  
+    <dependency> 
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-web</artifactId> 
+    </dependency>  
+    <dependency> 
+      <groupId>org.springframework.boot</groupId>  
+      <artifactId>spring-boot-starter-thymeleaf</artifactId> 
+    </dependency>  
+    <dependency> 
+      <groupId>org.thymeleaf.extras</groupId>  
+      <artifactId>thymeleaf-extras-springsecurity5</artifactId> 
+    </dependency> 
+  </dependencies>  
+  <build> 
+    <plugins> 
+      <plugin> 
+        <groupId>org.springframework.boot</groupId>  
+        <artifactId>spring-boot-maven-plugin</artifactId>  
+        <executions> 
+          <execution> 
+            <goals> 
+              <goal>repackage</goal> 
+            </goals> 
+          </execution> 
+        </executions> 
+      </plugin>  
+      <plugin>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-webapp-maven-plugin</artifactId>
+        <version>2.5.0</version>
+        <configuration>
+          <schemaVersion>v2</schemaVersion>
+          <subscriptionId>170331cf-a804-4ff3-9e6b-b04747d282d1</subscriptionId>
+          <resourceGroup>ms-identity-spring-boot-webapp-rg</resourceGroup>
+          <appName>ms-identity-spring-boot-webapp</appName>
+          <pricingTier>B1</pricingTier>
+          <region>centralus</region>
+          <runtime>
+            <os>Linux</os>
+            <javaVersion>Java 11</javaVersion>
+            <webContainer>Java SE</webContainer>
+          </runtime>
+          <deployment>
+            <resources>
+              <resource>
+                <directory>${project.basedir}/target</directory>
+                <includes>
+                  <include>*.jar</include>
+                </includes>
+              </resource>
+            </resources>
+          </deployment>
+        </configuration>
+      </plugin>
+    </plugins> 
+  </build> 
+</project>

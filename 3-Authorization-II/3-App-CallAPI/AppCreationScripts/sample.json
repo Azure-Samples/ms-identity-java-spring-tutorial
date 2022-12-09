@@ -1,0 +1,106 @@
+{
+  "Sample": {
+    "Title": "Enable your Java Spring Boot daemon tp call a protected Web API with its own identity",
+    "Level": 200,
+    "Client": "Java Spring Daemon",
+    "Service": "Java Spring Web API",
+    "RepositoryUrl": "ms-identity-java-spring-tutorial",
+    "Endpoint": "AAD v2.0",
+    "Description": "Enable your Java Spring Boot daemon tp call a protected Web API with its own identity",
+    "Languages": [ "java" ],
+    "Products": [ "azure-active-directory", "msal-java" ],
+    "Platform": "Java",
+    "Library": [ "MSAL Java" ]
+  },
+  "ReadmeSetup": {
+    "UseNewSetup": "1",
+    "CertificateOption": "0",
+    "AppRegistrationIncludeFilePath": ""
+  },
+  "ReadMeExploretheSample": {
+    "IncludeFilePath": "./ReadmeFiles/Explore.md"
+  },
+  "ReadmeAboutTheCode": {
+    "IncludeFilePath": "./ReadmeFiles/AboutCode.md"
+  },
+  "AADApps": [
+    {
+      "Id": "service",
+      "Name": "java-spring-webapi-auth",
+      "Kind": "WebApi",
+      "Audience": "AzureADMyOrg",
+      "SampleSubPath": "3-Authorization-II\\3-App-CallAPI\\resource-api",
+      "OptionalClaims": {
+        "AccessTokenClaims": [ "idtyp" ]
+      },
+      "Scopes": [ "ToDoList.Read", "ToDoList.ReadWrite" ],
+      "AppRoles": [
+        {
+          "AllowedMemberTypes": [ "Application" ],
+          "Name": "ToDoList.Read.All",
+          "Description": "Allow application to read all ToDo list items"
+        },
+        {
+          "AllowedMemberTypes": [ "Application" ],
+          "Name": "ToDoList.ReadWrite.All",
+          "Description": "Allow application to read and write into ToDo list"
+        }
+      ]
+    },
+    {
+      "Id": "client",
+      "Name": "java-spring-daemon-auth",
+      "Kind": "Daemon",
+      "Audience": "AzureADMyOrg",
+      "PasswordCredentials": "Auto",
+      "AllowImplicitFlow": false,
+	  "SampleSubPath": "3-Authorization-II\\3-App-CallAPI\\daemon",
+      "RequiredResourcesAccess": [
+        {
+          "Resource": "service",
+		  "ApplicationPermissions": [ "ToDoList.Read.All", "ToDoList.ReadWrite.All" ]
+        }
+      ]
+    }
+  ],
+  "CodeConfiguration": [
+    {
+      "App": "service",
+      "SettingKind": "Replace",
+      "SettingFile": "\\..\\resource-api\\src\\main\\resources\\application.yml",
+      "Mappings": [
+        {
+          "key": "Enter_Your_Tenant_ID_Here",
+          "value": "$tenantId"
+        },
+        {
+          "key": "Enter_Your_WebAPI_Client_ID_Here",
+          "value": "service.AppId"
+        }
+      ]
+    },
+    {
+      "App": "client",
+      "SettingKind": "Replace",
+      "SettingFile": "\\..\\daemon\\src\\main\\resources\\application.yml",
+      "Mappings": [
+        {
+          "key": "Enter_Your_Tenant_ID_Here",
+          "value": "$tenantId"
+        },
+        {
+          "key": "Enter_Your_Client_ID_Here",
+          "value": "client.AppId"
+        },
+        {
+          "key": "Enter_Your_Client_Secret_Here",
+          "value": "client.AppKey"
+        },
+        {
+          "key": "Enter_Your_WebAPI_Client_ID_Here",
+          "value": "service.AppId"
+        }
+      ]
+    }
+  ]
+}
