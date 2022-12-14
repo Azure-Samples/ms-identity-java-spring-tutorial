@@ -1,0 +1,29 @@
+<div class="card">
+    <h5 class="card-header bg-primary">
+        Index
+    </h5>
+    <div class="card-body">
+        <p class="card-text">
+        	<a class="btn btn-success" href="/addPage">Add</a>
+        	<table style="width:100%">
+				<tr>
+					<th>Id</th>
+					<th>Owner</th>
+					<th>To Do</th>
+				</tr>
+	            <th:block th:each="item : ${apiResp}">
+	            	<tr>
+		                <td th:text="${item.key}"></td>                
+		                <td th:text="${item.value.owner}"></td>
+		                <td th:text="${item.value.todo}"></td>
+		                <td> <a class="btn btn-success" th:href="|/delete?id=${item.key}|">Delete</a><td>
+		                <td> <a class="btn btn-success" th:href="|/details?id=${item.key}|">Details</a><td>
+		                <td> <a class="btn btn-success" th:href="|/editPage?id=${item.key}|">Edit</a><td>
+		            </tr>		           
+	            </th:block>			
+	        </table>
+            <a class="btn btn-success" href="/sign_in_status">Sign-in Status</a>
+            <a class="btn btn-success" href="/token_details">Token Details</a>
+        </p>
+    </div>
+</div>

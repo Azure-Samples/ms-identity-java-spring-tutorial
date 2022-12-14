@@ -1,0 +1,111 @@
+{
+  "Sample": {
+    "Title": "Enable your Java Spring Boot web app to sign in users with Azure Active Directory and call a protected Web api",
+    "Level": 200,
+    "Client": "Java Spring Web application",
+    "Service": "Java Spring Web API",
+    "RepositoryUrl": "ms-identity-java-spring-tutorial",
+    "Endpoint": "AAD v2.0",
+    "Description": "Enable your Java Spring Boot web app to sign in users in your Azure AD tenant and call a Web api protected with Spring Security and Microsoft Identity Platform",
+    "Languages": [ "java" ],
+    "Products": [ "java", "spring-boot", "azure-active-directory", "msal-java" ],
+    "Platform": "Java",
+    "Library": [ "MSAL.java" ]
+  },
+  "ReadmeSetup": {
+    "UseNewSetup": "1",
+    "CertificateOption": "0",
+    "AppRegistrationIncludeFilePath": ""
+  },
+  "ReadMeExploretheSample": {
+    "IncludeFilePath": "./ReadmeFiles/Explore.md"
+  },
+  "ReadmeAboutTheCode": {
+    "IncludeFilePath": "./ReadmeFiles/AboutCode.md"
+  },
+  "AADApps": [
+    {
+      "Id": "service",
+      "Name": "java-spring-webapi-auth",
+      "Kind": "WebApi",
+      "Audience": "AzureADMyOrg",
+      "SampleSubPath": "3-Authorization-II\\2-User-CAllAPI\\resource-api",
+      "OptionalClaims": {
+        "AccessTokenClaims": [ "idtyp" ]
+      },
+      "Scopes": [ "ToDoList.Read", "ToDoList.ReadWrite" ],
+      "AppRoles": [
+        {
+          "AllowedMemberTypes": [ "Application" ],
+          "Name": "ToDoList.Read.All",
+          "Description": "Allow application to read all ToDo list items"
+        },
+        {
+          "AllowedMemberTypes": [ "Application" ],
+          "Name": "ToDoList.ReadWrite.All",
+          "Description": "Allow application to read and write into ToDo list"
+        }
+      ]
+    },
+    {
+      "Id": "client",
+      "Name": "java-spring-webapp-auth",
+      "Kind": "WebApp",
+      "Audience": "AzureADMyOrg",
+      "PasswordCredentials": "Auto",
+      "AllowImplicitFlow": false,
+      "HomePage": "http://localhost:8080/",
+      "ReplyUrls": "http://localhost:8080/login/oauth2/code/",
+      "OptionalClaims": {
+        "IdTokenClaims": [ "acct" ]
+      },
+	  "SampleSubPath": "3-Authorization-II\\2-User-CAllAPI\\webapp",
+      "RequiredResourcesAccess": [
+        {
+          "Resource": "service",
+          "DelegatedPermissions": [ "ToDoList.Read", "ToDoList.ReadWrite" ]
+        }
+      ]
+    }
+  ],
+  "CodeConfiguration": [
+    {
+      "App": "service",
+      "SettingKind": "Replace",
+      "SettingFile": "\\..\\resource-api\\src\\main\\resources\\application.yml",
+      "Mappings": [
+        {
+          "key": "Enter_Your_Tenant_ID_Here",
+          "value": "$tenantId"
+        },
+        {
+          "key": "Enter_Your_WebAPI_Client_ID_Here",
+          "value": "service.AppId"
+        }
+      ]
+    },
+    {
+      "App": "client",
+      "SettingKind": "Replace",
+      "SettingFile": "\\..\\webapp\\src\\main\\resources\\application.yml",
+      "Mappings": [
+        {
+          "key": "Enter_Your_Tenant_ID_Here",
+          "value": "$tenantId"
+        },
+        {
+          "key": "Enter_Your_Client_ID_Here",
+          "value": "client.AppId"
+        },
+        {
+          "key": "Enter_Your_Client_Secret_Here",
+          "value": "client.AppKey"
+        },
+        {
+          "key": "Enter_Your_WebAPI_Client_ID_Here",
+          "value": "service.AppId"
+        }
+      ]
+    }
+  ]
+}
