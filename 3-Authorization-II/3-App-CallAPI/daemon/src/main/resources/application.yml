@@ -1,0 +1,8 @@
+app:
+  api:
+    base-address: http://localhost:8082
+  auth:
+    authority: https://login.microsoftonline.com/Enter_Your_Tenant_ID_Here/
+    client-id: Enter_Your_Client_ID_Here
+    client-secret: Enter_Your_Client_Secret_Here
+    scope: api://Enter_Your_WebAPI_Client_ID_Here/.default
